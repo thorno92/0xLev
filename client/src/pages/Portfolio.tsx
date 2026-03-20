@@ -9,25 +9,11 @@ import { PageTransition, FadeIn } from '@/components/PageTransition';
 import { TokenLogo } from '@/components/TokenLogo';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
 import { useStore } from '@/lib/store';
-import { trpc } from '@/lib/trpc';
 import { formatPrice, formatPercent, formatNumber, formatCompact } from '@/lib/format';
 import { Header } from '@/components/Header';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { toast } from 'sonner';
-
-/* ------------------------------------------------------------------ */
-/*  MOCK PORTFOLIO HOLDINGS                                            */
-/* ------------------------------------------------------------------ */
-const MOCK_HOLDINGS = [
-  { symbol: 'SOL', name: 'Solana', ticker: 'SOL', amount: 14.9023, price: 145.67, change: 9.57 },
-  { symbol: 'JUP', name: 'Jupiter', ticker: 'JUP', amount: 1240, price: 0.87, change: 4.21 },
-  { symbol: 'RENDER', name: 'Render', ticker: 'RENDER', amount: 42.5, price: 7.89, change: 12.1 },
-  { symbol: 'PYTH', name: 'Pyth Network', ticker: 'PYTH', amount: 890, price: 0.34, change: -1.8 },
-  { symbol: 'RAY', name: 'Raydium', ticker: 'RAY', amount: 65.2, price: 3.45, change: -1.12 },
-  { symbol: 'ORCA', name: 'Orca', ticker: 'ORCA', amount: 28.7, price: 4.12, change: 6.3 },
-  { symbol: 'WIF', name: 'dogwifhat', ticker: 'WIF', amount: 145, price: 1.23, change: 15.42 },
-  { symbol: 'BONK', name: 'Bonk', ticker: 'BONK', amount: 15000000, price: 0.00002134, change: -2.34 },
-];
+import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 
 /* ------------------------------------------------------------------ */
 /*  CONNECT WALLET STATE                                               */
@@ -157,38 +143,26 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState<TabId>('assets');
   const [timePeriod, setTimePeriod] = useState<'1D' | '7D' | '1M' | '1Y' | 'ALL'>('7D');
 
-  // Fetch real positions from server
-  const { data: serverPositions } = trpc.leverage.getPositions.useQuery(
-    { walletAddress: walletAddress ?? '' },
-    { enabled: !!walletAddress && walletConnected, refetchInterval: 10_000 },
-  );
-  const positions = serverPositions
-    ? (serverPositions as unknown as typeof openPositions)
-    : openPositions;
+  const positions = openPositions;
 
-  /* Build holdings from mock data */
+  // Real on-chain holdings via Solana RPC
+  const { holdings: realHoldings, totalValue: holdingsTotalValue, isLoading: holdingsLoading } = useWalletHoldings();
+
   const portfolioData = useMemo(() => {
-    const holdings = MOCK_HOLDINGS.map(h => ({
-      ...h,
-      value: h.amount * h.price,
-    }));
-    holdings.sort((a, b) => b.value - a.value);
-
-    const totalValue = holdings.reduce((s, h) => s + h.value, 0);
-    const totalPnl = holdings.reduce((s, h) => s + h.value * (h.change / 100), 0);
+    const totalValue = holdingsTotalValue;
+    const totalPnl = realHoldings.reduce((s, h) => s + h.value * (h.change / 100), 0);
     const totalPnlPct = totalValue > 0 ? (totalPnl / (totalValue - totalPnl)) * 100 : 0;
-
-    // Compute min/max from sparkline-like data
     const minPrice = totalValue * 0.94;
     const maxPrice = totalValue * 1.03;
 
-    const withAllocation = holdings.map(h => ({
+    const withAllocation = realHoldings.map(h => ({
       ...h,
+      ticker: h.ticker,
       allocation: totalValue > 0 ? (h.value / totalValue) * 100 : 0,
     }));
 
     return { totalValue, totalPnl, totalPnlPct, minPrice, maxPrice, holdings: withAllocation };
-  }, []);
+  }, [realHoldings, holdingsTotalValue]);
 
   const handleConnect = useCallback(() => {
     setVisible(true);
@@ -398,7 +372,23 @@ export default function Portfolio() {
               {/* --- ASSETS TAB --- */}
               {activeTab === 'assets' && (
                 <div>
+                  {holdingsLoading && portfolioData.holdings.length === 0 && (
+                    <div className="flex items-center justify-center py-16">
+                      <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mr-3" />
+                      <span className="text-[13px] text-muted-foreground/40">Loading holdings...</span>
+                    </div>
+                  )}
+
+                  {!holdingsLoading && portfolioData.holdings.length === 0 && (
+                    <div className="text-center py-16">
+                      <p className="text-[13px] text-muted-foreground/40">No token holdings found</p>
+                      <p className="text-[11px] text-muted-foreground/25 mt-1">Deposit SOL or SPL tokens to see them here</p>
+                    </div>
+                  )}
+
                   {/* Column headers */}
+                  {portfolioData.holdings.length > 0 && (
+                  <>
                   <div className="hidden sm:grid grid-cols-[minmax(140px,1.5fr)_90px_90px_100px_120px_130px_40px] items-center gap-3 px-3 py-3 border-b border-border/10">
                     <span className="text-[10px] text-muted-foreground/40 uppercase tracking-wider font-semibold">Name</span>
                     <span className="text-[10px] text-muted-foreground/40 uppercase tracking-wider font-semibold text-right">Allocation</span>
@@ -425,7 +415,7 @@ export default function Portfolio() {
                           className="hidden sm:grid grid-cols-[minmax(140px,1.5fr)_90px_90px_100px_120px_130px_40px] items-center gap-3 px-3 py-3.5 border-b border-border/6 hover:bg-secondary/15 transition-colors cursor-pointer group"
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <TokenLogo symbol={h.symbol} size={32} />
+                            <TokenLogo symbol={h.symbol} size={32} logoUrl={h.logoUrl} />
                             <div className="min-w-0">
                               <div className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors truncate">{h.name}</div>
                               <div className="text-[11px] text-muted-foreground/40 truncate">{h.ticker}</div>
@@ -465,7 +455,7 @@ export default function Portfolio() {
                         <div
                           className="sm:hidden flex items-center gap-3 px-3 py-3.5 border-b border-border/6 active:bg-secondary/15 transition-colors cursor-pointer"
                         >
-                          <TokenLogo symbol={h.symbol} size={36} />
+                          <TokenLogo symbol={h.symbol} size={36} logoUrl={h.logoUrl} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <span className="text-[14px] font-semibold text-foreground truncate">{h.name}</span>
@@ -482,6 +472,8 @@ export default function Portfolio() {
                       </React.Fragment>
                     );
                   })}
+                  </>
+                  )}
                 </div>
               )}
 

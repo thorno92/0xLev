@@ -19,9 +19,8 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { router, publicProcedure } from "../_core/trpc";
-import { getCachedAuth } from "../leverage-api";
+import { getCachedAuth, checkWallet } from "../leverage-api";
+import { logger } from "./audit";
 
 /* ------------------------------------------------------------------ */
 /*  Per-wallet rate limiting                                           */
@@ -36,7 +35,7 @@ interface WalletRateLimitEntry {
 // For horizontal scaling (multiple processes/containers), replace with
 // Redis-backed rate limiting (e.g. rate-limit-redis or ioredis + sliding window).
 const walletRateLimitMap = new Map<string, WalletRateLimitEntry>();
-const WALLET_RATE_LIMIT_MAX = 10;   // max operations per window
+const WALLET_RATE_LIMIT_MAX = 60;   // max operations per window
 const WALLET_RATE_LIMIT_WINDOW = 60_000; // 1 minute window
 
 // Clean up old entries periodically to prevent unbounded growth
@@ -79,23 +78,17 @@ function isWalletRateLimited(walletAddress: string): boolean {
  *   2. A valid (non-expired) JWT exists for that wallet
  *   3. The wallet is not exceeding the per-wallet rate limit
  *
- * Attach to any procedure that modifies state or moves funds:
- *   openPosition: walletProtectedProcedure.input(...).mutation(...)
+ * If the cached JWT has expired, transparently re-authenticates with the
+ * upstream API using checkWallet (no user signature needed).
  */
-export function requireWalletAuth<TInput extends { walletAddress: string }>(
+export async function requireWalletAuth<TInput extends { walletAddress: string }>(
   input: TInput,
   procedureName: string,
-): void {
+): Promise<void> {
   const { walletAddress } = input;
 
-  // Check JWT cache (expired entries return undefined)
-  const cached = getCachedAuth(walletAddress);
-  if (!cached) {
-    throw new TRPCError({
-      code: "PRECONDITION_FAILED",
-      message: "Wallet not connected to 0xLeverage. Call connectWallet first.",
-    });
-  }
+  // Try cache first, then transparent re-auth
+  await requireOxlJwt(walletAddress);
 
   // Per-wallet rate limit check
   if (isWalletRateLimited(walletAddress)) {
@@ -107,16 +100,23 @@ export function requireWalletAuth<TInput extends { walletAddress: string }>(
 }
 
 /**
- * Convenience: get cached auth or throw PRECONDITION_FAILED.
- * Use in procedures that need the JWT directly.
+ * Get cached auth for the wallet. If expired, transparently re-authenticates
+ * with the upstream API (checkWallet only needs the wallet address, not a
+ * user signature) so long-lived sessions never fail due to JWT expiry.
  */
-export function requireOxlJwt(walletAddress: string) {
+export async function requireOxlJwt(walletAddress: string) {
   const cached = getCachedAuth(walletAddress);
-  if (!cached) {
+  if (cached) return cached;
+
+  // Expired or missing — attempt silent re-auth
+  try {
+    const result = await checkWallet(walletAddress);
+    logger.info({ event: "jwt_auto_refreshed", wallet: walletAddress.slice(0, 4) + "..." + walletAddress.slice(-4) });
+    return { token: result.accessToken, tradeWallet: result.tradeWallet };
+  } catch {
     throw new TRPCError({
       code: "PRECONDITION_FAILED",
       message: "Wallet not connected to 0xLeverage. Call connectWallet first.",
     });
   }
-  return cached;
 }

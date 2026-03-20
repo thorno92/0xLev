@@ -117,7 +117,20 @@ const connectWalletLimiter = rateLimit({
 /*  Content Security Policy                                            */
 /* ------------------------------------------------------------------ */
 
+function analyticsOriginFromEnv(): string | null {
+  const raw = process.env.VITE_ANALYTICS_ENDPOINT?.trim();
+  if (!raw) return null;
+  try {
+    const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    return new URL(href).origin;
+  } catch {
+    return null;
+  }
+}
+
 function buildCspHeader(): string {
+  const analyticsOrigin = analyticsOriginFromEnv();
+
   // unsafe-eval is ONLY included in development for Vite HMR.
   // In production, eval is completely disallowed.
   const scriptSrc = isProd
@@ -139,6 +152,29 @@ function buildCspHeader(): string {
         "https://cdn.jsdelivr.net",
       ];
 
+  if (analyticsOrigin) {
+    scriptSrc.push(analyticsOrigin);
+  }
+
+  const connectSrc = [
+    "'self'",
+    "https://*.tradingview.com",
+    "https://api.coingecko.com",
+    "https://pro-api.coingecko.com",
+    "https://maps.googleapis.com",
+    "wss://*.tradingview.com",
+    "https://api.mainnet-beta.solana.com",
+    "https://api.devnet.solana.com",
+    "wss://api.mainnet-beta.solana.com",
+    "wss://api.devnet.solana.com",
+    "https://*.helius-rpc.com",
+    "wss://*.helius-rpc.com",
+    "https://api.jup.ag",
+  ];
+  if (analyticsOrigin) {
+    connectSrc.push(analyticsOrigin);
+  }
+
   const directives = [
     "default-src 'self'",
 
@@ -150,14 +186,14 @@ function buildCspHeader(): string {
     // Styles: self + inline + Google Fonts
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
 
-    // Images: self + data + blob + known CDN sources
-    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://assets.coingecko.com https://*.tradingview.com https://maps.googleapis.com https://maps.gstatic.com",
+    // Images: favicons/OG use CloudFront; token lists often use GitHub raw; wallet UIs may use misc HTTPS CDNs
+    "img-src 'self' data: blob: https: http:",
 
     // Fonts: self + Google Fonts
     "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
 
-    // Connections: self + trading APIs + CoinGecko + Solana RPC
-    "connect-src 'self' https://*.tradingview.com https://api.coingecko.com https://pro-api.coingecko.com https://maps.googleapis.com wss://*.tradingview.com https://api.mainnet-beta.solana.com https://api.devnet.solana.com wss://api.mainnet-beta.solana.com",
+    // Connections: self + trading APIs + CoinGecko + Solana RPC (+ optional Umami)
+    `connect-src ${connectSrc.join(" ")}`,
 
     // Frames: TradingView charts
     "frame-src 'self' https://s3.tradingview.com https://www.tradingview.com https://www.tradingview-widget.com https://*.tradingview-widget.com https://*.tradingview.com https://maps.googleapis.com",

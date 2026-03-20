@@ -9,12 +9,15 @@ import { Header } from '@/components/Header';
 import { useStore } from '@/lib/store';
 import { trpc } from '@/lib/trpc';
 import { formatPrice, formatNumber, formatPercent, formatTimeAgo } from '@/lib/format';
-import { Xmark } from 'iconoir-react';
+import { Input } from '@/components/ui/input';
+import { Xmark, EditPencil } from 'iconoir-react';
 import { TokenLogo } from '@/components/TokenLogo';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
+import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
+import { useTrackPositions } from '@/hooks/useTrackPositions';
 
 /* ------------------------------------------------------------------ */
 /*  SECTION LABEL                                                      */
@@ -60,19 +63,17 @@ function getHealthTextClass(dist: number) {
 /*  MAIN                                                               */
 /* ------------------------------------------------------------------ */
 export default function Positions() {
-  const { openPositions, removeOpenPosition, addClosedPosition, walletConnected, walletAddress } = useStore();
+  const { openPositions, removeOpenPosition, addClosedPosition, updatePositionTpSl, walletConnected, walletAddress } = useStore();
   const { setVisible } = useWalletModal();
   const closeMutation = trpc.leverage.closePosition.useMutation();
+  const updateTpSlMutation = trpc.leverage.updateTpSl.useMutation();
   const [isClosing, setIsClosing] = useState<string | null>(null);
+  const [editingTpSl, setEditingTpSl] = useState<{ tradeId: string; tp: string; sl: string } | null>(null);
 
-  // Fetch real positions from server
-  const { data: serverPositions } = trpc.leverage.getPositions.useQuery(
-    { walletAddress: walletAddress ?? '' },
-    { enabled: !!walletAddress && walletConnected, refetchInterval: 10_000 },
-  );
-  const positions = serverPositions
-    ? (serverPositions as unknown as typeof openPositions)
-    : openPositions;
+  useTradeWalletBalance();
+  useTrackPositions();
+
+  const positions = openPositions;
 
   const [, setLocation] = useLocation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -104,6 +105,26 @@ export default function Positions() {
       toast.error(message);
     } finally {
       setIsClosing(null);
+    }
+  };
+
+  const handleUpdateTpSl = async () => {
+    if (!walletAddress || !editingTpSl) return;
+    const tp = editingTpSl.tp ? parseFloat(editingTpSl.tp) : undefined;
+    const sl = editingTpSl.sl ? parseFloat(editingTpSl.sl) : undefined;
+    try {
+      await updateTpSlMutation.mutateAsync({
+        walletAddress,
+        tradeId: editingTpSl.tradeId,
+        tp,
+        sl,
+      });
+      updatePositionTpSl(editingTpSl.tradeId, tp, sl);
+      toast.success('TP/SL updated');
+      setEditingTpSl(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update TP/SL';
+      toast.error(message);
     }
   };
 
@@ -281,7 +302,7 @@ export default function Positions() {
                         </div>
                         <div className="text-right">
                           <div className={`font-data text-sm font-semibold ${isProfit ? 'text-success' : 'text-destructive'}`}>
-                            {isProfit ? '+' : ''}{formatNumber(pnl, 2)}
+                            {isProfit ? '+' : ''}{formatPrice(pnl)}
                           </div>
                           <div className={`font-mono text-[10px] ${isProfit ? 'text-success/60' : 'text-destructive/60'}`}>
                             {formatPercent(pos.liveProfitPercent ?? 0)}
@@ -348,7 +369,7 @@ export default function Positions() {
                           </div>
                           <div className="text-right">
                             <div className={`font-data text-base font-semibold ${isProfit ? 'text-success' : 'text-destructive'}`}>
-                              {isProfit ? '+' : ''}{formatNumber(pnl, 2)}
+                              {isProfit ? '+' : ''}{formatPrice(pnl)}
                             </div>
                             <div className={`font-mono text-[10px] ${isProfit ? 'text-success/60' : 'text-destructive/60'}`}>
                               {formatPercent(pos.liveProfitPercent ?? 0)}
@@ -371,6 +392,67 @@ export default function Positions() {
                                 </div>
                               ))}
                             </div>
+
+                            {/* TP/SL Edit */}
+                            {editingTpSl?.tradeId === pos.trade_id ? (
+                              <div className="grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+                                <div>
+                                  <div className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground mb-1">TAKE PROFIT</div>
+                                  <Input
+                                    type="number"
+                                    placeholder="TP price"
+                                    value={editingTpSl.tp}
+                                    onChange={(e) => setEditingTpSl({ ...editingTpSl, tp: e.target.value })}
+                                    className="h-7 bg-secondary border-border text-foreground font-data text-[11px]"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground mb-1">STOP LOSS</div>
+                                  <Input
+                                    type="number"
+                                    placeholder="SL price"
+                                    value={editingTpSl.sl}
+                                    onChange={(e) => setEditingTpSl({ ...editingTpSl, sl: e.target.value })}
+                                    className="h-7 bg-secondary border-border text-foreground font-data text-[11px]"
+                                  />
+                                </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateTpSl(); }}
+                                  disabled={updateTpSlMutation.isPending}
+                                  className="font-mono text-[10px] tracking-[0.1em] uppercase py-2 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all disabled:opacity-50"
+                                >
+                                  {updateTpSlMutation.isPending ? 'SAVING...' : 'SAVE'}
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setEditingTpSl(null); }}
+                                  className="font-mono text-[10px] tracking-[0.1em] uppercase py-2 border border-border text-muted-foreground hover:text-foreground transition-all"
+                                >
+                                  CANCEL
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-between">
+                                <div className="flex gap-4 text-[10px]">
+                                  <span className="text-muted-foreground">TP: <span className="text-success font-data">{pos.tp ? formatPrice(pos.tp) : '---'}</span></span>
+                                  <span className="text-muted-foreground">SL: <span className="text-destructive font-data">{pos.sl ? formatPrice(pos.sl) : '---'}</span></span>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingTpSl({
+                                      tradeId: pos.trade_id,
+                                      tp: pos.tp?.toString() ?? '',
+                                      sl: pos.sl?.toString() ?? '',
+                                    });
+                                  }}
+                                  className="text-muted-foreground hover:text-primary transition-colors p-1"
+                                  title="Edit TP/SL"
+                                >
+                                  <EditPencil className="w-3 h-3" />
+                                </button>
+                              </div>
+                            )}
+
                             <div>
                               <div className="flex justify-between mb-1">
                                 <span className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground">LIQ DISTANCE</span>

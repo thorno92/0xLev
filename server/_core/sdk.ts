@@ -201,7 +201,7 @@ class SDKServer {
     cookieValue: string | undefined | null
   ): Promise<{ openId: string; appId: string; name: string } | null> {
     if (!cookieValue) {
-      console.warn("[Auth] Missing session cookie");
+      // Expected for wallet-only / anonymous users — not an error (avoid log spam per request).
       return null;
     }
 

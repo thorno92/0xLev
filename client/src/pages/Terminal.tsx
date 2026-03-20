@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { useRoute, useLocation } from 'wouter';
 import { Header } from '@/components/Header';
 import { TokenPriceBar } from '@/components/TokenPriceBar';
 import { ChartPanel } from '@/components/ChartPanel';
@@ -7,6 +8,7 @@ import { BottomPanel } from '@/components/BottomPanel';
 import { TokenLogo } from '@/components/TokenLogo';
 import { WhitelistStatus } from '@/components/WhitelistStatus';
 import { useStore } from '@/lib/store';
+import { allTokens } from '@/lib/mockData';
 import { formatPrice, formatPercent, formatNumber } from '@/lib/format';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -15,6 +17,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid } from 'iconoir-react';
+import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
+import { useTrackPositions } from '@/hooks/useTrackPositions';
 
 const leveragePresets = [2, 5, 10, 25, 50, 100];
 const slippagePresets = [0.5, 1.0, 2.0, 5.0];
@@ -92,14 +96,65 @@ export default function Terminal() {
     walletAddress,
     walletBalance,
     selectedToken,
+    setSelectedToken,
     openPositions,
     addOpenPosition,
     removeOpenPosition,
     addClosedPosition,
   } = useStore();
 
+  // URL ↔ token sync
+  const isSolanaAddr = (s: string) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
+  const [, matchTerminal] = useRoute('/terminal/:address');
+  const [, matchRoot] = useRoute('/:address');
+  const rawAddr = matchTerminal?.address ?? matchRoot?.address;
+  const urlAddress = rawAddr && isSolanaAddr(rawAddr) ? rawAddr : undefined;
+  const [location, setLocation] = useLocation();
+  const syncedFromUrl = useRef(false);
+
+  // On mount / URL change: resolve the address to a token and select it
+  useEffect(() => {
+    if (!urlAddress) return;
+    if (selectedToken?.address === urlAddress) return;
+
+    const known = allTokens.find((t) => t.address === urlAddress);
+    if (known) {
+      setSelectedToken(known);
+    } else {
+      setSelectedToken({
+        symbol: urlAddress.slice(0, 4) + '…',
+        name: 'Unknown Token',
+        address: urlAddress,
+        price: 0,
+        change24h: 0,
+        volume24h: 0,
+        marketCap: 0,
+        liquidity: 0,
+        chain: 'solana',
+      });
+    }
+    syncedFromUrl.current = true;
+  }, [urlAddress]);
+
+  // When selected token changes (e.g. via search modal), update the URL
+  useEffect(() => {
+    if (!selectedToken) return;
+    if (syncedFromUrl.current) {
+      syncedFromUrl.current = false;
+      return;
+    }
+    const base = location.startsWith('/terminal') ? '/terminal/' : '/';
+    const target = `${base}${selectedToken.address}`;
+    if (location !== target) {
+      setLocation(target, { replace: true });
+    }
+  }, [selectedToken?.address]);
+
   const openMutation = trpc.leverage.openPosition.useMutation();
   const closeMutation = trpc.leverage.closePosition.useMutation();
+
+  useTradeWalletBalance();
+  useTrackPositions();
 
   const [amount, setAmount] = useState('');
   const [leverage, setLeverage] = useState(5);
@@ -112,6 +167,18 @@ export default function Terminal() {
   const amountNum = parseFloat(amount) || 0;
   const positionSize = tradingMode === 'leverage' ? amountNum * leverage : amountNum;
   const tradingFee = positionSize * 0.001;
+
+  // Live quote from upstream API — replaces client-side estimates
+  const quoteEnabled = !!walletAddress && walletConnected && !!selectedToken?.address && amountNum > 0 && tradingMode === 'leverage';
+  const { data: quoteData } = trpc.leverage.getQuote.useQuery(
+    {
+      walletAddress: walletAddress!,
+      contractAddress: selectedToken?.address ?? '',
+      leverage,
+      initialAmount: amountNum,
+    },
+    { enabled: quoteEnabled, staleTime: 5_000, refetchInterval: 15_000, retry: 1 },
+  );
 
   const liquidationPrice = useMemo(() => {
     if (!entryPrice || leverage <= 1) return 0;
@@ -155,7 +222,7 @@ export default function Terminal() {
 
   // Positions for right panel — real data from store
   const tokenPositions = openPositions.filter(
-    (p) => p.symbol === (selectedToken?.symbol ?? 'SOL')
+    (p) => p.contract_address === selectedToken?.address
   );
 
   // Quick amount handler
@@ -206,9 +273,12 @@ export default function Terminal() {
         contract_address: selectedToken.address,
         amount: amountNum,
         leverage,
-        entryPrice,
+        entryPrice: quoteData?.current_price ?? entryPrice,
+        liquidationPrice: quoteData?.liquidation_price ?? liquidationPrice,
         side: orderSide,
         openedAt: Date.now(),
+        tp,
+        sl,
       });
       toast.success(`${isBuy ? 'Buy' : 'Sell'} position opened`);
       setAmount('');
@@ -598,13 +668,17 @@ export default function Terminal() {
 
                 {/* Order Summary */}
                 <div className="bg-secondary/40 rounded p-2 space-y-1">
-                  <SummaryRow label="Entry Price" value={formatPrice(entryPrice)} />
+                  <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
                   <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
-                  <SummaryRow label="Trading Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} muted={amountNum <= 0} />
+                  {quoteData?.trade_cost != null && amountNum > 0 ? (
+                    <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />
+                  ) : (
+                    <SummaryRow label="Est. Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} muted={amountNum <= 0} />
+                  )}
                   {tradingMode === 'leverage' && (
                     <SummaryRow
                       label="Liq. Price"
-                      value={amountNum > 0 ? formatPrice(liquidationPrice) : 'N/A'}
+                      value={amountNum > 0 ? formatPrice(quoteData?.liquidation_price ?? liquidationPrice) : 'N/A'}
                       warning={amountNum > 0}
                       muted={amountNum <= 0}
                     />
@@ -927,11 +1001,15 @@ export default function Terminal() {
 
             {/* Order Summary */}
             <div className="bg-secondary/40 rounded p-2.5 space-y-1">
-              <SummaryRow label="Entry Price" value={formatPrice(entryPrice)} />
+              <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} />
-              <SummaryRow label="Trading Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} />
+              {quoteData?.trade_cost != null && amountNum > 0 ? (
+                <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />
+              ) : (
+                <SummaryRow label="Est. Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} />
+              )}
               {tradingMode === 'leverage' && (
-                <SummaryRow label="Liq. Price" value={amountNum > 0 ? formatPrice(liquidationPrice) : 'N/A'} warning />
+                <SummaryRow label="Liq. Price" value={amountNum > 0 ? formatPrice(quoteData?.liquidation_price ?? liquidationPrice) : 'N/A'} warning />
               )}
             </div>
 

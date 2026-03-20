@@ -28,11 +28,62 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
+import { SignJWT, jwtVerify } from "jose";
 import { publicProcedure, router } from "../_core/trpc";
 import * as api from "../leverage-api";
 import * as birdeye from "../birdeye";
 import { requireOxlJwt, requireWalletAuth } from "../middleware/walletAuth";
-import { auditLog, maskWallet, requestTimer } from "../middleware/audit";
+import { auditLog, maskWallet, requestTimer, logger } from "../middleware/audit";
+import {
+  WALLET_SESSION_COOKIE,
+  WALLET_SESSION_TTL_S,
+  getWalletSessionCookieOptions,
+} from "../_core/cookies";
+
+/* ------------------------------------------------------------------ */
+/*  Session JWT helpers                                                */
+/* ------------------------------------------------------------------ */
+
+function getSessionSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("JWT_SECRET not set");
+  return new TextEncoder().encode(secret);
+}
+
+async function mintSessionJwt(walletAddress: string): Promise<string> {
+  return new SignJWT({ wallet: walletAddress })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${WALLET_SESSION_TTL_S}s`)
+    .sign(getSessionSecret());
+}
+
+function extractCookie(
+  req: import("express").Request,
+  name: string,
+): string | undefined {
+  const header = req.headers.cookie;
+  if (!header) return undefined;
+  for (const pair of header.split(";")) {
+    const [key, ...rest] = pair.trim().split("=");
+    if (key?.trim() === name) return rest.join("=").trim();
+  }
+  return undefined;
+}
+
+async function verifySessionJwt(
+  token: string,
+): Promise<{ wallet: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSessionSecret());
+    if (typeof payload.wallet === "string" && payload.wallet.length >= 32) {
+      return { wallet: payload.wallet };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /*  Shared Zod Schemas                                                 */
@@ -242,6 +293,15 @@ export const leverageRouter = router({
       try {
         const result = await api.checkWallet(input.walletAddress);
         clearLockout(input.walletAddress);
+
+        // 5. Mint a session cookie so the user doesn't re-sign on every page load
+        const sessionToken = await mintSessionJwt(input.walletAddress);
+        ctx.res.cookie(
+          WALLET_SESSION_COOKIE,
+          sessionToken,
+          getWalletSessionCookieOptions(ctx.req),
+        );
+
         auditLog({
           requestId: reqId,
           walletAddress: maskWallet(input.walletAddress),
@@ -265,6 +325,58 @@ export const leverageRouter = router({
       }
     }),
 
+  /**
+   * Resume an existing session from the wallet_session cookie.
+   * Returns the wallet address and trade wallet if the session is valid,
+   * or null values if not (no error — client falls back to signature flow).
+   */
+  resumeSession: publicProcedure.query(async ({ ctx }) => {
+    const token = extractCookie(ctx.req, WALLET_SESSION_COOKIE);
+    if (!token) return { walletAddress: null, tradeWallet: null };
+
+    const session = await verifySessionJwt(token);
+    if (!session) return { walletAddress: null, tradeWallet: null };
+
+    // Check if the upstream 0xL JWT is still cached
+    const cached = api.getCachedAuth(session.wallet);
+    if (cached) {
+      logger.info({
+        event: "session_resumed",
+        wallet: maskWallet(session.wallet),
+        source: "cache",
+      });
+      return { walletAddress: session.wallet, tradeWallet: cached.tradeWallet };
+    }
+
+    // Upstream JWT expired or server restarted — silently re-authenticate
+    try {
+      const result = await api.checkWallet(session.wallet);
+      logger.info({
+        event: "session_resumed",
+        wallet: maskWallet(session.wallet),
+        source: "reauth",
+      });
+      return { walletAddress: session.wallet, tradeWallet: result.tradeWallet };
+    } catch {
+      // Upstream failed — clear the stale session cookie
+      ctx.res.clearCookie(WALLET_SESSION_COOKIE, { path: "/" });
+      return { walletAddress: null, tradeWallet: null };
+    }
+  }),
+
+  /** Disconnect wallet — clears session cookie and cached auth */
+  disconnectWallet: publicProcedure
+    .input(z.object({ walletAddress: walletAddressSchema }))
+    .mutation(async ({ input, ctx }) => {
+      api.clearCachedAuth(input.walletAddress);
+      ctx.res.clearCookie(WALLET_SESSION_COOKIE, { path: "/" });
+      logger.info({
+        event: "wallet_disconnected",
+        wallet: maskWallet(input.walletAddress),
+      });
+      return { success: true };
+    }),
+
   /** Get quote for a leveraged trade */
   getQuote: publicProcedure
     .input(
@@ -276,8 +388,8 @@ export const leverageRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      requireWalletAuth(input, "getQuote");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "getQuote");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.getQuote(token, input.contractAddress, input.leverage, input.initialAmount);
     }),
 
@@ -285,9 +397,26 @@ export const leverageRouter = router({
   getSolBalance: publicProcedure
     .input(z.object({ walletAddress: walletAddressSchema }))
     .query(async ({ input }) => {
-      requireWalletAuth(input, "getSolBalance");
-      const { token } = requireOxlJwt(input.walletAddress);
-      return api.getSolBalance(token);
+      await requireWalletAuth(input, "getSolBalance");
+      const { token } = await requireOxlJwt(input.walletAddress);
+      try {
+        return await api.getSolBalance(token);
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        const data = (err as { response?: { data?: unknown } }).response?.data;
+        const msg = err instanceof Error ? err.message : "unknown";
+        logger.error({
+          event: "getSolBalance_failed",
+          wallet: maskWallet(input.walletAddress),
+          upstreamStatus: status,
+          upstreamData: data,
+          error: msg,
+        });
+        throw new TRPCError({
+          code: status === 401 ? "UNAUTHORIZED" : "INTERNAL_SERVER_ERROR",
+          message: `Trade wallet balance unavailable (upstream ${status ?? "error"})`,
+        });
+      }
     }),
 
   /** Check if a token is whitelisted for trading */
@@ -299,8 +428,8 @@ export const leverageRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      requireWalletAuth(input, "checkWhitelist");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "checkWhitelist");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.checkWhitelist(token, input.contractAddress);
     }),
 
@@ -313,8 +442,8 @@ export const leverageRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      requireWalletAuth(input, "requestWhitelist");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "requestWhitelist");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.requestWhitelist(token, input.contractAddress);
     }),
 
@@ -337,8 +466,8 @@ export const leverageRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      requireWalletAuth(input, "openPosition");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "openPosition");
+      const { token } = await requireOxlJwt(input.walletAddress);
       const timer = requestTimer();
       const reqId = (ctx as { requestId?: string }).requestId ?? "unknown";
 
@@ -368,14 +497,25 @@ export const leverageRouter = router({
         });
 
         return result;
-      } catch (err) {
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        const data = (err as { response?: { data?: unknown } }).response?.data;
+        const msg = err instanceof Error ? err.message : "unknown";
+        logger.error({
+          event: "openPosition_failed",
+          wallet: maskWallet(input.walletAddress),
+          upstreamStatus: status,
+          upstreamData: data,
+          error: msg,
+          params: { contractAddress: input.contractAddress, leverage: input.leverage, amount: input.amount },
+        });
         auditLog({
           requestId: reqId,
           walletAddress: maskWallet(input.walletAddress),
           procedure: "openPosition",
           params: { contractAddress: input.contractAddress, leverage: input.leverage },
           outcome: "error",
-          errorCode: err instanceof TRPCError ? err.code : "UNKNOWN",
+          errorCode: status ? `HTTP_${status}` : (err instanceof TRPCError ? err.code : "UNKNOWN"),
           durationMs: timer.stop(),
         });
         throw err;
@@ -386,8 +526,8 @@ export const leverageRouter = router({
   getPositions: publicProcedure
     .input(z.object({ walletAddress: walletAddressSchema }))
     .query(async ({ input }) => {
-      requireWalletAuth(input, "getPositions");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "getPositions");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.getOpenPositions(token);
     }),
 
@@ -400,8 +540,8 @@ export const leverageRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      requireWalletAuth(input, "getTradeInfo");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "getTradeInfo");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.getTradeInfo(token, input.tradeId);
     }),
 
@@ -414,8 +554,8 @@ export const leverageRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      requireWalletAuth(input, "trackTrade");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "trackTrade");
+      const { token } = await requireOxlJwt(input.walletAddress);
       return api.trackTrade(token, input.tradeId);
     }),
 
@@ -430,8 +570,8 @@ export const leverageRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      requireWalletAuth(input, "updateTpSl");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "updateTpSl");
+      const { token } = await requireOxlJwt(input.walletAddress);
       const timer = requestTimer();
       const reqId = (ctx as { requestId?: string }).requestId ?? "unknown";
 
@@ -475,8 +615,8 @@ export const leverageRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      requireWalletAuth(input, "closePosition");
-      const { token } = requireOxlJwt(input.walletAddress);
+      await requireWalletAuth(input, "closePosition");
+      const { token } = await requireOxlJwt(input.walletAddress);
       const timer = requestTimer();
       const reqId = (ctx as { requestId?: string }).requestId ?? "unknown";
 

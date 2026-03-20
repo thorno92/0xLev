@@ -31,6 +31,8 @@ export interface OpenPosition {
   liquidationPrice?: number;
   side: OrderSide;
   openedAt: number;
+  tp?: number;
+  sl?: number;
 }
 
 export interface ClosedPosition extends OpenPosition {
@@ -71,6 +73,7 @@ interface AppState {
   setOpenPositions: (positions: OpenPosition[]) => void;
   removeOpenPosition: (tradeId: string) => void;
   updatePositionProfit: (tradeId: string, profit: number, profitPercent: number, currentPrice: number) => void;
+  updatePositionTpSl: (tradeId: string, tp?: number, sl?: number) => void;
   addClosedPosition: (position: ClosedPosition) => void;
 }
 
@@ -124,6 +127,11 @@ export const useStore = create<AppState>()(
           p.trade_id === tradeId
             ? { ...p, liveProfit: profit, liveProfitPercent: profitPercent, currentPrice }
             : p
+        ),
+      })),
+      updatePositionTpSl: (tradeId, tp, sl) => set((s) => ({
+        openPositions: s.openPositions.map((p) =>
+          p.trade_id === tradeId ? { ...p, tp, sl } : p
         ),
       })),
       addClosedPosition: (position) => set((s) => ({

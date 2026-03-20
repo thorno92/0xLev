@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'wouter';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Search, ArrowUpRightCircleSolid, ArrowDownRightCircleSolid } from 'iconoir-react';
@@ -16,15 +17,34 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { setSelectedToken } = useStore();
+  const [location, setLocation] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   const { allTokens } = useLivePrices();
 
+  const lowerQuery = query.toLowerCase();
   const filtered = allTokens.filter(
     (t) =>
-      t.symbol.toLowerCase().includes(query.toLowerCase()) ||
-      t.name.toLowerCase().includes(query.toLowerCase()) ||
-      t.address.toLowerCase().includes(query.toLowerCase())
+      t.symbol.toLowerCase().includes(lowerQuery) ||
+      t.name.toLowerCase().includes(lowerQuery) ||
+      t.address.toLowerCase().includes(lowerQuery)
   );
+
+  const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(query.trim());
+  const exactMatch = isSolanaAddress && filtered.some((t) => t.address === query.trim());
+  const customToken: TokenInfo | null =
+    isSolanaAddress && !exactMatch
+      ? {
+          symbol: query.trim().slice(0, 4) + '…',
+          name: 'Unknown Token',
+          address: query.trim(),
+          price: 0,
+          change24h: 0,
+          volume24h: 0,
+          marketCap: 0,
+          liquidity: 0,
+          chain: 'solana',
+        }
+      : null;
 
   useEffect(() => {
     if (open) {
@@ -36,6 +56,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
 
   const handleSelect = (token: TokenInfo) => {
     setSelectedToken(token);
+    setLocation(`/${token.address}`);
     onOpenChange(false);
   };
 
@@ -93,12 +114,29 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
 
         {/* Results */}
         <div className="max-h-[400px] overflow-y-auto">
-          {filtered.length === 0 ? (
+          {filtered.length === 0 && !customToken ? (
             <div className="py-8 text-center text-[13px] text-muted-foreground">
               No tokens found
             </div>
           ) : (
             <div className="py-1">
+              {customToken && (
+                <button
+                  onClick={() => handleSelect(customToken)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-left transition-colors active:bg-secondary ${
+                    filtered.length === 0 ? 'bg-secondary' : 'hover:bg-secondary/50'
+                  } border-b border-border`}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-bold text-primary">?</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium text-foreground">Use contract address</div>
+                    <div className="text-[10px] text-muted-foreground font-data truncate">{query.trim()}</div>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-secondary border border-border">
+                    Custom
+                  </div>
+                </button>
+              )}
               {filtered.map((token, i) => {
                 const isPositive = token.change24h >= 0;
                 return (

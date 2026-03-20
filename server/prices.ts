@@ -10,6 +10,7 @@
  */
 
 import { z } from "zod";
+import axios from "axios";
 import { logger } from "./middleware/audit";
 
 /* ------------------------------------------------------------------ */
@@ -143,20 +144,12 @@ export async function fetchLivePrices(): Promise<LivePriceData[]> {
   const url = buildCoinGeckoUrl(ids);
 
   try {
-    const response = await fetch(url, { headers: buildCoinGeckoHeaders() });
+    const response = await axios.get(url, {
+      headers: buildCoinGeckoHeaders(),
+      timeout: 10_000,
+    });
 
-    if (!response.ok) {
-      logger.warn({
-        event: "coingecko_api_error",
-        status: response.status,
-        statusText: response.statusText,
-        usingCache: priceCache.length > 0,
-      });
-      if (priceCache.length > 0) return priceCache;
-      throw new Error(`CoinGecko API returned ${response.status}`);
-    }
-
-    const rawData = await response.json();
+    const rawData = response.data;
     const parseResult = coinGeckoResponseSchema.safeParse(rawData);
 
     if (!parseResult.success) {
@@ -208,4 +201,15 @@ export async function getLivePriceMap(): Promise<Map<string, LivePriceData>> {
     map.set(p.symbol, p);
   }
   return map;
+}
+
+/** Quick SOL/USD lookup from the CoinGecko cache — never throws. */
+export async function getSolUsdPrice(): Promise<number> {
+  try {
+    const prices = await fetchLivePrices();
+    const sol = prices.find((p) => p.symbol === "SOL");
+    return sol?.price ?? 0;
+  } catch {
+    return 0;
+  }
 }

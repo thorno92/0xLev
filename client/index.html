@@ -53,10 +53,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <!-- Umami: injected from main.tsx only when VITE_ANALYTICS_* are set (empty env was loading /umami as HTML). -->
   </body>
 
 </html>

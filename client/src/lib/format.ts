@@ -14,6 +14,17 @@ export function formatPrice(price: number, decimals?: number): string {
   return `${sign}$${abs.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
 }
 
+export function formatPriceSol(price: number): string {
+  if (price === 0) return '0 SOL';
+  const abs = Math.abs(price);
+  const sign = price < 0 ? '-' : '';
+  if (abs < 0.00000001) return `${sign}${abs.toExponential(2)} SOL`;
+  if (abs < 0.0001) return `${sign}${abs.toFixed(10)} SOL`;
+  if (abs < 0.01) return `${sign}${abs.toFixed(8)} SOL`;
+  if (abs < 1) return `${sign}${abs.toFixed(6)} SOL`;
+  return `${sign}${abs.toFixed(4)} SOL`;
+}
+
 export function formatNumber(num: number, decimals: number = 2): string {
   return num.toLocaleString('en-US', {
     minimumFractionDigits: decimals,

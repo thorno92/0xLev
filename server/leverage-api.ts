@@ -10,7 +10,7 @@
  *   - Expired entries are evicted on read and by a periodic cleanup job
  *   - Upstream API responses are validated with Zod schemas (not blindly cast)
  *   - Missing env vars cause a fast startup failure instead of silent empty string
- *   - Authorization header sends raw JWT (per 0xL API spec: "Authorization: <jwt_token>")
+ *   - Authorization header sends "Bearer <jwt>" (docs show raw, but API rejects without Bearer prefix)
  *   - All errors are logged with structured context via the audit logger
  */
 
@@ -131,8 +131,7 @@ function createClient(jwt?: string) {
     "Content-Type": "application/json",
   };
   if (jwt) {
-    // 0xLeverage API expects the raw JWT (no "Bearer " prefix)
-    headers["Authorization"] = jwt;
+    headers["Authorization"] = `Bearer ${jwt}`;
   }
   return axios.create({
     baseURL: getApiBaseUrl(),
@@ -157,6 +156,7 @@ function parseApiResponse<T>(schema: z.ZodType<T>, data: unknown, context: strin
       event: "upstream_response_invalid",
       context,
       issues: result.error.issues,
+      receivedData: data,
     });
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
@@ -180,13 +180,13 @@ const checkWalletResponseSchema = z.object({
 });
 
 const quoteResponseSchema = z.object({
-  trade_cost: z.number(),
-  liquidation_price: z.number(),
-  current_price: z.number(),
-});
+  trade_cost: z.coerce.number(),
+  liquidation_price: z.coerce.number(),
+  current_price: z.coerce.number(),
+}).passthrough();
 
 const solBalanceResponseSchema = z.object({
-  balance_sol: z.number(),
+  balance_sol: z.coerce.number(),
 });
 
 const whitelistCheckResponseSchema = z.object({
@@ -206,14 +206,15 @@ const openPositionResponseSchema = z.object({
 const positionSchema = z.object({
   trade_id: z.string(),
   contract_address: z.string(),
-  leverage: z.number(),
-  amount: z.number(),
-  entry_price: z.number(),
-  current_price: z.number().optional(),
-  pnl: z.number().optional(),
-  tp: z.number().optional(),
-  sl: z.number().optional(),
-}).passthrough(); // allow extra fields from future API versions
+  leverage: z.coerce.number(),
+  amount: z.coerce.number(),
+  entryPrice: z.coerce.number(),
+  liveProfit: z.coerce.number().optional(),
+  openedAt: z.coerce.number().optional(),
+  symbol: z.string().optional(),
+  tp: z.coerce.number().optional(),
+  sl: z.coerce.number().optional(),
+}).passthrough();
 
 const openPositionsResponseSchema = z.object({
   success: z.boolean(),
@@ -226,9 +227,11 @@ const tradeInfoResponseSchema = z.object({
 });
 
 const trackTradeResponseSchema = z.object({
-  trade_id: z.string(),
-  liveProfit: z.number(),
-}).passthrough(); // allow extra fields from future API versions
+  trade_id: z.string().optional(),
+  tradeId: z.string().optional(),
+  liveProfit: z.coerce.number(),
+  currentPrice: z.coerce.number().optional(),
+}).passthrough();
 
 const updateTpSlResponseSchema = z.object({
   success: z.boolean().optional(),

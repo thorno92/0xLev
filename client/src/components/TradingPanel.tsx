@@ -12,6 +12,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { WhitelistStatus } from './WhitelistStatus';
 import { TokenLogo } from './TokenLogo';
+import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 
 const leveragePresets = [2, 5, 10, 25, 50, 100];
 const slippagePresets = [0.5, 1.0, 2.0, 5.0];
@@ -46,17 +47,24 @@ export function TradingPanel() {
   const openMutation = trpc.leverage.openPosition.useMutation();
   const closeMutation = trpc.leverage.closePosition.useMutation();
 
-  // Fetch real positions from server when wallet is connected
-  const { data: serverPositions } = trpc.leverage.getPositions.useQuery(
-    { walletAddress: walletAddress ?? '' },
-    { enabled: !!walletAddress && walletConnected, refetchInterval: 10_000 },
-  );
+  useTradeWalletBalance();
 
   const entryPrice = selectedToken?.price ?? 0;
   const amountNum = parseFloat(amount) || 0;
   const positionSize = tradingMode === 'leverage' ? amountNum * leverage : amountNum;
-
   const tradingFee = positionSize * 0.001;
+
+  // Live quote from upstream API
+  const quoteEnabled = !!walletAddress && walletConnected && !!selectedToken?.address && amountNum > 0 && tradingMode === 'leverage';
+  const { data: quoteData } = trpc.leverage.getQuote.useQuery(
+    {
+      walletAddress: walletAddress!,
+      contractAddress: selectedToken?.address ?? '',
+      leverage,
+      initialAmount: amountNum,
+    },
+    { enabled: quoteEnabled, staleTime: 5_000, refetchInterval: 15_000, retry: 1 },
+  );
   const liquidationPrice = useMemo(() => {
     if (!entryPrice || leverage <= 1) return 0;
     if (orderSide === 'buy') {
@@ -102,16 +110,18 @@ export function TradingPanel() {
         tp,
         sl,
       });
-      // Add to local store for immediate UI feedback
       addOpenPosition({
         trade_id: (result as Record<string, unknown>).trade_id as string ?? `${Date.now()}`,
         symbol: selectedToken.symbol,
         contract_address: selectedToken.address,
         amount: amountNum,
         leverage,
-        entryPrice,
+        entryPrice: quoteData?.current_price ?? entryPrice,
+        liquidationPrice: quoteData?.liquidation_price ?? liquidationPrice,
         side: orderSide,
         openedAt: Date.now(),
+        tp,
+        sl,
       });
       toast.success(`${orderSide === 'buy' ? 'Buy' : 'Sell'} position opened`);
       setAmount('');
@@ -156,12 +166,8 @@ export function TradingPanel() {
   };
 
   const isBuy = orderSide === 'buy';
-  // Use server positions if available, fall back to local store
-  const allPositions = serverPositions
-    ? (serverPositions as unknown as typeof openPositions)
-    : openPositions;
-  const tokenPositions = allPositions.filter(
-    (p) => p.symbol === (selectedToken?.symbol ?? 'SOL')
+  const tokenPositions = openPositions.filter(
+    (p) => p.contract_address === selectedToken?.address
   );
 
   return (
@@ -498,13 +504,17 @@ export function TradingPanel() {
 
             {/* Order Summary — always visible */}
             <div className="bg-secondary/40 rounded p-2 space-y-1">
-              <SummaryRow label="Entry Price" value={formatPrice(entryPrice)} />
+              <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
-              <SummaryRow label="Trading Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} muted={amountNum <= 0} />
+              {quoteData?.trade_cost != null && amountNum > 0 ? (
+                <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />
+              ) : (
+                <SummaryRow label="Est. Fee" value={amountNum > 0 ? `${formatNumber(tradingFee, 4)} SOL` : '---'} muted={amountNum <= 0} />
+              )}
               {tradingMode === 'leverage' && (
                 <SummaryRow
                   label="Liq. Price"
-                  value={amountNum > 0 ? formatPrice(liquidationPrice) : 'N/A'}
+                  value={amountNum > 0 ? formatPrice(quoteData?.liquidation_price ?? liquidationPrice) : 'N/A'}
                   warning={amountNum > 0}
                   muted={amountNum <= 0}
                   tooltip="Price at which your position will be liquidated"

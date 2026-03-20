@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)file:///C:/Users/nikla/Desktop/ApiCursoir/API_DOCUMENTATION.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leverage API – Developer docs</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card: #fff;
+      --text: #1a1a1a;
+      --muted: #666;
+      --border: #e5e5e5;
+      --accent: #2563eb;
+      --code-bg: #f4f4f5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 2rem 1rem;
+      max-width: 68rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem 0;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .base-url {
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+    }
+    .base-url code { background: #f0f0f0; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9em; }
+    .flow {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    .flow h2 { font-size: 0.85rem; margin: 0 0 0.5rem 0; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .flow ol { margin: 0; padding-left: 1.2rem; }
+    .flow li { margin: 0.25rem 0; }
+    section.endpoint {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    section.endpoint h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.35rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .step { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
+    .method {
+      font-family: ui-monospace, monospace;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: var(--code-bg);
+    }
+    .method.get { color: #059669; }
+    .method.post { color: var(--accent); }
+    .path { font-family: ui-monospace, monospace; font-size: 0.9rem; color: var(--text); }
+    .desc {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin: 0.5rem 0 0.75rem 0;
+    }
+    .req {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .req strong { color: var(--text); }
+    .body-code-row {
+      display: flex;
+      gap: 1.25rem;
+      align-items: stretch;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .body-code-row.no-body .code-col { min-width: 0; }
+    .body-params-box {
+      flex: 0 0 200px;
+      min-width: 180px;
+      padding: 1rem 1.25rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      border: none;
+    }
+    .body-params-box .body-params-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+    }
+    .body-params-box ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .body-params-box li { margin: 0.35rem 0; }
+    .body-params-box code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.8em;
+      background: rgba(0,0,0,0.06);
+      padding: 0.12rem 0.35rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .body-params-box .optional { color: var(--muted); font-size: 0.9em; }
+    .code-col { flex: 1; min-width: 300px; }
+    .code-tabs {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 0;
+      padding: 0.25rem 0 0;
+    }
+    .code-tabs button {
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 0.4rem 0.65rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .code-tabs button:hover { color: var(--text); background: rgba(0,0,0,0.04); }
+    .code-tabs button.active { color: var(--accent); font-weight: 500; background: rgba(37,99,235,0.08); }
+    .code-wrap {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+      background: #1e1e1e;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .code-wrap pre {
+      margin: 0;
+      padding: 1rem;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      background: transparent;
+      color: #d4d4d4;
+    }
+    .code-wrap pre code { background: transparent; padding: 0; color: #ccc; }
+    .code-wrap pre[data-lang] { display: none; }
+    .code-wrap pre[data-lang].active { display: block; }
+    /* Embedded Prism Tomorrow–style token colors (works without CDN) */
+    .code-wrap .token.comment,
+    .code-wrap .token.prolog,
+    .code-wrap .token.doctype,
+    .code-wrap .token.cdata { color: #969896; }
+    .code-wrap .token.punctuation { color: #c5c8c6; }
+    .code-wrap .token.namespace { opacity: 0.7; }
+    .code-wrap .token.property,
+    .code-wrap .token.tag,
+    .code-wrap .token.boolean,
+    .code-wrap .token.constant,
+    .code-wrap .token.symbol { color: #e06c75; }
+    .code-wrap .token.selector,
+    .code-wrap .token.attr-name,
+    .code-wrap .token.string,
+    .code-wrap .token.char,
+    .code-wrap .token.builtin,
+    .code-wrap .token.inserted { color: #98c379; }
+    .code-wrap .token.operator,
+    .code-wrap .token.entity,
+    .code-wrap .token.url,
+    .code-wrap .token.variable { color: #56b6c2; }
+    .code-wrap .token.atrule,
+    .code-wrap .token.attr-value,
+    .code-wrap .token.keyword { color: #c678dd; }
+    .code-wrap .token.function,
+    .code-wrap .token.class-name { color: #61afef; }
+    .code-wrap .token.regex,
+    .code-wrap .token.important,
+    .code-wrap .token.number { color: #d19a66; }
+    .errors-sec { margin-top: 2.5rem; }
+    .errors-sec h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
+    .errors-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .errors-table th, .errors-table td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+    .errors-table th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .errors-table code { background: #f0f0f0; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <h1>Leverage API</h1>
+  <p class="subtitle">Solana leverage positions — REST API with JWT token</p>
+  <div class="base-url">Base URL: <code id="baseUrl">https://levapi.0xleverage.api</code> <span style="color: var(--muted); font-size: 0.85rem;">— Version 1.0.0 · © 0xleverage.io. All rights reserved.</span></div>
+
+  <div class="flow">
+    <h2>Setup order</h2>
+    <ol>
+      <li>Call <strong>GET /health</strong> to confirm the server is up.</li>
+      <li>Call <strong>POST /check_wallet</strong> with <code>apikey</code> and <code>user_id</code> (wallet address) to get a <strong>JWT token</strong> and trade wallet.</li>
+      <li>Send the <strong>JWT token</strong> in the <strong>Authorization</strong> header: <code>Authorization: &lt;jwt_token&gt;</code></li>
+      <li>All POST endpoints (except <strong>/check_wallet</strong>) require both a valid <strong>JWT token</strong> (in the header) and a valid <strong>apikey</strong> in the body (so random clients cannot call the API).</li>
+      <li>Use the other endpoints in any order (quote → sol_balance → wlcheck → open → positions → close, etc.).</li>
+    </ol>
+  </div>
+
+  <section class="endpoint" id="health">
+    <h2><span class="step">1</span> <span class="method get">GET</span> <span class="path">/health</span></h2>
+    <p class="desc">Liveness check. No auth.</p>
+    <div class="req"><strong>Response:</strong> 200 — <code>{"ok": true}</code></div>
+    <div class="body-code-row no-body">
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python"><span class="token keyword">import</span> requests
+BASE <span class="token operator">=</span> <span class="token string">"API_URL"</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/health"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>status_code<span class="token punctuation">,</span> r<span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token comment"># 200 {"ok": True}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> <span class="token constant">BASE</span> <span class="token operator">=</span> <span class="token string">"API_URL"</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/health</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>status<span class="token punctuation">,</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 200 { ok: true }</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> <span class="token constant">BASE</span> <span class="token operator">=</span> <span class="token string">"API_URL"</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/health</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">{</span> ok<span class="token operator">:</span> <span class="token builtin">boolean</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>status<span class="token punctuation">,</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 200 { ok: true }</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> GET <span class="token string">"API_URL/health"</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> client <span class="token operator">=</span> <span class="token namespace">reqwest<span class="token punctuation">::</span></span><span class="token class-name">Client</span><span class="token punctuation">::</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> r <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"API_URL/health"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> json<span class="token punctuation">:</span> <span class="token namespace">serde_json<span class="token punctuation">::</span></span><span class="token class-name">Value</span> <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="check_wallet">
+    <h2><span class="step">2</span> <span class="method post">POST</span> <span class="path">/check_wallet</span></h2>
+    <p class="desc">Get JWT token and trade wallet. Use this first.</p>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>user_id</code> (string) — wallet address</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python"><span class="token keyword">import</span> requests
+BASE <span class="token operator">=</span> <span class="token string">"API_URL"</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/check_wallet"</span></span><span class="token punctuation">,</span> json<span class="token operator">=</span><span class="token punctuation">{</span>
+    <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token string">"user_id"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_WALLET_ADDRESS"</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+data <span class="token operator">=</span> r<span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+access_token <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"access_token"</span><span class="token punctuation">]</span>
+trade_wallet <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"Trade Wallet"</span><span class="token punctuation">]</span>
+<span class="token comment"># Use in headers: Authorization: &lt;jwt_token&gt;</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> <span class="token constant">BASE</span> <span class="token operator">=</span> <span class="token string">"API_URL"</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/check_wallet</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">user_id</span><span class="token operator">:</span> <span class="token string">"YOUR_WALLET_ADDRESS"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> accessToken <span class="token operator">=</span> data<span class="token punctuation">.</span>access_token<span class="token punctuation">;</span>
+<span class="token keyword">const</span> tradeWallet <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"Trade Wallet"</span><span class="token punctuation">]</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> <span class="token constant">BASE</span> <span class="token operator">=</span> <span class="token string">"API_URL"</span><span class="token punctuation">;</span>
+<span class="token keyword">interface</span> <span class="token class-name">CheckWalletRes</span> <span class="token punctuation">{</span> access_token<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span> <span class="token string">"Trade Wallet"</span><span class="token operator">:</span> <span class="token builtin">string</span> <span class="token punctuation">}</span>
+<span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/check_wallet</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> user_id<span class="token operator">:</span> <span class="token string">"YOUR_WALLET_ADDRESS"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> CheckWalletRes<span class="token punctuation">;</span>
+<span class="token keyword">const</span> accessToken <span class="token operator">=</span> data<span class="token punctuation">.</span>access_token<span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/check_wallet"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY","user_id":"YOUR_WALLET_ADDRESS"}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> body <span class="token operator">=</span> <span class="token namespace">serde_json<span class="token punctuation">::</span></span><span class="token macro property">json!</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token string">"user_id"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_WALLET_ADDRESS"</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> r <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/check_wallet"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>body<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> data<span class="token punctuation">:</span> <span class="token namespace">serde_json<span class="token punctuation">::</span></span><span class="token class-name">Value</span> <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> access_token <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"access_token"</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">as_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">unwrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="quote">
+    <h2><span class="step">3</span> <span class="method post">POST</span> <span class="path">/quote</span></h2>
+    <p class="desc">Trade cost, liquidation price, current price. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>contract_address</code> (string) — token mint</li>
+          <li><code>leverage</code> (number) — 1–100</li>
+          <li><code>initial_amount</code> (number)</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/quote"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+        <span class="token string">"contract_address"</span><span class="token punctuation">:</span> <span class="token string">"So11111111111111111111111111111111111111112"</span><span class="token punctuation">,</span>
+        <span class="token string">"leverage"</span><span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+        <span class="token string">"initial_amount"</span><span class="token punctuation">:</span> <span class="token number">0.1</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token comment"># trade_cost, liquidation_price, current_price</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/quote</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span>
+    <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">contract_address</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">leverage</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">initial_amount</span><span class="token operator">:</span> <span class="token number">0.1</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/quote</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> contract_address<span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> leverage<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> initial_amount<span class="token operator">:</span> <span class="token number">0.1</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/quote"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY","contract_address":"","leverage":5,"initial_amount":0.1}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> r <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/quote"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({
+        "</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">",
+        "</span>contract_address<span class="token string">": "</span><span class="token string">",
+        "</span>leverage<span class="token string">": 5,
+        "</span>initial_amount"<span class="token punctuation">:</span> <span class="token number">0.1</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="sol_balance">
+    <h2><span class="step">4</span> <span class="method post">POST</span> <span class="path">/sol_balance</span></h2>
+    <p class="desc">SOL balance of the user's trade wallet. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/sol_balance"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"balance_sol": 1.23456789}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/sol_balance</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> balance_sol <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/sol_balance</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> balance_sol <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">{</span> balance_sol<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/sol_balance"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY"}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> r <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/sol_balance"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">"})).send().await?;
+let data: serde_json::Value = r.json().await?;
+let balance: f64 = data["</span>balance_sol"<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">as_f64</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">unwrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="wlcheck">
+    <h2><span class="step">5</span> <span class="method post">POST</span> <span class="path">/wlcheck</span></h2>
+    <p class="desc">Check if a contract is whitelisted. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>contract_address</code> (string) — token mint</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/wlcheck"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token string">"contract_address"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"message": "Whitelisted"} or "Not whitelisted"</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/wlcheck</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token literal-property property">contract_address</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/wlcheck</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> contract_address<span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/wlcheck"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY","contract_address":""}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> r <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/wlcheck"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">", "</span>contract_address<span class="token string">": "</span>"<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="wlrequest">
+    <h2><span class="step">6</span> <span class="method post">POST</span> <span class="path">/wlrequest</span></h2>
+    <p class="desc">Submit whitelist request for a contract. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>contract_address</code> (string) — token mint</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/wlrequest"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token string">"contract_address"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 201 submitted, 200 already whitelisted</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/wlrequest</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token literal-property property">contract_address</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/wlrequest</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> contract_address<span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/wlrequest"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY","contract_address":""}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/wlrequest"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">", "</span>contract_address<span class="token string">": "</span>"<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="solopenlev">
+    <h2><span class="step">7</span> <span class="method post">POST</span> <span class="path">/solopenlev</span></h2>
+    <p class="desc">Open leverage position. JWT token + apikey. Token must be whitelisted.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>contract_address</code> (string) — token mint</li>
+          <li><code>amount</code> (number) — SOL</li>
+          <li><code>leverage</code> (number) — 1–100</li>
+          <li><code>soltip</code> (number)</li>
+          <li><code>TP</code> (number) <span class="optional">optional</span></li>
+          <li><code>SL</code> (number) <span class="optional">optional</span></li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/solopenlev"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+        <span class="token string">"contract_address"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+        <span class="token string">"amount"</span><span class="token punctuation">:</span> <span class="token number">0.1</span><span class="token punctuation">,</span>
+        <span class="token string">"leverage"</span><span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+        <span class="token string">"soltip"</span><span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+        <span class="token string">"TP"</span><span class="token punctuation">:</span> <span class="token number">50</span><span class="token punctuation">,</span>
+        <span class="token string">"SL"</span><span class="token punctuation">:</span> <span class="token number">10</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"success": true, "trade_id": "...", "tx_hash": "..."}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solopenlev</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">contract_address</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">amount</span><span class="token operator">:</span> <span class="token number">0.1</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">leverage</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">soltip</span><span class="token operator">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+    <span class="token constant">TP</span><span class="token operator">:</span> <span class="token number">50</span><span class="token punctuation">,</span>
+    <span class="token constant">SL</span><span class="token operator">:</span> <span class="token number">10</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solopenlev</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> contract_address<span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    amount<span class="token operator">:</span> <span class="token number">0.1</span><span class="token punctuation">,</span> leverage<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> soltip<span class="token operator">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span> <span class="token constant">TP</span><span class="token operator">:</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token constant">SL</span><span class="token operator">:</span> <span class="token number">10</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/solopenlev"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"KEY","contract_address":"","amount":0.1,"leverage":5,"soltip":0.001,"TP":50,"SL":10}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust"><span class="token keyword">let</span> body <span class="token operator">=</span> <span class="token namespace">serde_json<span class="token punctuation">::</span></span><span class="token macro property">json!</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token string">"contract_address"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    <span class="token string">"amount"</span><span class="token punctuation">:</span> <span class="token number">0.1</span><span class="token punctuation">,</span>
+    <span class="token string">"leverage"</span><span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+    <span class="token string">"soltip"</span><span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+    <span class="token string">"TP"</span><span class="token punctuation">:</span> <span class="token number">50</span><span class="token punctuation">,</span>
+    <span class="token string">"SL"</span><span class="token punctuation">:</span> <span class="token number">10</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/solopenlev"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\"<span class="token punctuation">{</span><span class="token punctuation">}</span>\"<span class="token punctuation">,</span> access_token<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>body<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="solopenpositions">
+    <h2><span class="step">8</span> <span class="method post">POST</span> <span class="path">/solopenpositions</span></h2>
+    <p class="desc">List all open positions for the user (by JWT user_id). JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/solopenpositions"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"success": true, "positions": [...]}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solopenpositions</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> positions <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solopenpositions</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> positions <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">await</span> r<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">{</span> positions<span class="token operator">:</span> <span class="token builtin">unknown</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/solopenpositions"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY"}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/solopenpositions"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span>"<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="soltradeinfo">
+    <h2><span class="step">9</span> <span class="method post">POST</span> <span class="path">/soltradeinfo</span></h2>
+    <p class="desc">Full trade details by trade_id. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>trade_id</code> (string) — required</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/soltradeinfo"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token string">"trade_id"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"success": true, "trade": {...}}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/soltradeinfo</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token literal-property property">trade_id</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/soltradeinfo</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> trade_id<span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/soltradeinfo"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"KEY","trade_id":""}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/soltradeinfo"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">", "</span>trade_id<span class="token string">": "</span>"<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="soltrack">
+    <h2><span class="step">10</span> <span class="method post">POST</span> <span class="path">/soltrack</span></h2>
+    <p class="desc">Live profit for a trade. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>trade_id</code> (string) — required</li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/soltrack"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token string">"trade_id"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"trade_id": "...", "liveProfit": ...}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/soltrack</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token literal-property property">trade_id</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> r <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/soltrack</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> trade_id<span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/soltrack"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"YOUR_API_KEY","trade_id":""}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/soltrack"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({"</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">", "</span>trade_id<span class="token string">": "</span>"<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="solupdatetpsl">
+    <h2><span class="step">11</span> <span class="method post">POST</span> <span class="path">/solupdatetpsl</span></h2>
+    <p class="desc">Update take-profit and/or stop-loss. Send at least one of <code>tp</code>, <code>sl</code>. JWT token + apikey.</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>trade_id</code> (string) — required</li>
+          <li><code>tp</code> (number, 0–1000) <span class="optional">optional</span></li>
+          <li><code>sl</code> (number, 0–100) <span class="optional">optional</span></li>
+        </ul>
+        <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--muted);">At least one of tp, sl required.</p>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/solupdatetpsl"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token string">"trade_id"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">"tp"</span><span class="token punctuation">:</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token string">"sl"</span><span class="token punctuation">:</span> <span class="token number">10</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># or only sl: {"apikey":"...", "trade_id":"...", "sl": 10}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solupdatetpsl</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> <span class="token literal-property property">trade_id</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token literal-property property">tp</span><span class="token operator">:</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token literal-property property">sl</span><span class="token operator">:</span> <span class="token number">10</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solupdatetpsl</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> trade_id<span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> tp<span class="token operator">:</span> <span class="token number">50</span><span class="token punctuation">,</span> sl<span class="token operator">:</span> <span class="token number">10</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/solupdatetpsl"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"KEY","trade_id":"","tp":50,"sl":10}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/solupdatetpsl"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({
+        "</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">",
+        "</span>trade_id<span class="token string">": "</span><span class="token string">",
+        "</span>tp<span class="token string">": 50,
+        "</span>sl"<span class="token punctuation">:</span> <span class="token number">10</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="endpoint" id="solcloselev">
+    <h2><span class="step">12</span> <span class="method post">POST</span> <span class="path">/solcloselev</span></h2>
+    <p class="desc">Close position. JWT token + apikey. <code>token_amount</code> required (use 100 for now; partial close coming soon).</p>
+    <div class="req"><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></div>
+    <div class="body-code-row">
+      <div class="body-params-box">
+        <div class="body-params-title">Body parameters</div>
+        <ul class="body-params-list">
+          <li><code>apikey</code> (string) — required</li>
+          <li><code>trade_id</code> (string) — required</li>
+          <li><code>sol_tip</code> (number)</li>
+          <li><code>slippage</code> (number)</li>
+          <li><code>token_amount</code> (number, 0–100) — % to close, 100 = full. <span style="color: var(--muted); font-size: 0.9em;">Required; partial close not implemented yet (use 100).</span></li>
+        </ul>
+      </div>
+      <div class="code-col">
+    <div class="code-tabs">
+      <button type="button" class="active" data-lang="python">Python</button>
+      <button type="button" data-lang="javascript">JavaScript</button>
+      <button type="button" data-lang="typescript">TypeScript</button>
+      <button type="button" data-lang="curl">cURL</button>
+      <button type="button" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-wrap">
+      <pre data-lang="python" class="active language-python" tabindex="0"><code class="language-python">r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>BASE<span class="token punctuation">}</span></span><span class="token string">/solcloselev"</span></span><span class="token punctuation">,</span>
+    headers<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"Authorization"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>access_token<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    json<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">"apikey"</span><span class="token punctuation">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+        <span class="token string">"trade_id"</span><span class="token punctuation">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+        <span class="token string">"sol_tip"</span><span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+        <span class="token string">"slippage"</span><span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">,</span>
+        <span class="token string">"token_amount"</span><span class="token punctuation">:</span> <span class="token number">100</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment"># 200 {"success": true, "message": "Sold", "SellTx": "..."}</span></code></pre>
+      <pre data-lang="javascript" class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solcloselev</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">apikey</span><span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">trade_id</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">sol_tip</span><span class="token operator">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">slippage</span><span class="token operator">:</span> <span class="token number">20</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">token_amount</span><span class="token operator">:</span> <span class="token number">100</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="typescript" class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">BASE</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/solcloselev</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token string-property property">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span> <span class="token string-property property">"Authorization"</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>accessToken<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    apikey<span class="token operator">:</span> <span class="token string">"YOUR_API_KEY"</span><span class="token punctuation">,</span> trade_id<span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+    sol_tip<span class="token operator">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span> slippage<span class="token operator">:</span> <span class="token number">20</span><span class="token punctuation">,</span> token_amount<span class="token operator">:</span> <span class="token number">100</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      <pre data-lang="curl" class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-s</span> <span class="token parameter variable">-X</span> POST <span class="token string">"API_URL/solcloselev"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Content-Type: application/json"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-H</span> <span class="token string">"Authorization: YOUR_JWT_TOKEN"</span> <span class="token punctuation">\</span>
+  <span class="token parameter variable">-d</span> <span class="token string">'{"apikey":"KEY","trade_id":"","sol_tip":0.001,"slippage":20,"token_amount":100}'</span></code></pre>
+      <pre data-lang="rust" class="language-rust" tabindex="0"><code class="language-rust">client<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">"API_URL/solcloselev"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Authorization"</span><span class="token punctuation">,</span> <span class="token macro property">format!</span><span class="token punctuation">(</span>\<span class="token string">"{}\", access_token))
+    .json(&amp;serde_json::json!({
+        "</span>apikey<span class="token string">": "</span><span class="token constant">YOUR_API_KEY</span><span class="token string">",
+        "</span>trade_id<span class="token string">": "</span><span class="token string">",
+        "</span>sol_tip<span class="token string">": 0.001,
+        "</span>slippage<span class="token string">": 20,
+        "</span>token_amount"<span class="token punctuation">:</span> <span class="token number">100</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">await</span><span class="token operator">?</span><span class="token punctuation">;</span></code></pre>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow errors-sec">
+    <h2>Error codes</h2>
+    <p style="margin: 0 0 0.75rem 0; color: var(--muted); font-size: 0.9rem;">All errors return JSON: <code>{"error": "message"}</code>. On 401, get a new JWT token via POST /check_wallet.</p>
+    <table class="errors-table">
+      <thead>
+        <tr><th>Code</th><th>Meaning</th><th>Example / when</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>200</code></td><td>OK</td><td>Success</td></tr>
+        <tr><td><code>201</code></td><td>Created</td><td>Whitelist request submitted (wlrequest)</td></tr>
+        <tr><td><code>400</code></td><td>Bad Request</td><td>Missing/invalid body, apikey, contract_address, trade_id; contract not whitelisted; position size exceeded; already open on token; insufficient balance; invalid token_amount (1–100); leverage/amount not numbers; etc.</td></tr>
+        <tr><td><code>401</code></td><td>Unauthorized</td><td>Missing or invalid JWT token; invalid apikey</td></tr>
+        <tr><td><code>403</code></td><td>Forbidden</td><td>Trade not found or access denied (e.g. close another user’s trade)</td></tr>
+        <tr><td><code>404</code></td><td>Not Found</td><td>User not registered; trade not found; wallet not found; soltrack no data</td></tr>
+        <tr><td><code>406</code></td><td>Not Acceptable</td><td>Selling Error (close failed)</td></tr>
+        <tr><td><code>422</code></td><td>Unprocessable</td><td>Couldnt sell (close attempted but failed)</td></tr>
+        <tr><td><code>429</code></td><td>Too Many Requests</td><td>Rate limit exceeded; retry after a short delay</td></tr>
+        <tr><td><code>500</code></td><td>Server Error</td><td>Internal server error; DB/whitelist/TP-SL error</td></tr>
+        <tr><td><code>502</code></td><td>Bad Gateway</td><td>Failed to fetch balance (sol_balance)</td></tr>
+        <tr><td><code>503</code></td><td>Unavailable</td><td>Unable to fetch user wallets/balance; user wallet creation failed; try again later</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <script src="./Leverage API – Developer docs_files/prism.min.js.download"></script>
+  <script src="./Leverage API – Developer docs_files/prism-python.min.js.download"></script>
+  <script src="./Leverage API – Developer docs_files/prism-javascript.min.js.download"></script>
+  <script src="./Leverage API – Developer docs_files/prism-typescript.min.js.download"></script>
+  <script src="./Leverage API – Developer docs_files/prism-bash.min.js.download"></script>
+  <script src="./Leverage API – Developer docs_files/prism-rust.min.js.download"></script>
+  <script>
+    (function() {
+      var langMap = { python: 'python', javascript: 'javascript', typescript: 'typescript', curl: 'bash', rust: 'rust' };
+      document.querySelectorAll('.code-wrap pre[data-lang]').forEach(function(pre) {
+        var lang = pre.getAttribute('data-lang');
+        var code = document.createElement('code');
+        code.className = 'language-' + (langMap[lang] || lang);
+        code.textContent = pre.textContent;
+        pre.textContent = '';
+        pre.appendChild(code);
+      });
+      if (typeof Prism !== 'undefined') Prism.highlightAll();
+
+      document.querySelectorAll(".code-tabs").forEach(function(tabs) {
+        tabs.querySelectorAll("button").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var lang = btn.getAttribute("data-lang");
+            var wrap = tabs.closest(".endpoint").querySelector(".code-wrap");
+            wrap.querySelectorAll("pre[data-lang]").forEach(function(pre) {
+              var on = pre.getAttribute("data-lang") === lang;
+              pre.classList.toggle("active", on);
+              if (on && typeof Prism !== 'undefined') {
+                var c = pre.querySelector('code');
+                if (c) Prism.highlightElement(c);
+              }
+            });
+            tabs.querySelectorAll("button").forEach(function(b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+          });
+        });
+      });
+    })();
+  </script>
+
+
+</body></html>

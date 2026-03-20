@@ -7,6 +7,7 @@ import {
   LogOut,
   ClockSolid,
   Search,
+  Download,
 } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,11 +24,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useStore } from '@/lib/store';
-import { truncateAddress, formatNumber } from '@/lib/format';
+import { truncateAddress, formatNumber, formatPrice } from '@/lib/format';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletAuth } from '@/hooks/useWalletAuth';
+import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
+import { useWalletHoldings } from '@/hooks/useWalletHoldings';
+import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { TrendingBar } from './TrendingBar';
 import { TokenSearchModal } from './TokenSearchModal';
@@ -38,6 +42,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import {
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  LAMPORTS_PER_SOL,
+} from '@solana/web3.js';
 
 const navLinks = [
   { name: 'Terminal', path: '/' },
@@ -67,16 +77,31 @@ export function Header() {
     walletConnected,
     walletAddress,
     walletBalance,
+    tradeWallet,
     disconnectWallet,
     openPositions,
   } = useStore();
+  const { totalValue: walletTotalValue, holdings } = useWalletHoldings();
+  useTradeWalletBalance();
+  const utils = trpc.useUtils();
+  const { connection } = useConnection();
   const { setVisible } = useWalletModal();
-  const { connected: adapterConnected } = useWallet();
-  const { connect: walletAuthConnect, disconnect: walletAuthDisconnect, isConnecting } = useWalletAuth();
+  const { publicKey, connected: adapterConnected, sendTransaction } = useWallet();
+  const {
+    connect: walletAuthConnect,
+    disconnect: walletAuthDisconnect,
+    isConnecting,
+    isSessionLoading,
+    sessionRestored,
+  } = useWalletAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [rakebackOpen, setRakebackOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [isDepositing, setIsDepositing] = useState(false);
+
+  const personalSol = holdings.find((h) => h.symbol === 'SOL')?.amount ?? 0;
 
   // Long-press detection for mobile theme toggle
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -107,10 +132,13 @@ export function Header() {
     }
   }, [theme, setTheme]);
 
-  // Auto-trigger sign-message when wallet adapter connects
+  // Auto-trigger sign-message when wallet adapter connects,
+  // but wait for session resume to finish first, and skip if session was restored.
   const hasTriggeredAuth = useRef(false);
   useEffect(() => {
-    if (adapterConnected && !walletConnected && !isConnecting && !hasTriggeredAuth.current) {
+    if (isSessionLoading) return;
+    if (sessionRestored || walletConnected) return;
+    if (adapterConnected && !isConnecting && !hasTriggeredAuth.current) {
       hasTriggeredAuth.current = true;
       walletAuthConnect()
         .then(() => toast.success('Wallet connected'))
@@ -123,7 +151,7 @@ export function Header() {
     if (!adapterConnected) {
       hasTriggeredAuth.current = false;
     }
-  }, [adapterConnected, walletConnected, isConnecting, walletAuthConnect, walletAuthDisconnect]);
+  }, [adapterConnected, walletConnected, isConnecting, isSessionLoading, sessionRestored, walletAuthConnect, walletAuthDisconnect]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -137,12 +165,36 @@ export function Header() {
     setVisible(true);
   };
 
-  const handleClaimRakeback = () => {
-    const tweetText = encodeURIComponent('Liquidation RakeBack of $12.012025 Claimed on 0xLeverage');
-    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
-    toast.success('RakeBack claimed successfully!');
-    setRakebackOpen(false);
-  };
+  const handleDeposit = useCallback(async () => {
+    const amount = parseFloat(depositAmount);
+    if (!amount || amount <= 0 || !publicKey || !tradeWallet) return;
+    if (amount > personalSol) {
+      toast.error('Insufficient SOL balance');
+      return;
+    }
+
+    setIsDepositing(true);
+    try {
+      const tx = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: new PublicKey(tradeWallet),
+          lamports: Math.round(amount * LAMPORTS_PER_SOL),
+        }),
+      );
+      const sig = await sendTransaction(tx, connection);
+      await connection.confirmTransaction(sig, 'confirmed');
+      toast.success(`Deposited ${amount} SOL to trade wallet`);
+      setDepositAmount('');
+      setDepositOpen(false);
+      utils.leverage.getSolBalance.invalidate();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Deposit failed';
+      toast.error(msg);
+    } finally {
+      setIsDepositing(false);
+    }
+  }, [depositAmount, publicKey, tradeWallet, personalSol, sendTransaction, connection]);
 
   const currentThemeOption = themeOptions.find((t) => t.name === theme) ?? themeOptions[0];
 
@@ -366,20 +418,21 @@ export function Header() {
 
                 {/* Wallet Stats */}
                 <div className="px-3 py-2 space-y-1.5 border-b border-border">
-                  <WalletRow label="Total Wallet Value" value="$12,450.00" />
-                  <WalletRow label="Funded Wallet" value="$8,200.00" />
-                  <WalletRow label="Balance" value={`${formatNumber(walletBalance ?? 0, 4)} SOL`} />
+                  <WalletRow label="Total Wallet Value" value={formatPrice(walletTotalValue)} />
+                  <WalletRow label="Wallet SOL" value={`${formatNumber(personalSol, 4)} SOL`} />
                   <div className="flex justify-between text-[12px] items-center">
-                    <span className="text-muted-foreground">RakeBack</span>
-                    <button
-                      onClick={() => setRakebackOpen(true)}
-                      className="font-data text-success hover:text-success/80 transition-colors"
-                    >
-                      $12.012025
-                    </button>
+                    <span className="text-muted-foreground">Funded Wallet</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-data text-foreground">{formatNumber(walletBalance ?? 0, 4)} SOL</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDepositOpen(true); }}
+                        className="text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors"
+                      >
+                        Deposit
+                      </button>
+                    </div>
                   </div>
-                  <WalletRow label="Open Positions" value={String(openPositions.length || 3)} />
-                  <WalletRow label="Open Orders" value="5" />
+                  <WalletRow label="Open Positions" value={String(openPositions.length)} />
                 </div>
 
                 {/* Actions */}
@@ -425,28 +478,49 @@ export function Header() {
       {/* Token Search Modal */}
       <TokenSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
 
-      {/* RakeBack Claim Dialog */}
-      <Dialog open={rakebackOpen} onOpenChange={setRakebackOpen}>
-          <DialogContent className="bg-card border-border max-w-sm mx-3 sm:mx-auto">
+      {/* Deposit SOL Dialog */}
+      <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+        <DialogContent className="bg-card border-border max-w-sm mx-3 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-[15px] text-foreground">RakeBack Claim</DialogTitle>
+            <DialogTitle className="text-[15px] text-foreground">Deposit SOL</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="text-center">
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
-                Liquidation RakeBack
+          <div className="space-y-4 pt-1">
+            <div className="space-y-1">
+              <div className="text-[11px] text-muted-foreground">
+                Transfer SOL from your wallet to your 0xLeverage trade wallet.
               </div>
-              <div className="text-[28px] font-data font-bold text-success">$12.012025</div>
-              <div className="text-[11px] text-muted-foreground mt-1">Claimed on 0xLeverage</div>
+              {tradeWallet && (
+                <div className="text-[10px] text-muted-foreground font-data break-all">
+                  Trade wallet: {tradeWallet}
+                </div>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-muted-foreground">Amount (SOL)</span>
+                <button
+                  onClick={() => setDepositAmount(String(Math.max(0, personalSol - 0.01)))}
+                  className="text-primary hover:text-primary/80 transition-colors text-[10px] font-medium"
+                >
+                  Max ({formatNumber(personalSol, 4)})
+                </button>
+              </div>
+              <input
+                type="number"
+                step="0.001"
+                min="0"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                placeholder="0.00"
+                className="w-full px-3 py-2 bg-secondary border border-border rounded text-[13px] font-data text-foreground focus:outline-none focus:border-primary/50"
+              />
             </div>
             <button
-              onClick={handleClaimRakeback}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors neon-cta"
+              onClick={handleDeposit}
+              disabled={isDepositing || !depositAmount || parseFloat(depositAmount) <= 0}
+              className="w-full py-2.5 rounded bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors neon-cta disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              Share to X to claim your RakeBack
+              {isDepositing ? 'Confirming…' : 'Deposit'}
             </button>
           </div>
         </DialogContent>

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useStore } from "@/lib/store";
 import { trpc } from "@/lib/trpc";
@@ -7,9 +7,34 @@ const AUTH_MESSAGE_PREFIX = "0xLeverage auth: ";
 
 export function useWalletAuth() {
   const { publicKey, signMessage, disconnect: adapterDisconnect } = useWallet();
-  const { connectWallet: storeConnect, disconnectWallet: storeDisconnect } = useStore();
+  const {
+    connectWallet: storeConnect,
+    disconnectWallet: storeDisconnect,
+    walletConnected,
+  } = useStore();
 
   const connectMutation = trpc.leverage.connectWallet.useMutation();
+  const disconnectMutation = trpc.leverage.disconnectWallet.useMutation();
+
+  const resumeQuery = trpc.leverage.resumeSession.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: Infinity,
+  });
+
+  const resumedRef = useRef(false);
+
+  // When the resume query returns a valid session, restore state without a signature
+  useEffect(() => {
+    if (resumedRef.current || walletConnected) return;
+    if (!resumeQuery.data) return;
+    const { walletAddress, tradeWallet } = resumeQuery.data;
+    if (walletAddress && tradeWallet) {
+      resumedRef.current = true;
+      storeConnect(walletAddress, tradeWallet);
+    }
+  }, [resumeQuery.data, walletConnected, storeConnect]);
 
   const connect = useCallback(async () => {
     if (!publicKey || !signMessage) {
@@ -37,14 +62,26 @@ export function useWalletAuth() {
   }, [publicKey, signMessage, connectMutation, storeConnect]);
 
   const disconnect = useCallback(() => {
+    const wallet = publicKey?.toBase58();
+    if (wallet) {
+      disconnectMutation.mutate({ walletAddress: wallet });
+    }
     adapterDisconnect();
     storeDisconnect();
-  }, [adapterDisconnect, storeDisconnect]);
+    resumedRef.current = false;
+  }, [publicKey, adapterDisconnect, storeDisconnect, disconnectMutation]);
+
+  const isSessionLoading = resumeQuery.isLoading;
+  const sessionRestored = resumedRef.current || !!(
+    resumeQuery.data?.walletAddress && resumeQuery.data?.tradeWallet
+  );
 
   return {
     connect,
     disconnect,
     isConnecting: connectMutation.isPending,
+    isSessionLoading,
+    sessionRestored,
     error: connectMutation.error,
     walletAddress: publicKey?.toBase58() ?? null,
   };

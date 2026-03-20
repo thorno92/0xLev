@@ -27,6 +27,8 @@ interface TokenLogoProps {
   className?: string;
   /** Set to true for logos visible on initial paint (header, price bar) */
   eager?: boolean;
+  /** Direct image URL — takes precedence over CDN lookup when provided */
+  logoUrl?: string;
 }
 
 /** Generated color avatar as the final fallback */
@@ -76,9 +78,10 @@ function Web3IconFallback({ symbol, size, className }: {
   );
 }
 
-function TokenLogoInner({ symbol, size = 20, className = '', eager = false }: TokenLogoProps) {
+function TokenLogoInner({ symbol, size = 20, className = '', eager = false, logoUrl: directUrl }: TokenLogoProps) {
   const [imgError, setImgError] = useState(false);
-  const logoUrl = getTokenLogoUrl(symbol, size > 40 ? 'large' : size > 24 ? 'standard' : 'small');
+  const cdnUrl = getTokenLogoUrl(symbol, size > 40 ? 'large' : size > 24 ? 'standard' : 'small');
+  const logoUrl = directUrl && !imgError ? directUrl : cdnUrl;
 
   // Stage 2: Web3Icons fallback with built-in fallback to generated avatar (CDN failed)
   if (imgError) {

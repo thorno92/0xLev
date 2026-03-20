@@ -33,14 +33,16 @@ function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
-        <Route path="/" component={Terminal} />
-        <Route path="/terminal" component={Terminal} />
         <Route path="/assistant" component={Assistant} />
         <Route path="/markets" component={Markets} />
         <Route path="/trending" component={Trending} />
         <Route path="/positions" component={Positions} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/404" component={NotFound} />
+        <Route path="/terminal/:address" component={Terminal} />
+        <Route path="/terminal" component={Terminal} />
+        <Route path="/:address" component={Terminal} />
+        <Route path="/" component={Terminal} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

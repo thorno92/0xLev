@@ -8,16 +8,26 @@ import { mockTransactions, mockTopTraders, mockHolderData, mockSocialPosts } fro
 import { formatPrice, formatNumber, formatPercent, formatCompact } from '@/lib/format';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
+import { useTrackPositions } from '@/hooks/useTrackPositions';
 
 const tabs = ['Transactions', 'Open Positions', 'Top Traders', 'Holder Analysis', 'Social'] as const;
 type Tab = typeof tabs[number];
 
 export function BottomPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('Transactions');
-  const [whitelistRequested, setWhitelistRequested] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { openPositions, selectedToken } = useStore();
+  const { openPositions, selectedToken, walletAddress, walletConnected } = useStore();
   const posCount = openPositions.length;
+
+  useTrackPositions();
+
+  const wlRequestMutation = trpc.leverage.requestWhitelist.useMutation({
+    onSuccess: (result) => {
+      toast.success(result.alreadyWhitelisted ? 'Already whitelisted' : 'Whitelist requested');
+    },
+    onError: (err) => toast.error(err.message || 'Failed to request whitelist'),
+  });
+  const whitelistRequested = wlRequestMutation.isSuccess;
 
   useEffect(() => {
     setIsLoading(true);
@@ -103,11 +113,11 @@ export function BottomPanel() {
         {/* Request Whitelist Button — compact on mobile */}
         <button
           onClick={() => {
-            if (!whitelistRequested) {
-              setWhitelistRequested(true);
-              toast.success('Whitelist requested');
+            if (!whitelistRequested && walletAddress && selectedToken?.address) {
+              wlRequestMutation.mutate({ walletAddress, contractAddress: selectedToken.address });
             }
           }}
+          disabled={wlRequestMutation.isPending || !walletConnected}
           className={`px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-semibold rounded transition-colors mr-1 flex items-center gap-1 btn-hover shrink-0 whitespace-nowrap ${
             whitelistRequested
               ? 'bg-success/10 text-success border border-success/20 cursor-default'
@@ -138,7 +148,7 @@ export function BottomPanel() {
               headers={activeTab === 'Transactions'
                 ? ['DATE', 'TYPE', 'PRICE', 'UTILITY', 'SOL', 'MAKER', 'TXN']
                 : activeTab === 'Open Positions'
-                ? ['TOKEN', 'SIDE', 'AMOUNT', 'LEVERAGE', 'ENTRY', 'CURRENT', 'P&L', 'CLOSE']
+                ? ['TOKEN', 'SIDE', 'AMOUNT', 'LEVERAGE', 'ENTRY', 'MARK', 'P&L', 'CLOSE']
                 : ['RANK', 'MAKER', 'VOLUME', 'TXNS', 'P&L', 'WIN RATE']
               }
             />
@@ -341,10 +351,10 @@ function OpenPositionsTable() {
                 <td className="numeric">{pos.leverage}x</td>
                 <td className="numeric">{formatPrice(pos.entryPrice)}</td>
                 <td className="numeric">{formatPrice(pos.currentPrice ?? 0)}</td>
-                <td className="numeric text-warning">{formatPrice(pos.liquidationPrice ?? 0)}</td>
+                <td className="numeric text-warning">{pos.liquidationPrice ? formatPrice(pos.liquidationPrice) : 'N/A'}</td>
                 <td className={`numeric font-medium ${pnlPositive ? 'text-success' : 'text-destructive'}`}>
                   <div className="flex flex-col items-end leading-tight">
-                    <span>{pnlPositive ? '+' : ''}{formatNumber(pos.liveProfit ?? 0, 2)}</span>
+                    <span>{pnlPositive ? '+' : ''}{formatPrice(pos.liveProfit ?? 0)}</span>
                     <span className="text-[9px] opacity-70">{formatPercent(pos.liveProfitPercent ?? 0)}</span>
                   </div>
                 </td>
