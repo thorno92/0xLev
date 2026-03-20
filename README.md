@@ -16,9 +16,9 @@ The backend proxies all trading to the 0xLeverage protocol API — secrets never
 | Backend | Express 4, tRPC 11, Superjson |
 | Database | MySQL/TiDB via Drizzle ORM |
 | Auth | OAuth (session cookies) + Solana wallet signature verification |
-| Testing | Vitest (69+ server tests) |
+| Testing | Vitest (86+ server tests) |
 | Charts | TradingView Advanced Chart widget |
-| Prices | CoinGecko (live prices), Birdeye (orderbook/trades) |
+| Prices | Jupiter (token prices), CoinGecko (market prices), Birdeye (orderbook/trades) |
 
 ---
 
@@ -29,7 +29,7 @@ pnpm install
 cp .env.example .env          # fill in required vars (see Environment Variables below)
 pnpm db:push                   # push database schema (first time or after schema changes)
 pnpm dev                       # Express + Vite with HMR on http://localhost:3000
-pnpm test                      # 69+ tests — run before every commit
+pnpm test                      # 86+ tests — run before every commit
 pnpm build && pnpm start       # production build
 ```
 
@@ -52,6 +52,10 @@ client/src/
   contexts/
     ThemeContext.tsx  10 themes (0x, cyberpunk, midnight, obsidian, ember, matrix, arctic, phantom, lavender, aurora)
   hooks/
+    useWalletAuth.ts   Wallet connection + session resume (signature → JWT)
+    useTrackPositions.ts  Live P&L + MARK price polling (Jupiter + trackTrade)
+    useTradeWalletBalance.ts  Trade wallet SOL balance polling
+    useWalletHoldings.ts  On-chain token holdings via Helius DAS API
     useLivePrices.ts   Price polling with 30s cache
     useFavorites.ts    Star/favorite tokens (localStorage)
     useComposition.ts  Composition event handling for inputs
@@ -74,8 +78,9 @@ server/
     audit.ts         Structured trade audit logging + request timer
     walletAuth.ts    Wallet JWT verification + per-wallet rate limiting
   leverage-api.ts    Axios client for 0xLeverage protocol, JWT cache (TTL-enforced)
+  jupiter.ts         Jupiter Price API proxy (v2 free / v3 with key)
   security.ts        CSP · rate limiting · HSTS · request guards
-  prices.ts          CoinGecko price service (Zod-validated, 30s cache)
+  prices.ts          CoinGecko price service (Zod-validated, 30s cache) + SOL/USD helper
   birdeye.ts         Birdeye API for real-time trades/orderbook (Zod-validated, 15s cache)
   routers.ts         tRPC root router (merges all sub-routers)
   db.ts              Database helpers
@@ -155,11 +160,7 @@ All 10 themes are CSS variable blocks. Adding a theme = adding a `[data-theme="n
 9. CSRF token issued on connect, required on all mutations
 ```
 
-**What still needs implementing (Priority 1):**
-- `client/src/contexts/WalletContext.tsx` — wrap the app with `@solana/wallet-adapter-react`
-- `client/src/hooks/useWalletAuth.ts` — sign-message hook that calls `connectWallet` with signature
-- Update `connectWallet` procedure to verify the signature before calling the API
-- See `docs/WALLET-ADAPTER-SPEC.md` for the complete implementation spec
+**Session binding:** After initial signature verification, the server mints an `HttpOnly` session cookie (3-day TTL). On subsequent page loads, `resumeSession` restores the wallet without re-signing. The upstream 0xLeverage JWT is transparently refreshed via `checkWallet` when it expires.
 
 ---
 
@@ -177,8 +178,9 @@ All 10 themes are CSS variable blocks. Adding a theme = adding a `[data-theme="n
 | `VITE_OAUTH_PORTAL_URL` | YES | Login portal URL (frontend) |
 | `PORT` | NO | Server port (default: 3000) |
 | `COINGECKO_API_KEY` | NO | Pro key to avoid free tier rate limits (warned at startup if missing) |
+| `JUPITER_API_KEY` | NO | Jupiter Price API v3 key — uses free v2 endpoint if not set |
 | `BIRDEYE_API_KEY` | NO | Birdeye API for real orderbook/trade data (warned at startup if missing) |
-| `VITE_SOLANA_RPC_URL` | NO | Private Solana RPC endpoint (defaults to public mainnet-beta) |
+| `VITE_SOLANA_RPC_URL` | NO | Solana RPC endpoint — use Helius/QuickNode; defaults to public mainnet-beta |
 
 Copy `.env.example` → `.env`. Never commit `.env`.
 
@@ -195,10 +197,11 @@ Test files live alongside the code they test:
 
 | File | Coverage |
 |------|----------|
-| `server/pages.test.ts` | tRPC procedures — auth, input validation, error handling (50+ tests) |
+| `server/pages.test.ts` | tRPC procedures — auth, input validation, error handling |
 | `server/security.test.ts` | Security headers, rate limiting, CSRF, Zod schemas |
-| `server/leverage-api.test.ts` | API proxy, JWT caching, response validation |
-| `server/prices.test.ts` | CoinGecko price fetcher, cache behaviour |
+| `server/leverage-api.test.ts` | API proxy, JWT caching, session management, wallet disconnect |
+| `server/jupiter.test.ts` | Jupiter price service — v2/v3 parsing, chunking, error handling |
+| `server/prices.test.ts` | CoinGecko price fetcher, cache behaviour, SOL/USD fallback |
 | `server/auth.logout.test.ts` | OAuth logout flow, cookie cleanup |
 
 ```typescript
@@ -259,10 +262,10 @@ await expect(caller.leverage.openPosition({ ... })).rejects.toThrow("Wallet not 
 
 | # | Task | Spec / File |
 |---|------|-------------|
-| 1 | Implement Solana wallet adapter + signature verification | `docs/WALLET-ADAPTER-SPEC.md` |
+| ~~1~~ | ~~Implement Solana wallet adapter + signature verification~~ | Done ✓ |
 | 2 | Replace mock orderbook with real market depth | `client/src/lib/mockData.ts` → Birdeye API (backend ready) |
 | 3 | Frontend test coverage (React Testing Library) | `client/src/__tests__/` (create) |
-| 4 | CI/CD pipeline (GitHub Actions) | `.github/workflows/` (create) |
+| ~~4~~ | ~~CI/CD pipeline (GitHub Actions)~~ | Done ✓ — `.github/workflows/ci.yml` |
 | 5 | Structured logging → external sink (Axiom/Datadog) | `server/middleware/audit.ts` |
 | 6 | Redis-backed rate limiting for multi-instance deployment | `server/middleware/walletAuth.ts`, `server/security.ts` |
 
@@ -345,7 +348,7 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 - [ ] `OXL_API_KEY` stored securely (not in `.env` files committed to git)
 - [ ] CORS origin updated in `server/_core/index.ts` to your production domain
 - [ ] `pnpm check` passes with zero TypeScript errors
-- [ ] `pnpm test` passes (69+ tests)
+- [ ] `pnpm test` passes (86+ tests)
 - [ ] `pnpm audit` run — no critical CVEs
 - [ ] Security headers verified with `curl -I https://your-domain.com`
 - [ ] Log rotation configured for stdout/stderr

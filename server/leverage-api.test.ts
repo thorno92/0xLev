@@ -12,16 +12,17 @@ import type { TrpcContext } from "./_core/context";
 const VALID_WALLET = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
 const VALID_CONTRACT = "So11111111111111111111111111111111111111112";
 
-function createPublicContext(): TrpcContext {
+function createPublicContext(cookieHeader?: string): TrpcContext {
   return {
     user: null,
     requestId: "test-req-id",
     req: {
       protocol: "https",
-      headers: {},
+      headers: cookieHeader ? { cookie: cookieHeader } : {},
     } as TrpcContext["req"],
     res: {
       clearCookie: vi.fn(),
+      cookie: vi.fn(),
     } as unknown as TrpcContext["res"],
   };
 }
@@ -157,5 +158,46 @@ describe("leverage router", () => {
         contractAddress: VALID_CONTRACT,
       }),
     ).rejects.toThrow("Wallet not connected");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  Session management                                                 */
+/* ------------------------------------------------------------------ */
+
+describe("session management", () => {
+  it("resumeSession returns null when no cookie is present", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.leverage.resumeSession();
+    expect(result).toEqual({ walletAddress: null, tradeWallet: null });
+  });
+
+  it("resumeSession returns null for an invalid/expired JWT cookie", async () => {
+    const ctx = createPublicContext("wallet_session=invalid-jwt-token");
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.leverage.resumeSession();
+    expect(result).toEqual({ walletAddress: null, tradeWallet: null });
+  });
+
+  it("disconnectWallet clears the session cookie", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.leverage.disconnectWallet({
+      walletAddress: VALID_WALLET,
+    });
+    expect(result).toEqual({ success: true });
+    expect(ctx.res.clearCookie).toHaveBeenCalledWith(
+      "wallet_session",
+      expect.objectContaining({ path: "/" }),
+    );
+  });
+
+  it("disconnectWallet rejects invalid wallet address", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.leverage.disconnectWallet({ walletAddress: "bad" }),
+    ).rejects.toThrow();
   });
 });

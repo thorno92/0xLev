@@ -76,4 +76,23 @@ describe('prices service', () => {
 
     await expect(fetchLivePrices()).rejects.toThrow();
   });
+
+  it('getSolUsdPrice returns SOL price from cache', async () => {
+    const mockResponse = {
+      solana: { usd: 142.5, usd_24h_change: 1.0, usd_24h_vol: 1000, usd_market_cap: 50000 },
+    };
+    mockedAxios.get.mockResolvedValue({ data: mockResponse });
+
+    const { getSolUsdPrice } = await import('./prices');
+    const price = await getSolUsdPrice();
+    expect(price).toBe(142.5);
+  });
+
+  it('getSolUsdPrice returns 0 when API fails and no cache', async () => {
+    mockedAxios.get.mockRejectedValue(new Error('Network error'));
+
+    const { getSolUsdPrice } = await import('./prices');
+    const price = await getSolUsdPrice();
+    expect(price).toBe(0);
+  });
 });
