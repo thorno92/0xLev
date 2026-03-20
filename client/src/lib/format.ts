@@ -1,0 +1,54 @@
+/**
+ * Formatting utilities for the trading terminal.
+ * All financial data formatting in one place.
+ */
+
+export function formatPrice(price: number, decimals?: number): string {
+  if (price === 0) return '$0.00';
+  const abs = Math.abs(price);
+  const sign = price < 0 ? '-' : '';
+  if (abs < 0.0001) return `${sign}$${abs.toFixed(8)}`;
+  if (abs < 0.01) return `${sign}$${abs.toFixed(6)}`;
+  if (abs < 1) return `${sign}$${abs.toFixed(4)}`;
+  const d = decimals ?? 2;
+  return `${sign}$${abs.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
+}
+
+export function formatNumber(num: number, decimals: number = 2): string {
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+export function formatCompact(num: number): string {
+  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
+  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
+  if (num >= 1_000) return `$${(num / 1_000).toFixed(1)}K`;
+  return `$${num.toFixed(2)}`;
+}
+
+export function formatPercent(pct: number): string {
+  const sign = pct >= 0 ? '+' : '';
+  return `${sign}${pct.toFixed(2)}%`;
+}
+
+export function formatSol(amount: number): string {
+  return `${amount.toFixed(4)} SOL`;
+}
+
+export function truncateAddress(address: string, chars: number = 4): string {
+  if (address.length <= chars * 2 + 3) return address;
+  return `${address.slice(0, chars)}...${address.slice(-chars)}`;
+}
+
+export function formatTimeAgo(timestamp: number): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}

@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1771876718991,
+      "tag": "0000_freezing_garia",
+      "breakpoints": true
+    }
+  ]
+}

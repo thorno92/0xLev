@@ -1,0 +1,45 @@
+# Gitleaks configuration
+# Prevents API keys, JWTs, and private keys from being committed to git
+# Used by the CI pipeline (gitleaks-action) and can be run locally:
+#   brew install gitleaks
+#   gitleaks detect --source . --config .gitleaks.toml
+
+title = "0xLeverage Secret Scanner"
+
+[extend]
+# Extend the default ruleset — adds ~100 common secret patterns
+useDefault = true
+
+[[rules]]
+id = "oxl-api-key"
+description = "0xLeverage API Key"
+regex = '''OXL_API_KEY\s*=\s*['""]?[A-Za-z0-9_\-]{20,}['""]?'''
+severity = "CRITICAL"
+tags = ["trading", "api-key"]
+
+[[rules]]
+id = "jwt-secret"
+description = "JWT signing secret"
+regex = '''JWT_SECRET\s*=\s*['""]?.{32,}['""]?'''
+severity = "CRITICAL"
+tags = ["auth", "secret"]
+
+[[rules]]
+id = "database-url-with-password"
+description = "Database URL containing credentials"
+regex = '''DATABASE_URL\s*=\s*['""]?mysql://[^:]+:[^@]+@'''
+severity = "CRITICAL"
+tags = ["database", "credentials"]
+
+[allowlist]
+# Ignore example env files — they contain placeholder values only
+paths = [
+  ".env.example",
+  "docs/",
+  "specs/",
+]
+# Ignore test fixtures with fake keys
+regexes = [
+  '''test-api-key-for-ci''',
+  '''test-jwt-secret''',
+]

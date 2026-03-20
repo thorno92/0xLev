@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Type check + test + build ─────────────────────────────────────
+  test:
+    name: Type Check · Tests · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript check
+        run: pnpm check
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          NODE_ENV: test
+          # Minimal env for test suite — no real secrets needed
+          DATABASE_URL: mysql://test:test@localhost/test
+          OXL_API_BASE_URL: http://localhost:9999
+          OXL_API_KEY: test-api-key-for-ci
+          JWT_SECRET: test-jwt-secret-at-least-32-chars-long-for-ci
+
+      - name: Build
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+  # ─── Security audit ─────────────────────────────────────────────────
+  security:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+        # Fails CI on HIGH or CRITICAL CVEs — adjust level if needed
+        continue-on-error: false
+
+  # ─── Secret scanning ─────────────────────────────────────────────────
+  secrets:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for secret scan
+
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Blocks CI if any secrets (API keys, JWTs, private keys) are found in git history
