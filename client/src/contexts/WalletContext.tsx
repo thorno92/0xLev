@@ -30,10 +30,7 @@ export function WalletContextProvider({ children }: WalletContextProviderProps) 
   const onWalletError = useCallback((error: WalletError, adapter?: Adapter) => {
     console.error("[Wallet adapter]", adapter?.name, error);
     const label = adapter?.name ?? "Wallet";
-    const message =
-      error instanceof WalletError || error instanceof Error
-        ? (error.message?.trim() || "Wallet connection failed")
-        : "Wallet connection failed";
+    const message = error.message?.trim() || "Wallet connection failed";
     toast.error(message, {
       description:
         label === "MetaMask"
