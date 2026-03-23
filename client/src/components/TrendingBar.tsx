@@ -1,8 +1,8 @@
+import { useMemo } from 'react';
 import { useLivePrices } from '@/hooks/useLivePrices';
 import { useStore, type TokenInfo } from '@/lib/store';
 import { formatPercent } from '@/lib/format';
 import { TokenLogo } from './TokenLogo';
-
 import { useLocation } from 'wouter';
 
 function TokenPill({ token, isActive, onSelect }: {
@@ -43,8 +43,15 @@ export function TrendingBar() {
     navigate('/');
   };
 
-  const { trendingTokens } = useLivePrices();
-  const tokens = trendingTokens.slice(0, 8);
+  const { allTokens: liveTokens } = useLivePrices();
+
+  // Sort by absolute 24h change — biggest movers are "trending"
+  const tokens = useMemo(() => {
+    return [...liveTokens]
+      .filter((t) => t.chain === 'solana')  // Solana-only for now
+      .sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h))
+      .slice(0, 10);
+  }, [liveTokens]);
 
   return (
     <div className="flex items-center gap-1.5 overflow-hidden">
