@@ -21,9 +21,16 @@ function calcLiquidationPrice(
     : entryPriceUsd * (1 + 1 / leverage);
 }
 
+/* ------------------------------------------------------------------ */
+/*  Jupiter USD price fetcher — retry-hardened                         */
+/* ------------------------------------------------------------------ */
+
+const JUPITER_MAX_RETRIES = 2;
+const JUPITER_RETRY_BASE_MS = 800;
+
 /**
  * Fetch Jupiter USD prices via the server-side proxy.
- * Always bypasses cache (staleTime: 0) so polls get fresh data.
+ * Retries up to 2 times with exponential backoff.
  * Returns empty map on failure — callers keep previous values.
  */
 async function fetchJupiterUsd(
@@ -32,16 +39,22 @@ async function fetchJupiterUsd(
 ): Promise<Map<string, number>> {
   const map = new Map<string, number>();
   if (mints.length === 0) return map;
-  try {
-    const data = await utils.prices.jupiter.fetch(
-      { mints },
-      { staleTime: 0 },
-    );
-    for (const [mint, info] of Object.entries(data)) {
-      if (info.usdPrice > 0) map.set(mint, info.usdPrice);
+
+  for (let attempt = 0; attempt <= JUPITER_MAX_RETRIES; attempt++) {
+    try {
+      const data = await utils.prices.jupiter.fetch(
+        { mints },
+        { staleTime: 0 },
+      );
+      for (const [mint, info] of Object.entries(data)) {
+        if (info.usdPrice > 0) map.set(mint, info.usdPrice);
+      }
+      if (map.size > 0) return map;
+    } catch {
+      if (attempt < JUPITER_MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, JUPITER_RETRY_BASE_MS * (attempt + 1)));
+      }
     }
-  } catch {
-    // Jupiter unavailable — return empty, callers use previous values
   }
   return map;
 }
@@ -101,13 +114,20 @@ export function useTrackPositions() {
           const leverage = sp.leverage as number;
           const side = prev?.side ?? "buy";
 
-          // Convert SOL-denominated entry price to USD
-          const entryUsd = solUsd > 0
+          // Never overwrite a valid price with zero — prefer previous value
+          const entryUsd = solUsd > 0 && rawEntrySol > 0
             ? rawEntrySol * solUsd
-            : prev?.entryPrice ?? 0; // keep previous if Jupiter unavailable
+            : (prev?.entryPrice ?? 0) > 0
+              ? prev!.entryPrice
+              : 0;
 
-          // Current USD price directly from Jupiter
-          const currentUsd = jupUsd.get(contractAddr) ?? prev?.currentPrice;
+          // Prefer fresh Jupiter price, fall back to previous if valid
+          const freshJup = jupUsd.get(contractAddr);
+          const currentUsd = (freshJup && freshJup > 0)
+            ? freshJup
+            : (prev?.currentPrice ?? 0) > 0
+              ? prev!.currentPrice
+              : undefined;
 
           return {
             trade_id: tradeId,
@@ -174,6 +194,23 @@ export function useTrackPositions() {
         const jupUsd = await fetchJupiterUsd(utils, mints);
         const solUsd = jupUsd.get(SOL_MINT) ?? 0;
 
+        // If SOL/USD is unavailable, we can't convert P&L from SOL→USD.
+        // Still update MARK prices from Jupiter (those are already USD).
+        if (solUsd <= 0) {
+          for (const pos of positions) {
+            const jupPrice = jupUsd.get(pos.contract_address);
+            if (jupPrice && jupPrice > 0) {
+              updatePositionProfit(
+                pos.trade_id,
+                pos.liveProfit ?? 0,
+                pos.liveProfitPercent ?? 0,
+                jupPrice,
+              );
+            }
+          }
+          return;
+        }
+
         // Fire all trackTrade calls in parallel
         const results = await Promise.allSettled(
           positions.map((pos) =>
@@ -214,9 +251,7 @@ export function useTrackPositions() {
                 jupPrice,
               );
             }
-            if (settled.status === "rejected") {
-              console.warn(`[trackTrade] ${pos.trade_id}:`, settled.reason);
-            }
+            // trackTrade rejected — silent, will retry next poll
           }
         }
       } finally {
@@ -225,7 +260,7 @@ export function useTrackPositions() {
     }
 
     poll();
-    const id = setInterval(poll, 10_000);
+    const id = setInterval(poll, 5_000);  // 5s — positions need fast updates
     return () => {
       cancelled = true;
       clearInterval(id);

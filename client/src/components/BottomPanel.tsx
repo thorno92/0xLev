@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { SkeletonTable } from '@/components/Skeleton';
-import { OpenNewWindow, XmarkCircleSolid, Globe, CheckCircleSolid } from 'iconoir-react';
+import { OpenNewWindow, Globe } from 'iconoir-react';
 import { TokenLogo } from '@/components/TokenLogo';
 import { useStore } from '@/lib/store';
 import { mockTransactions, mockTopTraders, mockHolderData, mockSocialPosts } from '@/lib/mockData';
@@ -80,13 +80,13 @@ export function BottomPanel() {
 
         {/* Social Links — hidden on very small screens */}
         <div className="hidden sm:flex items-center gap-0.5 mr-2 shrink-0">
-          <a href="https://example.com" target="_blank" rel="noopener noreferrer"
+          <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
             title="Website"
           >
             <Globe className="w-3 h-3" />
           </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
+          <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
             title="Twitter"
           >
@@ -94,7 +94,7 @@ export function BottomPanel() {
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
           </a>
-          <a href="https://telegram.org" target="_blank" rel="noopener noreferrer"
+          <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
             title="Telegram"
           >
@@ -322,9 +322,9 @@ function OpenPositionsTable() {
             <th style={{ textAlign: 'right' }}>Lev</th>
             <th style={{ textAlign: 'right' }}>Entry</th>
             <th style={{ textAlign: 'right' }}>Mark</th>
-            <th style={{ textAlign: 'right' }}>Liq.</th>
+            <th style={{ textAlign: 'right' }}>Liq. Price</th>
             <th style={{ textAlign: 'right' }}>P&L</th>
-            <th style={{ textAlign: 'center', width: 36 }}></th>
+            <th style={{ textAlign: 'center', width: 72 }}>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -362,13 +362,12 @@ function OpenPositionsTable() {
                   <button
                     onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
                     disabled={isClosing === pos.trade_id}
-                    className="text-muted-foreground hover:text-destructive transition-colors p-0.5 rounded hover:bg-destructive/10 disabled:opacity-50"
-                    title="Close Position"
+                    className="px-2.5 py-1 text-[10px] font-semibold rounded transition-all duration-100 bg-destructive/8 text-destructive border border-destructive/20 hover:bg-destructive/15 hover:border-destructive/30 disabled:opacity-50 whitespace-nowrap btn-hover"
                   >
                     {isClosing === pos.trade_id ? (
                       <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
                     ) : (
-                      <XmarkCircleSolid className="w-3 h-3" />
+                      'Close'
                     )}
                   </button>
                 </td>

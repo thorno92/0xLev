@@ -100,7 +100,7 @@ const coinGeckoResponseSchema = z.record(z.string(), coinGeckoTokenSchema);
 
 let priceCache: LivePriceData[] = [];
 let lastFetchTime = 0;
-const CACHE_TTL_MS = 30_000; // 30 seconds — respect CoinGecko free tier limits
+const CACHE_TTL_MS = 20_000;  // 20s — still respects CoinGecko free tier
 
 if (!process.env.COINGECKO_API_KEY) {
   logger.warn({ event: "coingecko_free_tier", reason: "COINGECKO_API_KEY not set — using free tier (rate-limited under load)" });
@@ -132,7 +132,7 @@ function buildCoinGeckoHeaders(): Record<string, string> {
 /*  Public API                                                         */
 /* ------------------------------------------------------------------ */
 
-/** Fetch live prices. Returns cached data if still fresh (< 30s). */
+/** Fetch live prices. Returns cached data if still fresh (< 20s). */
 export async function fetchLivePrices(): Promise<LivePriceData[]> {
   const now = Date.now();
 

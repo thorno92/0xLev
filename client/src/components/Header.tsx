@@ -7,7 +7,6 @@ import {
   LogOut,
   ClockSolid,
   Search,
-  Download,
 } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -297,7 +296,7 @@ export function Header() {
 
           {/* Social Links -- desktop only */}
           <a
-            href="https://twitter.com"
+            href="#" data-todo="0xLeverage-social-url"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex text-muted-foreground/70 hover:text-primary transition-all p-1.5 rounded hover:bg-primary/10 icon-btn-hover"
@@ -308,7 +307,7 @@ export function Header() {
             </svg>
           </a>
           <a
-            href="https://telegram.org"
+            href="#" data-todo="0xLeverage-social-url"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex text-muted-foreground/70 hover:text-primary transition-all p-1.5 rounded hover:bg-primary/10 icon-btn-hover"

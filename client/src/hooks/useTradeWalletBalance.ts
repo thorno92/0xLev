@@ -15,8 +15,8 @@ export function useTradeWalletBalance() {
     { walletAddress: walletAddress! },
     {
       enabled: !!walletAddress && walletConnected,
-      refetchInterval: 30_000,
-      staleTime: 20_000,
+      refetchInterval: 15_000,
+      staleTime: 10_000,
       retry: 1,
     },
   );

@@ -7,7 +7,6 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { PageTransition, StaggerContainer } from '@/components/PageTransition';
 import { Header } from '@/components/Header';
-import { trendingStats } from '@/lib/mockData';
 import { useLivePrices } from '@/hooks/useLivePrices';
 import { formatPrice, formatPercent, formatCompact } from '@/lib/format';
 import { useStore, type Chain } from '@/lib/store';
@@ -144,6 +143,8 @@ export default function Trending() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<TrendingFilters>(emptyTrendingFilters);
 
+  const { isFavorite, toggleFavorite } = useFavorites();
+
   const activeFilterCount = useMemo(() => Object.values(filters).filter(v => v !== '').length, [filters]);
   const updateFilter = useCallback((key: keyof TrendingFilters, val: string) => {
     setFilters(prev => ({ ...prev, [key]: val }));
@@ -183,7 +184,7 @@ export default function Trending() {
       return sortDir === 'desc' ? bV - aV : aV - bV;
     });
     return tokens;
-  }, [activeNet, activeTime, sortBy, sortDir, filters]);
+  }, [allTokens, activeNet, activeTime, sortBy, sortDir, filters, isFavorite]);
 
   const mockExtra = useMemo(() => {
     const m = new Map<string, { txns: number; makers: number; c5m: number; c1h: number; score: number }>();
@@ -199,8 +200,6 @@ export default function Trending() {
     });
     return m;
   }, []);
-
-  const { isFavorite, toggleFavorite } = useFavorites();
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent, address: string) => {
     e.stopPropagation();
@@ -222,11 +221,19 @@ export default function Trending() {
   const topGainer = useMemo(() => [...allTokens].sort((a, b) => b.change24h - a.change24h)[0], [allTokens]);
   const topLoser = useMemo(() => [...allTokens].sort((a, b) => a.change24h - b.change24h)[0], [allTokens]);
 
+  const aggregateStats = useMemo(() => {
+    const totalVolume = allTokens.reduce((sum, t) => sum + (t.volume24h ?? 0), 0);
+    return {
+      volume24h: formatCompact(totalVolume),
+      txns24h: '\u2014',  // Requires Solana RPC subscription — not available without indexer
+    };
+  }, [allTokens]);
+
   const SortTh = ({ label, col, align = 'right' }: { label: string; col: string; align?: string }) => (
     <th
       onClick={() => handleSort(col)}
       className="cursor-pointer select-none"
-      style={{ textAlign: align as any }}
+      style={{ textAlign: align as React.CSSProperties['textAlign'] }}
     >
       <span className="inline-flex items-center gap-1">
         {label}
@@ -316,8 +323,8 @@ export default function Trending() {
             {/* == STATS == */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-px border border-border overflow-hidden">
               {[
-                { label: '24H VOLUME', value: trendingStats.volume24h },
-                { label: '24H TXNS', value: trendingStats.txns24h },
+                { label: '24H VOLUME', value: aggregateStats.volume24h },
+                { label: '24H TXNS', value: aggregateStats.txns24h },
                 { label: 'TOP GAINER', value: topGainer?.symbol || '--', sub: topGainer ? formatPercent(topGainer.change24h) : '', color: 'text-success' },
                 { label: 'TOP LOSER', value: topLoser?.symbol || '--', sub: topLoser ? formatPercent(topLoser.change24h) : '', color: 'text-destructive' },
               ].map(s => (

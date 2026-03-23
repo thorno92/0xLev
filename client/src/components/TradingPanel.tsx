@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid, OpenNewWindow } from 'iconoir-react';
+import { Settings, WarningTriangleSolid, InfoCircleSolid } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -233,6 +233,7 @@ export function TradingPanel() {
                 const pnlPositive = (pos.liveProfit ?? 0) >= 0;
                 return (
                   <div key={pos.trade_id} className="px-3 py-2.5">
+                    {/* Header: Side badge + Amount */}
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-1.5">
                         <span className={`text-[10px] font-semibold px-1 py-0.5 rounded ${
@@ -242,25 +243,17 @@ export function TradingPanel() {
                         }`}>
                           {pos.side === 'buy' ? 'BUY' : 'SELL'} {pos.leverage}x
                         </span>
-                        <span className="text-[11px] font-data text-foreground">{formatNumber(pos.amount, 4)} SOL</span>
+                        <span className="text-[11px] font-data text-foreground">
+                          {formatNumber(pos.amount, 4)} SOL
+                        </span>
                       </div>
-                      <button
-                        onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
-                        disabled={isClosing === pos.trade_id}
-                        className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded hover:bg-destructive/10 disabled:opacity-50"
-                        title="Close Position"
-                      >
-                        {isClosing === pos.trade_id ? (
-                          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
-                        ) : (
-                          <XmarkCircleSolid className="w-3 h-3" />
-                        )}
-                      </button>
                     </div>
+
+                    {/* Price data */}
                     <div className="space-y-1">
                       <MiniRow label="Entry" value={formatPrice(pos.entryPrice)} />
                       <MiniRow label="Mark" value={formatPrice(pos.currentPrice ?? 0)} />
-                      <MiniRow label="Liq." value={formatPrice(pos.liquidationPrice ?? 0)} warning />
+                      <MiniRow label="Liq." value={pos.liquidationPrice ? formatPrice(pos.liquidationPrice) : 'N/A'} warning />
                       <div className="flex justify-between text-[11px]">
                         <span className="text-muted-foreground">P&L</span>
                         <span className={`font-data font-medium ${pnlPositive ? 'text-success' : 'text-destructive'}`}>
@@ -268,6 +261,24 @@ export function TradingPanel() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Denomination note */}
+                    <div className="text-[9px] text-muted-foreground/40 mt-1.5 text-right italic">
+                      Prices in USD via Jupiter
+                    </div>
+
+                    {/* Close Position Button — prominent, full-width */}
+                    <button
+                      onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
+                      disabled={isClosing === pos.trade_id}
+                      className="mt-2 w-full h-7 flex items-center justify-center gap-1.5 text-[11px] font-semibold rounded transition-all duration-100 bg-destructive/8 text-destructive border border-destructive/20 hover:bg-destructive/15 hover:border-destructive/30 disabled:opacity-50 btn-hover"
+                    >
+                      {isClosing === pos.trade_id ? (
+                        <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
+                      ) : (
+                        'Close Position'
+                      )}
+                    </button>
                   </div>
                 );
               })}

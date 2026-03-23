@@ -19,8 +19,8 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { getCachedAuth, checkWallet } from "../leverage-api";
-import { logger } from "./audit";
+import { getCachedAuthWithExpiry, checkWallet } from "../leverage-api";
+import { logger, maskWallet } from "./audit";
 
 /* ------------------------------------------------------------------ */
 /*  Per-wallet rate limiting                                           */
@@ -100,18 +100,37 @@ export async function requireWalletAuth<TInput extends { walletAddress: string }
 }
 
 /**
- * Get cached auth for the wallet. If expired, transparently re-authenticates
- * with the upstream API (checkWallet only needs the wallet address, not a
- * user signature) so long-lived sessions never fail due to JWT expiry.
+ * Get cached auth for the wallet. If near expiry, fires a background
+ * refresh (non-blocking) so the next request gets a fresh token.
+ * If fully expired or missing, does a blocking re-auth.
  */
 export async function requireOxlJwt(walletAddress: string) {
-  const cached = getCachedAuth(walletAddress);
-  if (cached) return cached;
+  const cached = getCachedAuthWithExpiry(walletAddress);
 
-  // Expired or missing — attempt silent re-auth
+  if (cached) {
+    // Token still valid — but if close to expiry, refresh in background
+    if (cached.nearExpiry) {
+      checkWallet(walletAddress)
+        .then(() => {
+          logger.info({
+            event: "jwt_proactive_refresh",
+            wallet: maskWallet(walletAddress),
+          });
+        })
+        .catch(() => {
+          // Silent — current token still valid for now
+        });
+    }
+    return { token: cached.token, tradeWallet: cached.tradeWallet };
+  }
+
+  // Expired or missing — blocking re-auth
   try {
     const result = await checkWallet(walletAddress);
-    logger.info({ event: "jwt_auto_refreshed", wallet: walletAddress.slice(0, 4) + "..." + walletAddress.slice(-4) });
+    logger.info({
+      event: "jwt_auto_refreshed",
+      wallet: maskWallet(walletAddress),
+    });
     return { token: result.accessToken, tradeWallet: result.tradeWallet };
   } catch {
     throw new TRPCError({
