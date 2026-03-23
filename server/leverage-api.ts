@@ -95,6 +95,33 @@ export function setCachedAuth(walletAddress: string, token: string, tradeWallet:
   });
 }
 
+/* ------------------------------------------------------------------ */
+/*  Proactive refresh support                                          */
+/* ------------------------------------------------------------------ */
+
+const PROACTIVE_REFRESH_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Like getCachedAuth but also reports if the token is close to expiry.
+ * Allows callers to fire a non-blocking background refresh.
+ */
+export function getCachedAuthWithExpiry(walletAddress: string):
+  | { token: string; tradeWallet: string; nearExpiry: boolean }
+  | undefined {
+  const key = walletAddress.toLowerCase();
+  const entry = jwtCache.get(key);
+  if (!entry) return undefined;
+
+  // Evict expired entries on read
+  if (Date.now() >= entry.expiresAt) {
+    jwtCache.delete(key);
+    return undefined;
+  }
+
+  const nearExpiry = (entry.expiresAt - Date.now()) < PROACTIVE_REFRESH_THRESHOLD_MS;
+  return { token: entry.token, tradeWallet: entry.tradeWallet, nearExpiry };
+}
+
 /** Remove cached auth for a wallet (call on explicit disconnect). */
 export function clearCachedAuth(walletAddress: string): void {
   jwtCache.delete(walletAddress.toLowerCase());
