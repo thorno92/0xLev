@@ -204,9 +204,9 @@ export function Header() {
         <Link href="/">
           <div className="flex items-center mr-2 sm:mr-5 shrink-0 cursor-pointer group logo-glow">
             <img
-              src="/logo.svg"
+              src="/0xLev-Clean.png"
               alt="0xLeverage"
-              className="h-5 sm:h-[22px] w-auto"
+              className="h-6 sm:h-7 w-auto"
               draggable={false}
             />
           </div>
