@@ -199,9 +199,7 @@ export function Header() {
 
   return (
     <>
-      {/* Safe area spacer for iPhone notch / Dynamic Island */}
-      <div className="bg-card shrink-0 safe-area-top" />
-      <header className="h-11 border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30">
+      <header className="border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30 safe-area-header">
         {/* Logo */}
         <Link href="/">
           <div className="flex items-center mr-2 sm:mr-5 shrink-0 cursor-pointer group logo-glow">

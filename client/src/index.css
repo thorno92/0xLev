@@ -1570,9 +1570,17 @@
    ============================================================ */
 
 /* ---- SAFE AREA: iPhone notch / Dynamic Island ---- */
-.safe-area-top {
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-top: constant(safe-area-inset-top); /* iOS 11.0-11.2 */
+@supports (padding-top: constant(safe-area-inset-top)) {
+  .safe-area-header {
+    padding-top: constant(safe-area-inset-top);
+    min-height: calc(2.75rem + constant(safe-area-inset-top));
+  }
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-area-header {
+    padding-top: env(safe-area-inset-top);
+    min-height: calc(2.75rem + env(safe-area-inset-top));
+  }
 }
 
 /* ---- LOGO GLOW (Purple shimmer on hover) ---- */
