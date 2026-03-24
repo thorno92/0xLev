@@ -7,7 +7,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { WalletContextProvider } from "./contexts/WalletContext";
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { TestingBuildBanner } from './components/TestingBuildBanner';
 
 // Critical path -- eagerly loaded (Terminal IS the landing page now)
 import Terminal from "./pages/Terminal";
@@ -66,7 +65,6 @@ function App() {
               },
             }}
           />
-          <TestingBuildBanner />
           <Router />
           <MobileBottomNav />
         </TooltipProvider>

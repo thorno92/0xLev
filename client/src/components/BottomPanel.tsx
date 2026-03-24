@@ -44,19 +44,67 @@ export function BottomPanel() {
 
   return (
     <div className="flex flex-col bg-card border-t border-border h-full">
-      {/* Tab Bar — scrollable on mobile with fade indicators */}
-      <div className="flex items-center border-b border-border shrink-0 relative">
-        {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none sm:hidden" />
-        {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none sm:hidden" />
-
-        <div className="flex items-center shrink-0 px-0.5 overflow-x-auto scrollbar-none">
+      {/* ── MOBILE Tab Bar: grid layout ── */}
+      <div className="sm:hidden shrink-0 border-b border-border">
+        <div className="grid grid-cols-3 gap-px bg-border/30">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-2 sm:px-2.5 py-1.5 text-[10px] sm:text-[11px] font-medium transition-colors relative flex items-center gap-1 tab-hover whitespace-nowrap shrink-0 ${
+              className={`py-2 text-[11px] font-medium transition-colors text-center relative ${
+                activeTab === tab
+                  ? 'text-foreground bg-card'
+                  : 'text-muted-foreground/60 bg-card hover:text-foreground'
+              }`}
+            >
+              <span className="flex items-center justify-center gap-1">
+                {tab === 'Open Positions' ? 'Positions' : tab === 'Holder Analysis' ? 'Holders' : tab}
+                {tab === 'Open Positions' && posCount > 0 && (
+                  <span className="text-[9px] font-data bg-primary/12 text-primary px-1 py-px rounded font-medium">
+                    {posCount}
+                  </span>
+                )}
+              </span>
+              {activeTab === tab && (
+                <motion.div
+                  layoutId="bottom-panel-tab-mobile"
+                  className="absolute bottom-0 left-1 right-1 h-[2px] bg-primary rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+        {/* Whitelist button — full width below tabs on mobile */}
+        {walletConnected && (
+          <div className="px-3 py-2 border-t border-border/50">
+            <button
+              onClick={() => {
+                if (!whitelistRequested && walletAddress && selectedToken?.address) {
+                  wlRequestMutation.mutate({ walletAddress, contractAddress: selectedToken.address });
+                }
+              }}
+              disabled={wlRequestMutation.isPending || !walletConnected}
+              className={`w-full py-1.5 text-[11px] font-semibold rounded transition-colors flex items-center justify-center gap-1.5 ${
+                whitelistRequested
+                  ? 'bg-success/10 text-success border border-success/20 cursor-default'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              }`}
+            >
+              {whitelistRequested ? 'Whitelist Requested' : 'Request Whitelist'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── DESKTOP Tab Bar: horizontal row ── */}
+      <div className="hidden sm:flex items-center border-b border-border shrink-0">
+        <div className="flex items-center shrink-0 px-0.5">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-2.5 py-1.5 text-[11px] font-medium transition-colors relative flex items-center gap-1 tab-hover whitespace-nowrap shrink-0 ${
                 activeTab === tab
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
@@ -80,11 +128,10 @@ export function BottomPanel() {
           ))}
         </div>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Social Links — hidden on very small screens */}
-        <div className="hidden sm:flex items-center gap-0.5 mr-2 shrink-0">
+        {/* Social Links */}
+        <div className="flex items-center gap-0.5 mr-2 shrink-0">
           <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
             title="Website"
@@ -109,13 +156,13 @@ export function BottomPanel() {
           </a>
         </div>
 
-        {/* Score — hidden on mobile */}
-        <div className="hidden sm:flex items-center gap-1 mr-2 shrink-0">
+        {/* Score */}
+        <div className="flex items-center gap-1 mr-2 shrink-0">
           <span className="text-[9px] text-muted-foreground">Score</span>
           <span className="text-[11px] font-data font-bold text-warning">78/100</span>
         </div>
 
-        {/* Request Whitelist Button — compact on mobile */}
+        {/* Request Whitelist Button */}
         <button
           onClick={() => {
             if (!whitelistRequested && walletAddress && selectedToken?.address) {
@@ -123,23 +170,13 @@ export function BottomPanel() {
             }
           }}
           disabled={wlRequestMutation.isPending || !walletConnected}
-          className={`px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-semibold rounded transition-colors mr-1 flex items-center gap-1 btn-hover shrink-0 whitespace-nowrap ${
+          className={`px-3 py-1 text-[10px] font-semibold rounded transition-colors mr-1 flex items-center gap-1 btn-hover shrink-0 whitespace-nowrap ${
             whitelistRequested
               ? 'bg-success/10 text-success border border-success/20 cursor-default'
               : 'bg-primary text-primary-foreground hover:bg-primary/90'
           }`}
         >
-          {whitelistRequested ? (
-            <>
-              <span className="hidden sm:inline">Whitelist Requested</span>
-              <span className="sm:hidden">Requested</span>
-            </>
-          ) : (
-            <>
-              <span className="hidden sm:inline">Request Whitelist</span>
-              <span className="sm:hidden">Whitelist</span>
-            </>
-          )}
+          {whitelistRequested ? 'Whitelist Requested' : 'Request Whitelist'}
         </button>
       </div>
 
@@ -224,27 +261,41 @@ function TransactionsTable() {
       {/* Mobile card layout */}
       <div className="sm:hidden divide-y divide-border/50">
         {transactions.map((tx, i) => (
-          <div key={i} className="px-3 py-2 flex items-center gap-2.5">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className={`text-[10px] font-semibold px-1 py-0.5 rounded ${
+          <div key={i} className="px-3 py-2.5">
+            {/* Row 1: Type badge + time + maker */}
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
                   tx.type === 'Buy' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
                 }`}>
                   {tx.type}
                 </span>
-                <span className="text-[10px] text-muted-foreground font-data">{tx.date}</span>
+                <span className="text-[10px] text-muted-foreground font-data">{tx.time}</span>
+                <span className="text-[9px] text-muted-foreground/50 font-data">{tx.date}</span>
               </div>
-              <div className="flex items-center gap-2 text-[10px]">
-                <span className="font-data text-foreground">{formatPrice(tx.price)}</span>
-                <span className="text-muted-foreground">{tx.sol.toFixed(4)} SOL</span>
-              </div>
+              <button
+                onClick={() => { navigator.clipboard.writeText(tx.maker); toast.info('Address copied'); }}
+                className="text-primary text-[10px] font-data"
+              >
+                {truncateMaker(tx.maker)}
+              </button>
             </div>
-            <button
-              onClick={() => { navigator.clipboard.writeText(tx.maker); toast.info('Address copied'); }}
-              className="text-primary text-[10px] font-data shrink-0"
-            >
-              {truncateMaker(tx.maker)}
-            </button>
+            {/* Row 2: Price + Amount + SOL value */}
+            <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-3">
+                <div>
+                  <span className="text-[9px] text-muted-foreground/50 mr-1">Price</span>
+                  <span className="font-data font-medium text-foreground">{formatPrice(tx.price)}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] text-muted-foreground/50 mr-1">Amt</span>
+                  <span className="font-data text-foreground/80">{formatNumber(tx.amount, 0)}</span>
+                </div>
+              </div>
+              <span className={`font-data font-medium ${tx.type === 'Buy' ? 'text-success/80' : 'text-destructive/80'}`}>
+                {tx.sol.toFixed(4)} SOL
+              </span>
+            </div>
           </div>
         ))}
       </div>
