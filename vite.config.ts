@@ -183,7 +183,7 @@ export default defineConfig({
         },
       },
     },
-    target: 'es2022',
+    target: ['es2017', 'chrome67', 'safari12', 'firefox68'],
     minify: 'esbuild',
     cssCodeSplit: true,
   },
