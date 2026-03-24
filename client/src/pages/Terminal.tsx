@@ -1088,30 +1088,38 @@ function MiniOrderBook({
   midPrice: number;
   symbol: string;
 }) {
+  const asksRef = useRef<HTMLDivElement>(null);
   const maxTotal = Math.max(
     asks.length > 0 ? asks[asks.length - 1].total : 0,
     bids.length > 0 ? bids[bids.length - 1].total : 0
   );
 
+  // Auto-scroll asks to bottom so lowest ask is always visible near spread
+  useEffect(() => {
+    if (asksRef.current) {
+      asksRef.current.scrollTop = asksRef.current.scrollHeight;
+    }
+  }, [asks]);
+
   return (
     <div className="h-full flex flex-col text-[10px] font-data">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border shrink-0">
         <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Order Book</span>
         <span className="text-[10px] text-muted-foreground">{symbol}/USD</span>
       </div>
 
       {/* Column headers */}
-      <div className="flex items-center justify-between px-3 py-1 text-[9px] text-muted-foreground uppercase tracking-wider">
+      <div className="flex items-center justify-between px-3 py-1 text-[9px] text-muted-foreground uppercase tracking-wider shrink-0">
         <span>Price</span>
         <span>Size</span>
         <span>Total</span>
       </div>
 
-      {/* Asks (sells) -- reversed so lowest ask is at bottom, overflow scrolls */}
-      <div className="flex-1 overflow-y-auto scrollbar-none flex flex-col justify-end px-1">
+      {/* Asks (sells) -- scrolled to bottom so lowest ask sits next to spread */}
+      <div ref={asksRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-none px-1">
         {asks.map((ask, i) => (
-          <div key={`ask-${i}`} className="relative flex items-center justify-between px-2 py-[2px] hover:bg-secondary/30 rounded-sm shrink-0">
+          <div key={`ask-${i}`} className="relative flex items-center justify-between px-2 py-[2px] hover:bg-secondary/30 rounded-sm">
             <div
               className="absolute right-0 top-0 bottom-0 bg-destructive/8 rounded-sm"
               style={{ width: `${(ask.total / maxTotal) * 100}%` }}
@@ -1133,10 +1141,10 @@ function MiniOrderBook({
         </span>
       </div>
 
-      {/* Bids (buys) */}
-      <div className="flex-1 overflow-y-auto scrollbar-none px-1">
+      {/* Bids (buys) -- top-aligned so highest bid sits next to spread */}
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none px-1">
         {bids.map((bid, i) => (
-          <div key={`bid-${i}`} className="relative flex items-center justify-between px-2 py-[2px] hover:bg-secondary/30 rounded-sm shrink-0">
+          <div key={`bid-${i}`} className="relative flex items-center justify-between px-2 py-[2px] hover:bg-secondary/30 rounded-sm">
             <div
               className="absolute right-0 top-0 bottom-0 bg-success/8 rounded-sm"
               style={{ width: `${(bid.total / maxTotal) * 100}%` }}
