@@ -6,6 +6,7 @@
 dist/
 build/
 *.dist
+api/
 # Environment variables — catch ALL .env variants
 .env
 .env.*
