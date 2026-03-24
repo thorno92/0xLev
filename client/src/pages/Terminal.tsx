@@ -346,7 +346,7 @@ export default function Terminal() {
   }, [isDragging]);
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-background bg-grain">
+    <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background bg-grain">
       {/* Header */}
       <Header />
 

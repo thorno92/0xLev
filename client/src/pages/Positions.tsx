@@ -159,7 +159,7 @@ export default function Positions() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
+    <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
       <Header />
       <div className="flex-1 overflow-auto">
         {!walletConnected ? (

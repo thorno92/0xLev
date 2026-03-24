@@ -200,7 +200,7 @@ export default function Portfolio() {
   const balanceDec = dotIdx >= 0 ? balanceStr.slice(dotIdx) : '.000';
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
+    <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
       <Header />
 
       {!walletConnected ? (

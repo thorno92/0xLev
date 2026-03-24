@@ -844,7 +844,7 @@ export default function Markets() {
   );
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
+    <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
       <Header />
       {/* Desktop: normal scroll */}
       <div className="hidden md:block flex-1 overflow-auto">

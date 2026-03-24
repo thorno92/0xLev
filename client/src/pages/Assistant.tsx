@@ -85,7 +85,7 @@ export default function Assistant() {
   const showSuggestions = messages.length <= 2 && !isTyping;
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
+    <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
       <Header />
       <PageTransition className="flex-1 flex overflow-hidden relative">
         {/* == CHAT == */}

@@ -1570,10 +1570,14 @@
    ============================================================ */
 
 /* ---- SAFE AREA: iPhone notch / Dynamic Island ---- */
-/* Applied globally — pushes entire page content below the status bar */
-html {
+/* h-screen-safe = 100vh minus safe area insets, so content never goes behind the notch */
+.h-screen-safe {
+  height: 100vh;
+  height: calc(100vh - constant(safe-area-inset-top));
+  height: calc(100vh - env(safe-area-inset-top, 0px));
   padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: border-box;
 }
 
 
