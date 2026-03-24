@@ -44,7 +44,7 @@ export function BottomPanel() {
 
   return (
     <div className="flex flex-col bg-card border-t border-border h-full">
-      {/* ── MOBILE Tab Bar: grid layout ── */}
+      {/* ── MOBILE Tab Bar: 3-col grid, whitelist fills the 6th cell ── */}
       <div className="sm:hidden shrink-0 border-b border-border">
         <div className="grid grid-cols-3 gap-px bg-border/30">
           {tabs.map((tab) => (
@@ -74,27 +74,25 @@ export function BottomPanel() {
               )}
             </button>
           ))}
+          {/* 6th cell — Whitelist button fills the gap */}
+          <button
+            onClick={() => {
+              if (!whitelistRequested && walletAddress && selectedToken?.address) {
+                wlRequestMutation.mutate({ walletAddress, contractAddress: selectedToken.address });
+              }
+            }}
+            disabled={wlRequestMutation.isPending || !walletConnected}
+            className={`py-2 text-[11px] font-semibold transition-colors text-center bg-card flex items-center justify-center gap-1 ${
+              !walletConnected
+                ? 'text-muted-foreground/30 cursor-default'
+                : whitelistRequested
+                ? 'text-success'
+                : 'text-primary'
+            }`}
+          >
+            {whitelistRequested ? '✓ Whitelisted' : 'Whitelist'}
+          </button>
         </div>
-        {/* Whitelist button — full width below tabs on mobile */}
-        {walletConnected && (
-          <div className="px-3 py-2 border-t border-border/50">
-            <button
-              onClick={() => {
-                if (!whitelistRequested && walletAddress && selectedToken?.address) {
-                  wlRequestMutation.mutate({ walletAddress, contractAddress: selectedToken.address });
-                }
-              }}
-              disabled={wlRequestMutation.isPending || !walletConnected}
-              className={`w-full py-1.5 text-[11px] font-semibold rounded transition-colors flex items-center justify-center gap-1.5 ${
-                whitelistRequested
-                  ? 'bg-success/10 text-success border border-success/20 cursor-default'
-                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
-              }`}
-            >
-              {whitelistRequested ? 'Whitelist Requested' : 'Request Whitelist'}
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ── DESKTOP Tab Bar: horizontal row ── */}
