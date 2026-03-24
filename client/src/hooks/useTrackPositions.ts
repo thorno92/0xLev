@@ -153,6 +153,7 @@ export function useTrackPositions() {
           }
         }
 
+        if (cancelled) return;
         setOpenPositions(merged);
         syncedRef.current = walletAddress;
       } catch {
@@ -192,6 +193,7 @@ export function useTrackPositions() {
         const mints = [...new Set(positions.map((p) => p.contract_address))];
         if (!mints.includes(SOL_MINT)) mints.push(SOL_MINT);
         const jupUsd = await fetchJupiterUsd(utils, mints);
+        if (cancelled) return;
         const solUsd = jupUsd.get(SOL_MINT) ?? 0;
 
         // If SOL/USD is unavailable, we can't convert P&L from SOL→USD.

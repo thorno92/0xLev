@@ -400,6 +400,7 @@ export default function Positions() {
                                   <div className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground mb-1">TAKE PROFIT</div>
                                   <Input
                                     type="number"
+                                    inputMode="decimal"
                                     placeholder="TP price"
                                     value={editingTpSl.tp}
                                     onChange={(e) => setEditingTpSl({ ...editingTpSl, tp: e.target.value })}
@@ -410,6 +411,7 @@ export default function Positions() {
                                   <div className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground mb-1">STOP LOSS</div>
                                   <Input
                                     type="number"
+                                    inputMode="decimal"
                                     placeholder="SL price"
                                     value={editingTpSl.sl}
                                     onChange={(e) => setEditingTpSl({ ...editingTpSl, sl: e.target.value })}

@@ -93,7 +93,7 @@ function TrendingFilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, pr
           {showPrefix && (
             <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
           )}
-          <Input type="number" placeholder="Min" value={minVal} onChange={(e) => onMinChange(e.target.value)}
+          <Input type="number" inputMode="decimal" placeholder="Min" value={minVal} onChange={(e) => onMinChange(e.target.value)}
             className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`} />
           {showSuffix && (
             <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>
@@ -103,7 +103,7 @@ function TrendingFilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, pr
           {showPrefix && (
             <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
           )}
-          <Input type="number" placeholder="Max" value={maxVal} onChange={(e) => onMaxChange(e.target.value)}
+          <Input type="number" inputMode="decimal" placeholder="Max" value={maxVal} onChange={(e) => onMaxChange(e.target.value)}
             className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`} />
           {showSuffix && (
             <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>

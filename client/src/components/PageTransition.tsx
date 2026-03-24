@@ -79,6 +79,11 @@ export function FadeIn({ children, className = '', delay = 0, direction = 'up' }
     const el = ref.current;
     if (!el) return;
 
+    if (!('IntersectionObserver' in window)) {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

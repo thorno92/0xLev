@@ -371,6 +371,7 @@ export function TradingPanel() {
               <div className="relative">
                 <Input
                   type="number"
+                  inputMode="decimal"
                   placeholder="0.00"
                   min={0}
                   max={10000}
@@ -443,6 +444,7 @@ export function TradingPanel() {
                   </div>
                   <Input
                     type="number"
+                    inputMode="decimal"
                     placeholder={formatPrice(entryPrice * (isBuy ? 1.1 : 0.9)).replace('$', '')}
                     value={takeProfit}
                     onChange={(e) => setTakeProfit(e.target.value)}
@@ -462,6 +464,7 @@ export function TradingPanel() {
                   </div>
                   <Input
                     type="number"
+                    inputMode="decimal"
                     placeholder={formatPrice(entryPrice * (isBuy ? 0.95 : 1.05)).replace('$', '')}
                     value={stopLoss}
                     onChange={(e) => setStopLoss(e.target.value)}

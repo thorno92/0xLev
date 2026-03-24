@@ -153,7 +153,7 @@ function MetricItem({ label, value, accent }: { label: string; value: string; ac
   return (
     <div className="flex items-center gap-1 shrink-0">
       <span className="text-[9px] text-muted-foreground tracking-wider font-medium">{label}</span>
-      <span className={`text-[11px] sm:text-[12px] font-data ${accent ? `text-${accent}` : 'text-foreground'}`}>
+      <span className={`text-[11px] sm:text-[12px] font-data ${accent === 'success' ? 'text-success' : accent === 'destructive' ? 'text-destructive' : 'text-foreground'}`}>
         {accent === 'success' && <span className="inline-block w-1.5 h-1.5 rounded-full bg-success mr-0.5 align-middle" />}
         {accent === 'destructive' && <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive mr-0.5 align-middle" />}
         {value}

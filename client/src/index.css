@@ -1628,19 +1628,38 @@
   overflow: hidden;
 }
 
+/* Fallback: simple sliding highlight for older browsers */
 .border-beam::after {
-  content: '';
+  content: "";
   position: absolute;
-  width: 60px;
-  height: 60px;
-  background: var(--primary);
-  border-radius: 50%;
-  filter: blur(20px);
-  opacity: 0.35;
-  offset-path: rect(0 100% 100% 0 round 0);
-  animation: border-beam 6s linear infinite;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  animation: border-beam-fallback 3s linear infinite;
+  opacity: 0.3;
   pointer-events: none;
   z-index: 0;
+}
+@keyframes border-beam-fallback {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+/* Modern browsers: use offset-path */
+@supports (offset-path: rect(0 100% 100% 0 round 0)) {
+  .border-beam::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0.35;
+    offset-path: rect(0 100% 100% 0 round 0);
+    animation: border-beam 6s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 /* Variant: faster beam for small elements like buttons */
@@ -1722,15 +1741,21 @@
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: conic-gradient(
-    from var(--gradient-angle),
-    transparent 25%,
-    var(--primary) 50%,
-    transparent 75%
-  );
+  /* Fallback for older browsers */
+  background: linear-gradient(135deg, transparent 25%, var(--primary) 50%, transparent 75%);
   animation: gradient-rotate 4s linear infinite;
   z-index: -1;
   opacity: 0.5;
+}
+@supports (background: conic-gradient(from 0deg, red, blue)) {
+  .gradient-border::before {
+    background: conic-gradient(
+      from var(--gradient-angle),
+      transparent 25%,
+      var(--primary) 50%,
+      transparent 75%
+    );
+  }
 }
 
 .gradient-border::after {

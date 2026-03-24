@@ -189,7 +189,8 @@ export async function fetchLivePrices(): Promise<LivePriceData[]> {
       usingCache: priceCache.length > 0,
     });
     if (priceCache.length > 0) return priceCache;
-    throw error;
+    logger.warn({ event: "coingecko_unavailable_no_cache" });
+    return [];
   }
 }
 

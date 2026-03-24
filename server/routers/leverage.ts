@@ -171,7 +171,7 @@ const LOCKOUT_DURATION_MS = 15 * 60_000; // 15-minute block
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of lockoutMap) {
-    if (now > entry.lockedUntil && now - entry.windowStart > LOCKOUT_WINDOW_MS) {
+    if (now > entry.lockedUntil || now - entry.windowStart > LOCKOUT_WINDOW_MS * 2) {
       lockoutMap.delete(key);
     }
   }

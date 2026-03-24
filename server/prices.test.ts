@@ -69,12 +69,13 @@ describe('prices service', () => {
     }
   });
 
-  it('should handle API errors gracefully and throw when no cache', async () => {
+  it('should return empty array on API error with no cache', async () => {
     mockedAxios.get.mockRejectedValue(new Error('Request failed with status code 429'));
 
     const { fetchLivePrices } = await import('./prices');
 
-    await expect(fetchLivePrices()).rejects.toThrow();
+    const result = await fetchLivePrices();
+    expect(result).toEqual([]);
   });
 
   it('getSolUsdPrice returns SOL price from cache', async () => {
