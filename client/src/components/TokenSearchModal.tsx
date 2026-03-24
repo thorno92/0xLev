@@ -60,13 +60,23 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
     onOpenChange(false);
   };
 
+  const resultsRef = useRef<HTMLDivElement>(null);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
+      setSelectedIndex((i) => {
+        const next = Math.min(i + 1, filtered.length - 1);
+        resultsRef.current?.children[0]?.children[next]?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((i) => Math.max(i - 1, 0));
+      setSelectedIndex((i) => {
+        const next = Math.max(i - 1, 0);
+        resultsRef.current?.children[0]?.children[next]?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
     } else if (e.key === 'Enter' && filtered[selectedIndex]) {
       handleSelect(filtered[selectedIndex]);
     }
@@ -113,7 +123,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
         </div>
 
         {/* Results */}
-        <div className="max-h-[400px] overflow-y-auto">
+        <div ref={resultsRef} className="max-h-[50vh] sm:max-h-[400px] overflow-y-auto">
           {filtered.length === 0 && !customToken ? (
             <div className="py-8 text-center text-[13px] text-muted-foreground">
               No tokens found

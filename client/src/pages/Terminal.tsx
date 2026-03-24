@@ -398,7 +398,7 @@ export default function Terminal() {
         </div>
 
         {/* RIGHT COLUMN: Trading Panel + Order Book */}
-        <div className="w-[320px] xl:w-[340px] shrink-0 border-l border-border flex flex-col bg-card overflow-hidden">
+        <div className="w-[280px] lg:w-[320px] xl:w-[340px] shrink-0 border-l border-border flex flex-col bg-card overflow-hidden">
           {/* Tab bar: Trade / Order Book */}
           <div className="flex border-b border-border shrink-0">
             <button
@@ -826,19 +826,19 @@ export default function Terminal() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={handleSwipeTab}
-            className={`flex-1 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[120px]' : 'pb-[56px]'}`}
+            className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[120px]' : 'pb-2'}`}
             style={{ touchAction: 'pan-y' }}
           >
           {/* Chart Tab */}
           {mobileTab === 'chart' && (
-            <div className="h-full min-h-[400px]">
+            <div className="h-full min-h-[280px]">
               <ChartPanel />
             </div>
           )}
 
           {/* Order Book Tab */}
           {mobileTab === 'book' && (
-            <div className="h-full min-h-[500px]">
+            <div className="h-full min-h-[300px]">
               <MiniOrderBook
                 asks={orderBook.asks}
                 bids={orderBook.bids}
@@ -960,7 +960,7 @@ export default function Terminal() {
                     <button
                       key={preset}
                       onClick={() => setLeverage(preset)}
-                      className={`flex-1 py-1 text-[10px] font-data rounded transition-colors ${
+                      className={`flex-1 py-1.5 text-[10px] font-data rounded transition-colors min-h-[32px] ${
                         leverage === preset
                           ? 'bg-primary/12 text-primary border border-primary/25'
                           : 'bg-secondary text-muted-foreground border border-transparent'
@@ -1023,8 +1023,8 @@ export default function Terminal() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Data Panel: Transactions/Positions/etc */}
-        <div className="border-t border-border">
+        {/* Data Panel: Transactions/Positions/etc — constrained to not squeeze chart */}
+        <div className="border-t border-border max-h-[35vh] min-h-0 overflow-hidden">
           <BottomPanel />
         </div>
       </div>

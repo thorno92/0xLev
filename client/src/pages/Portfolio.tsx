@@ -236,8 +236,8 @@ export default function Portfolio() {
               {/* Balance + Chart row */}
               <div className="flex flex-col sm:flex-row items-start gap-0">
                 {/* Left: Balance number */}
-                <div className="shrink-0 pr-0 sm:pr-10 w-full sm:w-auto sm:min-w-[340px]">
-                  <div className="flex items-baseline flex-wrap mb-3">
+                <div className="shrink-0 pr-0 sm:pr-10 w-full sm:w-auto">
+                  <div className="flex items-baseline mb-3">
                     <span className="text-[36px] sm:text-[52px] font-bold text-foreground tracking-tight leading-none tabular-nums">
                       ${balanceInt}
                     </span>

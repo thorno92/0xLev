@@ -1707,6 +1707,11 @@
   z-index: -1;
 }
 
+/* Safe area padding for notched devices (iPhone X+, etc.) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* ---- SUBTLE GLOW PULSE (for active panels) ---- */
 @keyframes glow-pulse {
   0%, 100% {

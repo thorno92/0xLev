@@ -372,7 +372,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
     >
       {/* ---- HOVER PREVIEW POPUP ---- */}
       {hovered && (
-        <div className="absolute z-50 left-full top-0 ml-2 w-[260px] rounded-xl bg-card border border-white/[0.06] shadow-2xl shadow-black/40 p-3.5 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute z-50 left-full top-0 ml-2 w-[260px] rounded-xl bg-card border border-white/[0.06] shadow-2xl shadow-black/40 p-3.5 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150 hidden sm:block">
           {/* Sparkline chart */}
           <div className="mb-3 rounded-lg bg-white/[0.02] p-2">
             <MiniSparkline data={sparkData} width={228} height={64} color={token.change24h >= 0 ? 'var(--color-success)' : 'var(--color-destructive)'} />

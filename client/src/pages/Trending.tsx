@@ -264,7 +264,7 @@ export default function Trending() {
 
               {/* Filters */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pr-4">
                   {timeFilters.map(f => (
                     <button
                       key={f}
@@ -280,7 +280,7 @@ export default function Trending() {
                   ))}
                 </div>
                 <div className="h-4 w-px bg-border hidden sm:block" />
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pr-4">
                   {networkFilters.map(n => {
                     const Icon = filterNetworkIcon[n];
                     return (
@@ -321,14 +321,14 @@ export default function Trending() {
             </div>
 
             {/* == STATS == */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px border border-border overflow-hidden">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-[1px] bg-border/30 border border-border rounded overflow-hidden">
               {[
                 { label: '24H VOLUME', value: aggregateStats.volume24h },
                 { label: '24H TXNS', value: aggregateStats.txns24h },
                 { label: 'TOP GAINER', value: topGainer?.symbol || '--', sub: topGainer ? formatPercent(topGainer.change24h) : '', color: 'text-success' },
                 { label: 'TOP LOSER', value: topLoser?.symbol || '--', sub: topLoser ? formatPercent(topLoser.change24h) : '', color: 'text-destructive' },
               ].map(s => (
-                <div key={s.label} className="p-4 border border-border/30 bg-card/30">
+                <div key={s.label} className="p-4 bg-card/50">
                   <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-foreground">{s.label}</div>
                   <div className="flex items-baseline gap-1.5 mt-1">
                     <span className={`font-data text-lg font-semibold ${s.color || 'text-foreground'}`}>{s.value}</span>
@@ -507,7 +507,7 @@ export default function Trending() {
 
               {/* Filters */}
               <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pr-4">
                   {timeFilters.map(f => (
                     <button
                       key={f}
@@ -522,7 +522,7 @@ export default function Trending() {
                     </button>
                   ))}
                 </div>
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pr-4">
                   {networkFilters.map(n => {
                     const Icon = filterNetworkIcon[n];
                     return (

@@ -69,7 +69,7 @@ export function MobileBottomNav() {
             return (
               <Link key={tab.path} href={tab.path}>
                 <button
-                  className={`flex flex-col items-center justify-center min-w-[56px] w-full py-1 transition-colors duration-150 ${
+                  className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors duration-150 ${
                     isActive ? 'text-primary' : 'text-muted-foreground/60 active:text-foreground'
                   }`}
                 >

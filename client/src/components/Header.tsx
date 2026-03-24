@@ -199,7 +199,7 @@ export function Header() {
 
   return (
     <>
-      <header className="h-11 border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top">
+      <header className="h-11 border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30">
         {/* Logo */}
         <Link href="/">
           <div className="flex items-baseline gap-0.5 mr-2 sm:mr-5 shrink-0 cursor-pointer group">
@@ -245,16 +245,15 @@ export function Header() {
         </button>
 
         {/* Divider -- desktop only */}
-        <div className="hidden lg:block w-px h-4 bg-border mr-2 shrink-0" />
+        <div className="hidden md:block w-px h-4 bg-border mr-2 shrink-0" />
 
-        {/* Trending carousel -- desktop only, no "TRENDING" label */}
-        <div className="hidden lg:block flex-1 overflow-hidden">
+        {/* Trending carousel -- tablet+ */}
+        <div className="hidden md:block flex-1 overflow-hidden">
           <TrendingBar />
         </div>
 
         {/* Spacer for mobile */}
         <div className="flex-1 md:hidden" />
-        <div className="hidden md:block lg:hidden flex-1" />
 
         {/* Right Actions */}
         <div className="flex items-center gap-1 sm:gap-1.5 ml-1 sm:ml-3 shrink-0">
@@ -511,7 +510,7 @@ export function Header() {
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-3 py-2 bg-secondary border border-border rounded text-[13px] font-data text-foreground focus:outline-none focus:border-primary/50"
+                className="w-full px-3 py-2 bg-secondary border border-border rounded text-[13px] font-data text-foreground focus:outline-none focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/30"
               />
             </div>
             <button
