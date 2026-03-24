@@ -268,27 +268,11 @@ export function Header() {
             <Search className="w-4 h-4" />
           </button>
 
-          {/* Mobile theme toggle -- tap to cycle, long-press to open picker sheet */}
+          {/* Mobile theme toggle -- tap opens picker sheet */}
           <button
-            onTouchStart={handleThemeTouchStart}
-            onTouchEnd={handleThemeTouchEnd}
-            onTouchCancel={() => {
-              if (longPressTimer.current) {
-                clearTimeout(longPressTimer.current);
-                longPressTimer.current = null;
-              }
-            }}
-            onClick={(e) => {
-              // Prevent click on touch devices (handled by touch events)
-              // Only fire on non-touch (desktop fallback)
-              if ('ontouchstart' in window) { e.preventDefault(); return; }
-              const idx = themeOptions.findIndex(t => t.name === theme);
-              const next = themeOptions[(idx + 1) % themeOptions.length];
-              setTheme(next.name);
-              toast.success(`Theme: ${next.label}`);
-            }}
+            onClick={() => setThemePickerOpen(true)}
             className="sm:hidden flex items-center justify-center p-1.5 rounded hover:bg-primary/8 transition-colors select-none"
-            title={`Theme: ${currentThemeOption.label} (hold for picker)`}
+            title={`Theme: ${currentThemeOption.label}`}
           >
             <span
               className="w-4 h-4 rounded-full ring-1 ring-white/20 ring-offset-1 ring-offset-background transition-colors"
