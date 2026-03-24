@@ -3,7 +3,13 @@
  * All financial data formatting in one place.
  */
 
+function safeNum(n: number): number {
+  if (n == null || !isFinite(n)) return 0;
+  return n;
+}
+
 export function formatPrice(price: number, decimals?: number): string {
+  price = safeNum(price);
   if (price === 0) return '$0.00';
   const abs = Math.abs(price);
   const sign = price < 0 ? '-' : '';
@@ -15,6 +21,7 @@ export function formatPrice(price: number, decimals?: number): string {
 }
 
 export function formatPriceSol(price: number): string {
+  price = safeNum(price);
   if (price === 0) return '0 SOL';
   const abs = Math.abs(price);
   const sign = price < 0 ? '-' : '';
@@ -26,6 +33,7 @@ export function formatPriceSol(price: number): string {
 }
 
 export function formatNumber(num: number, decimals: number = 2): string {
+  num = safeNum(num);
   return num.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -33,6 +41,7 @@ export function formatNumber(num: number, decimals: number = 2): string {
 }
 
 export function formatCompact(num: number): string {
+  num = safeNum(num);
   if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
   if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
   if (num >= 1_000) return `$${(num / 1_000).toFixed(1)}K`;
@@ -40,11 +49,13 @@ export function formatCompact(num: number): string {
 }
 
 export function formatPercent(pct: number): string {
+  pct = safeNum(pct);
   const sign = pct >= 0 ? '+' : '';
   return `${sign}${pct.toFixed(2)}%`;
 }
 
 export function formatSol(amount: number): string {
+  amount = safeNum(amount);
   return `${amount.toFixed(4)} SOL`;
 }
 

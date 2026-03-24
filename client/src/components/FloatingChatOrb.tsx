@@ -51,12 +51,12 @@ export function FloatingChatOrb() {
   };
 
   return (
-    <div className="fixed bottom-14 right-3 sm:bottom-5 sm:right-4 z-50">
+    <div className="fixed bottom-[72px] right-3 sm:bottom-5 sm:right-4 z-40">
       {/* Chat Panel */}
       {isOpen && (
         <div
           className="mb-3 bg-card border border-border rounded shadow-2xl shadow-black/40 flex flex-col overflow-hidden
-            w-[calc(100vw-1.5rem)] sm:w-80 max-w-80"
+            w-[min(calc(100vw-2rem),320px)] sm:w-80"
           style={{ height: 'min(380px, calc(100vh - 120px))' }}
         >
           {/* Header */}

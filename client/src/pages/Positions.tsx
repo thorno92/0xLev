@@ -222,7 +222,7 @@ export default function Positions() {
               {/* == RISK METRICS == */}
               <div>
                 <SectionLabel label="RISK OVERVIEW" />
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px border border-border overflow-hidden">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-[1px] bg-border/30 border border-border rounded overflow-hidden">
                   {[
                     { label: 'TOTAL MARGIN', value: `$${formatNumber(totalMargin, 2)}`, positive: null as boolean | null },
                     { label: 'NOTIONAL', value: `$${formatNumber(totalNotional, 0)}`, positive: null },
@@ -231,7 +231,7 @@ export default function Positions() {
                     { label: 'MAX LEVERAGE', value: `${maxLeverage}x`, positive: maxLeverage < 15 ? true : maxLeverage < 25 ? null : false },
                     { label: 'NEAREST LIQ', value: `${nearestLiq.dist.toFixed(1)}%`, positive: nearestLiq.dist > 20 ? true : nearestLiq.dist > 10 ? null : false },
                   ].map(stat => (
-                    <div key={stat.label} className="p-4 border border-border/30 bg-card/30">
+                    <div key={stat.label} className="p-4 bg-card/50">
                       <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-foreground mb-1.5">{stat.label}</div>
                       <div className={`font-data text-base font-semibold ${
                         stat.positive === true ? 'text-success' : stat.positive === false ? 'text-destructive' : 'text-foreground'

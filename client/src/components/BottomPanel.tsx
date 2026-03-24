@@ -44,9 +44,14 @@ export function BottomPanel() {
 
   return (
     <div className="flex flex-col bg-card border-t border-border h-full">
-      {/* Tab Bar — scrollable on mobile */}
-      <div className="flex items-center border-b border-border shrink-0 overflow-x-auto scrollbar-none">
-        <div className="flex items-center shrink-0 px-0.5">
+      {/* Tab Bar — scrollable on mobile with fade indicators */}
+      <div className="flex items-center border-b border-border shrink-0 relative">
+        {/* Left fade */}
+        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none sm:hidden" />
+        {/* Right fade */}
+        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none sm:hidden" />
+
+        <div className="flex items-center shrink-0 px-0.5 overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -215,55 +220,86 @@ function TransactionsTable() {
   }, [birdeyeTrades]);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Date / Time</th>
-            <th>Type</th>
-            <th style={{ textAlign: 'right' }}>Price</th>
-            <th style={{ textAlign: 'right' }}>Amount</th>
-            <th style={{ textAlign: 'right' }}>SOL</th>
-            <th>Maker</th>
-            <th style={{ textAlign: 'center', width: 40 }}>TXN</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((tx, i) => (
-            <tr key={i} className="row-hover">
-              <td className="whitespace-nowrap">
-                <div className="text-foreground font-medium font-data text-[12px] leading-tight">{tx.time}</div>
-                <div className="text-muted-foreground/70 text-[10px] font-data leading-tight">{tx.date}</div>
-              </td>
-              <td>
-                <span className={`font-medium ${tx.type === 'Buy' ? 'text-success' : 'text-destructive'}`}>
+    <>
+      {/* Mobile card layout */}
+      <div className="sm:hidden divide-y divide-border/50">
+        {transactions.map((tx, i) => (
+          <div key={i} className="px-3 py-2 flex items-center gap-2.5">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className={`text-[10px] font-semibold px-1 py-0.5 rounded ${
+                  tx.type === 'Buy' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
+                }`}>
                   {tx.type}
                 </span>
-              </td>
-              <td className="numeric">{formatPrice(tx.price)}</td>
-              <td className="numeric">{formatNumber(tx.amount, 0)}</td>
-              <td className="numeric">{tx.sol.toFixed(4)}</td>
-              <td>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(tx.maker);
-                    toast.info('Address copied');
-                  }}
-                  className="text-primary hover:text-primary/80 font-data transition-colors text-[12px] badge-hover"
-                >
-                  {truncateMaker(tx.maker)}
-                </button>
-              </td>
-              <td style={{ textAlign: 'center' }}>
-                <button className="text-muted-foreground hover:text-foreground transition-colors p-0.5 icon-btn-hover">
-                  <OpenNewWindow className="w-2.5 h-2.5" />
-                </button>
-              </td>
+                <span className="text-[10px] text-muted-foreground font-data">{tx.date}</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px]">
+                <span className="font-data text-foreground">{formatPrice(tx.price)}</span>
+                <span className="text-muted-foreground">{tx.sol.toFixed(4)} SOL</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(tx.maker); toast.info('Address copied'); }}
+              className="text-primary text-[10px] font-data shrink-0"
+            >
+              {truncateMaker(tx.maker)}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Date / Time</th>
+              <th>Type</th>
+              <th style={{ textAlign: 'right' }}>Price</th>
+              <th style={{ textAlign: 'right' }}>Amount</th>
+              <th style={{ textAlign: 'right' }}>SOL</th>
+              <th>Maker</th>
+              <th style={{ textAlign: 'center', width: 40 }}>TXN</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {transactions.map((tx, i) => (
+              <tr key={i} className="row-hover">
+                <td className="whitespace-nowrap">
+                  <div className="text-foreground font-medium font-data text-[12px] leading-tight">{tx.time}</div>
+                  <div className="text-muted-foreground/70 text-[10px] font-data leading-tight">{tx.date}</div>
+                </td>
+                <td>
+                  <span className={`font-medium ${tx.type === 'Buy' ? 'text-success' : 'text-destructive'}`}>
+                    {tx.type}
+                  </span>
+                </td>
+                <td className="numeric">{formatPrice(tx.price)}</td>
+                <td className="numeric">{formatNumber(tx.amount, 0)}</td>
+                <td className="numeric">{tx.sol.toFixed(4)}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(tx.maker);
+                      toast.info('Address copied');
+                    }}
+                    className="text-primary hover:text-primary/80 font-data transition-colors text-[12px] badge-hover"
+                  >
+                    {truncateMaker(tx.maker)}
+                  </button>
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  <button className="text-muted-foreground hover:text-foreground transition-colors p-0.5 icon-btn-hover">
+                    <OpenNewWindow className="w-2.5 h-2.5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -312,106 +348,178 @@ function OpenPositionsTable() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Side</th>
-            <th style={{ textAlign: 'right' }}>Size</th>
-            <th style={{ textAlign: 'right' }}>Lev</th>
-            <th style={{ textAlign: 'right' }}>Entry</th>
-            <th style={{ textAlign: 'right' }}>Mark</th>
-            <th style={{ textAlign: 'right' }}>Liq. Price</th>
-            <th style={{ textAlign: 'right' }}>P&L</th>
-            <th style={{ textAlign: 'center', width: 72 }}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {positions.map((pos) => {
-            const pnlPositive = (pos.liveProfit ?? 0) >= 0;
-            return (
-              <tr key={pos.trade_id} className="row-hover">
-                <td>
-                  <div className="flex items-center gap-1.5">
-                    <TokenLogo symbol={pos.symbol} size={16} />
-                    <span className="font-medium text-foreground">{pos.symbol}</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`text-[10px] font-semibold px-1 py-0.5 rounded ${
-                    pos.side === 'buy'
-                      ? 'bg-success/10 text-success'
-                      : 'bg-destructive/10 text-destructive'
+    <>
+      {/* Mobile card layout */}
+      <div className="sm:hidden divide-y divide-border/50">
+        {positions.map((pos) => {
+          const pnlPositive = (pos.liveProfit ?? 0) >= 0;
+          return (
+            <div key={pos.trade_id} className="px-3 py-2.5">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <TokenLogo symbol={pos.symbol} size={16} />
+                  <span className="text-[12px] font-medium text-foreground">{pos.symbol}</span>
+                  <span className={`text-[9px] font-semibold px-1 py-0.5 rounded ${
+                    pos.side === 'buy' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
                   }`}>
-                    {pos.side === 'buy' ? 'BUY' : 'SELL'}
+                    {pos.side === 'buy' ? 'BUY' : 'SELL'} {pos.leverage}x
                   </span>
-                </td>
-                <td className="numeric">{formatNumber(pos.amount, 4)}</td>
-                <td className="numeric">{pos.leverage}x</td>
-                <td className="numeric">{formatPrice(pos.entryPrice)}</td>
-                <td className="numeric">{formatPrice(pos.currentPrice ?? 0)}</td>
-                <td className="numeric text-warning">{pos.liquidationPrice ? formatPrice(pos.liquidationPrice) : 'N/A'}</td>
-                <td className={`numeric font-medium ${pnlPositive ? 'text-success' : 'text-destructive'}`}>
-                  <div className="flex flex-col items-end leading-tight">
-                    <span>{pnlPositive ? '+' : ''}{formatPrice(pos.liveProfit ?? 0)}</span>
-                    <span className="text-[9px] opacity-70">{formatPercent(pos.liveProfitPercent ?? 0)}</span>
-                  </div>
-                </td>
-                <td style={{ textAlign: 'center' }}>
-                  <button
-                    onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
-                    disabled={isClosing === pos.trade_id}
-                    className="px-2.5 py-1 text-[10px] font-semibold rounded transition-all duration-100 bg-destructive/8 text-destructive border border-destructive/20 hover:bg-destructive/15 hover:border-destructive/30 disabled:opacity-50 whitespace-nowrap btn-hover"
-                  >
-                    {isClosing === pos.trade_id ? (
-                      <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
-                    ) : (
-                      'Close'
-                    )}
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                </div>
+                <span className={`text-[11px] font-data font-medium ${pnlPositive ? 'text-success' : 'text-destructive'}`}>
+                  {pnlPositive ? '+' : ''}{formatPrice(pos.liveProfit ?? 0)}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] mb-2">
+                <div><span className="text-muted-foreground">Entry</span> <span className="font-data text-foreground">{formatPrice(pos.entryPrice)}</span></div>
+                <div><span className="text-muted-foreground">Mark</span> <span className="font-data text-foreground">{formatPrice(pos.currentPrice ?? 0)}</span></div>
+                <div><span className="text-muted-foreground">Liq.</span> <span className="font-data text-warning">{pos.liquidationPrice ? formatPrice(pos.liquidationPrice) : 'N/A'}</span></div>
+                <div><span className="text-muted-foreground">Size</span> <span className="font-data text-foreground">{formatNumber(pos.amount, 4)} SOL</span></div>
+                <div className="col-span-2">
+                  <span className="text-muted-foreground">P&L %</span>{' '}
+                  <span className={`font-data ${pnlPositive ? 'text-success' : 'text-destructive'}`}>{formatPercent(pos.liveProfitPercent ?? 0)}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
+                disabled={isClosing === pos.trade_id}
+                className="w-full h-7 text-[10px] font-semibold rounded transition-all duration-100 bg-destructive/8 text-destructive border border-destructive/20 hover:bg-destructive/15 hover:border-destructive/30 disabled:opacity-50 btn-hover"
+              >
+                {isClosing === pos.trade_id ? (
+                  <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
+                ) : (
+                  'Close Position'
+                )}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Side</th>
+              <th style={{ textAlign: 'right' }}>Size</th>
+              <th style={{ textAlign: 'right' }}>Lev</th>
+              <th style={{ textAlign: 'right' }}>Entry</th>
+              <th style={{ textAlign: 'right' }}>Mark</th>
+              <th style={{ textAlign: 'right' }}>Liq. Price</th>
+              <th style={{ textAlign: 'right' }}>P&L</th>
+              <th style={{ textAlign: 'center', width: 72 }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {positions.map((pos) => {
+              const pnlPositive = (pos.liveProfit ?? 0) >= 0;
+              return (
+                <tr key={pos.trade_id} className="row-hover">
+                  <td>
+                    <div className="flex items-center gap-1.5">
+                      <TokenLogo symbol={pos.symbol} size={16} />
+                      <span className="font-medium text-foreground">{pos.symbol}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`text-[10px] font-semibold px-1 py-0.5 rounded ${
+                      pos.side === 'buy'
+                        ? 'bg-success/10 text-success'
+                        : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      {pos.side === 'buy' ? 'BUY' : 'SELL'}
+                    </span>
+                  </td>
+                  <td className="numeric">{formatNumber(pos.amount, 4)}</td>
+                  <td className="numeric">{pos.leverage}x</td>
+                  <td className="numeric">{formatPrice(pos.entryPrice)}</td>
+                  <td className="numeric">{formatPrice(pos.currentPrice ?? 0)}</td>
+                  <td className="numeric text-warning">{pos.liquidationPrice ? formatPrice(pos.liquidationPrice) : 'N/A'}</td>
+                  <td className={`numeric font-medium ${pnlPositive ? 'text-success' : 'text-destructive'}`}>
+                    <div className="flex flex-col items-end leading-tight">
+                      <span>{pnlPositive ? '+' : ''}{formatPrice(pos.liveProfit ?? 0)}</span>
+                      <span className="text-[9px] opacity-70">{formatPercent(pos.liveProfitPercent ?? 0)}</span>
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button
+                      onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
+                      disabled={isClosing === pos.trade_id}
+                      className="px-2.5 py-1 text-[10px] font-semibold rounded transition-all duration-100 bg-destructive/8 text-destructive border border-destructive/20 hover:bg-destructive/15 hover:border-destructive/30 disabled:opacity-50 whitespace-nowrap btn-hover"
+                    >
+                      {isClosing === pos.trade_id ? (
+                        <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
+                      ) : (
+                        'Close'
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
 function TopTradersTable() {
   return (
-    <div className="overflow-x-auto">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th style={{ width: 40 }}>#</th>
-            <th>Address</th>
-            <th style={{ textAlign: 'right' }}>P&L</th>
-            <th style={{ textAlign: 'right' }}>Win Rate</th>
-            <th style={{ textAlign: 'right' }}>Trades</th>
-            <th style={{ textAlign: 'right' }}>Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockTopTraders.map((trader) => (
-            <tr key={trader.rank} className="row-hover">
-              <td className="text-muted-foreground font-data">{trader.rank}</td>
-              <td>
-                <button className="text-primary hover:text-primary/80 font-data transition-colors text-[12px] badge-hover">
-                  {trader.address}
-                </button>
-              </td>
-              <td className="numeric text-success font-medium">+{formatCompact(trader.pnl)}</td>
-              <td className="numeric">{trader.winRate}%</td>
-              <td className="numeric">{trader.trades}</td>
-              <td className="numeric">{formatCompact(trader.volume)}</td>
+    <>
+      {/* Mobile card layout */}
+      <div className="sm:hidden divide-y divide-border/50">
+        {mockTopTraders.map((trader) => (
+          <div key={trader.rank} className="px-3 py-2.5">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground font-data w-4">#{trader.rank}</span>
+                <button className="text-primary text-[11px] font-data">{trader.address}</button>
+              </div>
+              <span className="text-[11px] font-data text-success font-medium">+{formatCompact(trader.pnl)}</span>
+            </div>
+            <div className="flex items-center gap-3 text-[10px] ml-6">
+              <span className="text-muted-foreground">Win <span className="text-foreground font-data">{trader.winRate}%</span></span>
+              <span className="text-muted-foreground">Trades <span className="text-foreground font-data">{trader.trades}</span></span>
+              <span className="text-muted-foreground">Vol <span className="text-foreground font-data">{formatCompact(trader.volume)}</span></span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th style={{ width: 40 }}>#</th>
+              <th>Address</th>
+              <th style={{ textAlign: 'right' }}>P&L</th>
+              <th style={{ textAlign: 'right' }}>Win Rate</th>
+              <th style={{ textAlign: 'right' }}>Trades</th>
+              <th style={{ textAlign: 'right' }}>Volume</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {mockTopTraders.map((trader) => (
+              <tr key={trader.rank} className="row-hover">
+                <td className="text-muted-foreground font-data">{trader.rank}</td>
+                <td>
+                  <button className="text-primary hover:text-primary/80 font-data transition-colors text-[12px] badge-hover">
+                    {trader.address}
+                  </button>
+                </td>
+                <td className="numeric text-success font-medium">+{formatCompact(trader.pnl)}</td>
+                <td className="numeric">{trader.winRate}%</td>
+                <td className="numeric">{trader.trades}</td>
+                <td className="numeric">{formatCompact(trader.volume)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -468,7 +576,36 @@ function HolderAnalysis() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobile card layout */}
+      <div className="sm:hidden divide-y divide-border/50">
+        {mockHolderData.map((holder, i) => (
+          <div key={i} className="px-3 py-2">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${
+                  holder.type === 'Whale' ? 'bg-warning/10 text-warning' :
+                  holder.type === 'DEX' ? 'bg-primary/10 text-primary' :
+                  holder.type === 'Large' ? 'bg-success/10 text-success' :
+                  'bg-secondary text-muted-foreground'
+                }`}>{holder.type}</span>
+                <span className="font-data text-primary text-[10px]">{holder.address}</span>
+              </div>
+              <span className="text-[11px] font-data text-foreground">{holder.percentage}%</span>
+            </div>
+            <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
+              <div className={`h-full rounded-full ${
+                holder.type === 'Whale' ? 'bg-warning' :
+                holder.type === 'DEX' ? 'bg-primary' :
+                holder.type === 'Large' ? 'bg-success' :
+                'bg-muted-foreground'
+              }`} style={{ width: `${holder.percentage * 4}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="data-table">
           <thead>
             <tr>
