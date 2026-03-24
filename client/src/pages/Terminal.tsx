@@ -59,10 +59,10 @@ export default function Terminal() {
   const [rightTab, setRightTab] = useState<RightTab>('trade');
 
   // Mobile view tab
-  type MobileTab = 'chart' | 'book' | 'trade';
+  type MobileTab = 'chart' | 'book' | 'trade' | 'data';
   const [mobileTab, setMobileTab] = useState<MobileTab>('chart');
   const [swipeDirection, setSwipeDirection] = useState(0); // -1 left, 1 right
-  const mobileTabs: MobileTab[] = ['chart', 'book', 'trade'];
+  const mobileTabs: MobileTab[] = ['chart', 'book', 'trade', 'data'];
 
   const handleSwipeTab = useCallback((_: unknown, info: PanInfo) => {
     const SWIPE_THRESHOLD = 50;
@@ -783,17 +783,18 @@ export default function Terminal() {
       {/* ============================================================
           MOBILE LAYOUT -- tab-based with swipeable sections
           ============================================================ */}
-      <div className="md:hidden flex flex-col flex-1 overflow-hidden">
+      <div className="md:hidden flex flex-col flex-1 min-h-0 pb-[72px]">
         {/* Mobile Tab Bar */}
         <div className="flex bg-card border-b border-border shrink-0">
-          {mobileTabs.map(tab => (
+          {(['chart', 'book', 'trade', 'data'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => {
-                const fromIdx = mobileTabs.indexOf(mobileTab);
-                const toIdx = mobileTabs.indexOf(tab);
+                const allTabs = ['chart', 'book', 'trade', 'data'] as const;
+                const fromIdx = allTabs.indexOf(mobileTab as typeof allTabs[number]);
+                const toIdx = allTabs.indexOf(tab);
                 setSwipeDirection(toIdx > fromIdx ? 1 : -1);
-                setMobileTab(tab);
+                setMobileTab(tab as MobileTab);
               }}
               className={`flex-1 py-2.5 text-[11px] font-semibold uppercase tracking-wider transition-all relative ${
                 mobileTab === tab
@@ -801,7 +802,7 @@ export default function Terminal() {
                   : 'text-muted-foreground/50'
               }`}
             >
-              {tab === 'chart' ? 'Chart' : tab === 'book' ? 'Order Book' : 'Trade'}
+              {tab === 'chart' ? 'Chart' : tab === 'book' ? 'Book' : tab === 'trade' ? 'Trade' : 'Data'}
               {mobileTab === tab && (
                 <motion.div
                   layoutId="mobile-tab-indicator"
@@ -826,19 +827,19 @@ export default function Terminal() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={handleSwipeTab}
-            className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[120px]' : 'pb-2'}`}
+            className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[64px]' : ''}`}
             style={{ touchAction: 'pan-y' }}
           >
-          {/* Chart Tab */}
+          {/* Chart Tab — fills all available space */}
           {mobileTab === 'chart' && (
-            <div className="h-full min-h-[280px]">
+            <div className="h-full">
               <ChartPanel />
             </div>
           )}
 
           {/* Order Book Tab */}
           {mobileTab === 'book' && (
-            <div className="h-full min-h-[300px]">
+            <div className="h-full">
               <MiniOrderBook
                 asks={orderBook.asks}
                 bids={orderBook.bids}
@@ -1020,19 +1021,21 @@ export default function Terminal() {
 
           </>
           )}
+
+          {/* Data Tab — Transactions, Open Positions, etc */}
+          {mobileTab === 'data' && (
+            <div className="h-full">
+              <BottomPanel />
+            </div>
+          )}
           </motion.div>
         </AnimatePresence>
-
-        {/* Data Panel: Transactions/Positions/etc — constrained to not squeeze chart */}
-        <div className="border-t border-border max-h-[35vh] min-h-0 overflow-hidden">
-          <BottomPanel />
-        </div>
       </div>
 
       {/* ============================================================
           MOBILE: Sticky Execute Button at bottom (only on trade tab)
           ============================================================ */}
-      <div className={`md:hidden fixed bottom-[56px] left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-3 py-2 safe-area-bottom transition-all ${mobileTab === 'trade' ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
+      <div className={`md:hidden fixed bottom-[72px] left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-3 py-2 transition-all ${mobileTab === 'trade' ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
         {walletConnected ? (
           <button
             onClick={handleExecute}
