@@ -199,7 +199,7 @@ export function Header() {
 
   return (
     <>
-      <header className="border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30 safe-area-header">
+      <header className="h-11 border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30">
         {/* Logo */}
         <Link href="/">
           <div className="flex items-center mr-2 sm:mr-5 shrink-0 cursor-pointer group logo-glow">

@@ -41,7 +41,8 @@
 
     <!-- Critical CSS: prevent FOUC with dark background -->
     <style>
-      html, body, #root { background: #09080F; color: #F0ECF9; min-height: 100vh; margin: 0; }
+      html { background: #09080F; color: #F0ECF9; min-height: 100vh; margin: 0; padding-top: constant(safe-area-inset-top); padding-top: env(safe-area-inset-top); }
+      body, #root { background: #09080F; min-height: 100vh; margin: 0; }
       body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
       .font-data { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-variant-numeric: tabular-nums; }
     </style>
