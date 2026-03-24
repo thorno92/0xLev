@@ -1569,6 +1569,15 @@
    Text shimmer, border beam, background grain, sliding tabs
    ============================================================ */
 
+/* ---- LOGO GLOW (Purple shimmer on hover) ---- */
+.logo-glow img {
+  filter: drop-shadow(0 0 4px var(--primary));
+  transition: filter 0.3s ease;
+}
+.logo-glow:hover img {
+  filter: drop-shadow(0 0 8px var(--primary)) drop-shadow(0 0 16px var(--glow-subtle));
+}
+
 /* ---- TEXT SHIMMER (Shining Text) ---- */
 @keyframes text-shimmer {
   0% {

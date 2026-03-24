@@ -199,13 +199,16 @@ export function Header() {
 
   return (
     <>
-      <header className="h-11 border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30">
+      <header className="border-b border-border bg-card flex items-center px-2 sm:px-3 shrink-0 select-none neon-stream-top relative z-30" style={{ paddingTop: 'env(safe-area-inset-top)', minHeight: 'calc(2.75rem + env(safe-area-inset-top, 0px))' }}>
         {/* Logo */}
         <Link href="/">
-          <div className="flex items-baseline gap-0.5 mr-2 sm:mr-5 shrink-0 cursor-pointer group">
-            <span className="text-[14px] sm:text-[15px] font-bold tracking-tight text-shimmer font-data">
-              0xLeverage
-            </span>
+          <div className="flex items-center mr-2 sm:mr-5 shrink-0 cursor-pointer group logo-glow">
+            <img
+              src="/logo.svg"
+              alt="0xLeverage"
+              className="h-5 sm:h-[22px] w-auto"
+              draggable={false}
+            />
           </div>
         </Link>
 
