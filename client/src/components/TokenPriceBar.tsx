@@ -84,9 +84,13 @@ export function TokenPriceBar() {
 
         {/* Contract address — hidden on mobile */}
         <button
-          onClick={() => {
-            navigator.clipboard.writeText(selectedToken.address);
-            toast.info('Contract address copied');
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(selectedToken.address);
+              toast.success('Copied!');
+            } catch {
+              toast.error('Failed to copy');
+            }
           }}
           className="hidden lg:flex items-center gap-1 text-[11px] font-data text-muted-foreground hover:text-foreground transition-colors shrink-0 badge-hover"
           title="Copy contract address"

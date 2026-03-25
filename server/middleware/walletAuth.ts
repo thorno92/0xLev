@@ -117,8 +117,9 @@ export async function requireOxlJwt(walletAddress: string) {
             wallet: maskWallet(walletAddress),
           });
         })
-        .catch(() => {
-          // Silent — current token still valid for now
+        .catch((err) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.warn({ event: "jwt_proactive_refresh_failed", wallet: maskWallet(walletAddress), error: msg });
         });
     }
     return { token: cached.token, tradeWallet: cached.tradeWallet };

@@ -76,7 +76,8 @@ async function verifySessionJwt(
 ): Promise<{ wallet: string } | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecret());
-    if (typeof payload.wallet === "string" && payload.wallet.length >= 32) {
+    const BASE58_JWT_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (typeof payload.wallet === "string" && BASE58_JWT_REGEX.test(payload.wallet)) {
       return { wallet: payload.wallet };
     }
     return null;
@@ -163,6 +164,7 @@ interface LockoutEntry {
 }
 
 const lockoutMap = new Map<string, LockoutEntry>();
+const MAX_LOCKOUT_MAP_SIZE = 10_000;
 const LOCKOUT_MAX_FAILURES = 10;
 const LOCKOUT_WINDOW_MS = 5 * 60_000;   // 5 minutes
 const LOCKOUT_DURATION_MS = 15 * 60_000; // 15-minute block
@@ -196,6 +198,10 @@ function recordFailure(walletAddress: string): void {
   const entry = lockoutMap.get(key);
 
   if (!entry || now - entry.windowStart > LOCKOUT_WINDOW_MS) {
+    if (lockoutMap.size >= MAX_LOCKOUT_MAP_SIZE) {
+      const firstKey = lockoutMap.keys().next().value;
+      if (firstKey) lockoutMap.delete(firstKey);
+    }
     lockoutMap.set(key, { failures: 1, windowStart: now, lockedUntil: 0 });
     return;
   }

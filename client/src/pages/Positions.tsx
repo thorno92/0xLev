@@ -494,7 +494,7 @@ export default function Positions() {
                   <div className="border border-border overflow-hidden">
                     {[
                       { label: 'PORTFOLIO EXPOSURE', value: `$${formatNumber(totalNotional, 0)}`, sub: 'Total notional value' },
-                      { label: 'MARGIN UTILIZATION', value: `${((totalMargin / (totalMargin * 2.5)) * 100).toFixed(1)}%`, sub: 'Of available margin' },
+                      { label: 'MARGIN UTILIZATION', value: `${totalMargin > 0 ? ((totalMargin / (totalMargin * 2.5)) * 100).toFixed(1) : '0'}%`, sub: 'Of available margin' },
                       { label: 'LONG/SHORT RATIO', value: `${longCount}/${shortCount}`, sub: `${positions.length > 0 ? ((longCount / positions.length) * 100).toFixed(0) : 0}% long` },
                       { label: 'NEAREST LIQUIDATION', value: `${nearestLiq.dist.toFixed(1)}%`, sub: `${nearestLiq.symbol} distance` },
                       { label: 'AVG POSITION SIZE', value: `$${formatNumber(totalMargin / Math.max(positions.length, 1), 2)}`, sub: 'Per position margin' },

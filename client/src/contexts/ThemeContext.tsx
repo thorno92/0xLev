@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type ThemeName = "0x" | "cyberpunk" | "midnight" | "lavender" | "obsidian" | "ember" | "matrix" | "arctic" | "phantom" | "aurora";
 
@@ -61,8 +61,10 @@ export function ThemeProvider({
     setThemeState(newTheme);
   };
 
+  const value = useMemo(() => ({ theme, setTheme, isDark }), [theme, setTheme, isDark]);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, isDark }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

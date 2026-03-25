@@ -111,7 +111,9 @@ export function TradingPanel() {
         sl,
       });
       addOpenPosition({
-        trade_id: (result as Record<string, unknown>).trade_id as string ?? `${Date.now()}`,
+        trade_id: result && typeof result === 'object' && 'trade_id' in result
+          ? String((result as { trade_id: unknown }).trade_id)
+          : `${Date.now()}`,
         symbol: selectedToken.symbol,
         contract_address: selectedToken.address,
         amount: amountNum,

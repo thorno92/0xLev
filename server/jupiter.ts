@@ -65,15 +65,17 @@ export async function fetchJupiterPrices(
           decimals?: number;
           priceChange24h?: number;
         };
-        const usdPrice = entry.usdPrice ?? Number(entry.price);
-        if (usdPrice > 0) {
-          prices.set(mint, {
-            mint,
-            usdPrice,
-            decimals: entry.decimals,
-            change24h: entry.priceChange24h,
-          });
-        }
+        const usdPrice = typeof entry?.usdPrice === 'number' ? entry.usdPrice
+          : typeof entry?.price === 'string' ? Number(entry.price)
+          : typeof entry?.price === 'number' ? entry.price
+          : NaN;
+        if (!isFinite(usdPrice) || usdPrice <= 0) continue;
+        prices.set(mint, {
+          mint,
+          usdPrice,
+          decimals: entry.decimals,
+          change24h: entry.priceChange24h,
+        });
       }
     } catch (err) {
       logger.error({

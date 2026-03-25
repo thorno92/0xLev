@@ -34,7 +34,7 @@ app.use(
   cors({
     origin: isProd
       ? (origin, cb) => {
-          if (!origin || ALLOWED_ORIGINS.includes(origin) || origin.endsWith(".vercel.app")) {
+          if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             cb(null, true);
           } else {
             cb(new Error("CORS blocked"));

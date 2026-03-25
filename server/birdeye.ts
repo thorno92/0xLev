@@ -62,6 +62,7 @@ interface CachedData<T> {
 
 const tradeCache = new Map<string, CachedData<BirdeyeTrade[]>>();
 const TRADE_CACHE_TTL = 15_000; // 15 seconds
+const MAX_CACHE_SIZE = 500;
 
 /* ------------------------------------------------------------------ */
 /*  Response validation schemas                                        */
@@ -148,6 +149,10 @@ export async function getRecentTrades(
       source: item.source,
     }));
 
+    if (tradeCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = tradeCache.keys().next().value;
+      if (firstKey) tradeCache.delete(firstKey);
+    }
     tradeCache.set(tokenAddress, { data: trades, timestamp: Date.now() });
     return trades;
   } catch (err) {

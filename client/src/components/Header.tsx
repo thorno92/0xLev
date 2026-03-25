@@ -389,9 +389,13 @@ export function Header() {
                   <div className="flex items-center justify-between">
                     <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Wallet</div>
                     <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(walletAddress);
-                        toast.info('Address copied');
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(walletAddress);
+                          toast.success('Copied!');
+                        } catch {
+                          toast.error('Failed to copy');
+                        }
                       }}
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
