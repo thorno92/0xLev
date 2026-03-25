@@ -6,7 +6,7 @@
 dist/
 build/
 *.dist
-api/
+api/*.log
 # Environment variables — catch ALL .env variants
 .env
 .env.*
