@@ -1,14 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "vite build",
+  "buildCommand": "pnpm run build:vercel",
   "installCommand": "pnpm install",
   "outputDirectory": "dist/public",
   "framework": null,
-  "functions": {
-    "api/trpc/[...trpc].ts": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
