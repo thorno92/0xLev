@@ -35812,6 +35812,7 @@ var client = axios2.create({
 });
 var tradeCache = /* @__PURE__ */ new Map();
 var TRADE_CACHE_TTL = 15e3;
+var MAX_CACHE_SIZE = 500;
 var birdeyeTradeItemSchema = z3.object({
   txHash: z3.string().default(""),
   blockUnixTime: z3.number().finite().default(0),
@@ -35871,6 +35872,10 @@ async function getRecentTrades(tokenAddress, limit = 20) {
       maker: item.owner ?? item.from ?? "",
       source: item.source
     }));
+    if (tradeCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = tradeCache.keys().next().value;
+      if (firstKey) tradeCache.delete(firstKey);
+    }
     tradeCache.set(tokenAddress, { data: trades, timestamp: Date.now() });
     return trades;
   } catch (err) {
@@ -35949,7 +35954,9 @@ async function requireOxlJwt(walletAddress) {
           event: "jwt_proactive_refresh",
           wallet: maskWallet(walletAddress)
         });
-      }).catch(() => {
+      }).catch((err) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        logger.warn({ event: "jwt_proactive_refresh_failed", wallet: maskWallet(walletAddress), error: msg });
       });
     }
     return { token: cached.token, tradeWallet: cached.tradeWallet };
@@ -35990,7 +35997,8 @@ function extractCookie(req, name) {
 async function verifySessionJwt(token) {
   try {
     const { payload } = await jwtVerify(token, getSessionSecret());
-    if (typeof payload.wallet === "string" && payload.wallet.length >= 32) {
+    const BASE58_JWT_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (typeof payload.wallet === "string" && BASE58_JWT_REGEX.test(payload.wallet)) {
       return { wallet: payload.wallet };
     }
     return null;
@@ -36009,6 +36017,7 @@ var priceLevelSchema = z4.number().positive("Price must be positive").max(1e9, "
 var slippageSchema = z4.number().nonnegative("Slippage cannot be negative").max(100, "Slippage cannot exceed 100%");
 var tokenAmountSchema = z4.number().min(1, "Minimum close amount is 1%").max(100, "Maximum close amount is 100%").default(100);
 var lockoutMap = /* @__PURE__ */ new Map();
+var MAX_LOCKOUT_MAP_SIZE = 1e4;
 var LOCKOUT_MAX_FAILURES = 10;
 var LOCKOUT_WINDOW_MS = 5 * 6e4;
 var LOCKOUT_DURATION_MS = 15 * 6e4;
@@ -36036,6 +36045,10 @@ function recordFailure(walletAddress) {
   const now = Date.now();
   const entry = lockoutMap.get(key);
   if (!entry || now - entry.windowStart > LOCKOUT_WINDOW_MS) {
+    if (lockoutMap.size >= MAX_LOCKOUT_MAP_SIZE) {
+      const firstKey = lockoutMap.keys().next().value;
+      if (firstKey) lockoutMap.delete(firstKey);
+    }
     lockoutMap.set(key, { failures: 1, windowStart: now, lockedUntil: 0 });
     return;
   }
@@ -36614,15 +36627,14 @@ async function fetchJupiterPrices(mints) {
       if (!priceMap || typeof priceMap !== "object") continue;
       for (const [mint, info] of Object.entries(priceMap)) {
         const entry = info;
-        const usdPrice = entry.usdPrice ?? Number(entry.price);
-        if (usdPrice > 0) {
-          prices.set(mint, {
-            mint,
-            usdPrice,
-            decimals: entry.decimals,
-            change24h: entry.priceChange24h
-          });
-        }
+        const usdPrice = typeof entry?.usdPrice === "number" ? entry.usdPrice : typeof entry?.price === "string" ? Number(entry.price) : typeof entry?.price === "number" ? entry.price : NaN;
+        if (!isFinite(usdPrice) || usdPrice <= 0) continue;
+        prices.set(mint, {
+          mint,
+          usdPrice,
+          decimals: entry.decimals,
+          change24h: entry.priceChange24h
+        });
       }
     } catch (err) {
       logger.error({
@@ -38226,7 +38238,7 @@ var ALLOWED_ORIGINS = [
 app.use(
   cors({
     origin: isProd2 ? (origin, cb) => {
-      if (!origin || ALLOWED_ORIGINS.includes(origin) || origin.endsWith(".vercel.app")) {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
         cb(null, true);
       } else {
         cb(new Error("CORS blocked"));
