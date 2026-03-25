@@ -4,6 +4,12 @@
   "installCommand": "pnpm install",
   "outputDirectory": "dist/public",
   "framework": null,
+  "functions": {
+    "api/trpc/[...trpc].js": {
+      "includeFiles": "dist/fn/**",
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
