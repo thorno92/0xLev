@@ -24,20 +24,23 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
-const isProd = process.env.NODE_ENV === "production";
 const ALLOWED_ORIGINS = [
   "https://0xl-testing.xyz",
   "https://www.0xl-testing.xyz",
-  "https://0x-lev-neon.vercel.app",
 ];
+
 app.use(
   cors({
-    origin: isProd
+    origin: process.env.NODE_ENV === "production"
       ? (origin, cb) => {
-          if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+          if (
+            !origin ||
+            ALLOWED_ORIGINS.includes(origin!) ||
+            origin!.endsWith(".vercel.app")
+          ) {
             cb(null, true);
           } else {
-            cb(new Error("CORS blocked"));
+            cb(null, false);
           }
         }
       : true,
