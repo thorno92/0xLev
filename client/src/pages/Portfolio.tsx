@@ -21,19 +21,26 @@ import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 function ConnectState({ onConnect }: { onConnect: () => void }) {
   return (
     <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6 min-h-[60vh]">
-      <div className="text-center max-w-md space-y-8">
-        <div className="space-y-3">
-          <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground">PORTFOLIO</div>
-          <h1 className="text-2xl font-semibold text-foreground">Connect your wallet</h1>
+      <div className="text-center max-w-sm space-y-6">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3v3a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V6" />
+          </svg>
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Connect your wallet</h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Track your holdings, monitor performance, and manage positions across all chains.
+            Track your holdings, monitor performance, and manage positions.
           </p>
         </div>
         <button
           onClick={onConnect}
-          className="font-mono text-[11px] tracking-[0.1em] uppercase px-8 py-3 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+          className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all duration-200 shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98]"
         >
-          [ CONNECT WALLET ]
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3v3a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V6" />
+          </svg>
+          Connect Wallet
         </button>
       </div>
     </div>
