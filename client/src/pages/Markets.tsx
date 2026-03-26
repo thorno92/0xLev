@@ -634,7 +634,7 @@ export default function Markets() {
     activeFilter?: string,
     onFilterChange?: (v: string) => void,
   ) => (
-    <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-white/[0.04]">
+    <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-white/[0.04] h-full">
       {/* Column header */}
       <div className="px-4 py-3.5 border-b border-white/[0.03]">
         <div className="flex items-center justify-between">
@@ -724,7 +724,7 @@ export default function Markets() {
           {/* ========================================================== */}
           {/*  3 SIDE-BY-SIDE COLUMNS (desktop)                           */}
           {/* ========================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8 items-stretch">
             {renderColumn(
               'Gainers', 'Best performers by 24h change',
               'bg-success',
