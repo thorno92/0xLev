@@ -529,7 +529,7 @@ export default function Markets() {
   const handleTrade = useCallback((e: React.MouseEvent, token: TokenInfo) => {
     e.stopPropagation();
     setSelectedToken(token);
-    navigate('/');
+    navigate(`/terminal/${token.address}`);
   }, [setSelectedToken, navigate]);
 
   // Computed dashboard sections (compact top cards)

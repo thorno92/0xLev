@@ -40,7 +40,7 @@ export function TrendingBar() {
 
   const handleSelect = (token: TokenInfo) => {
     setSelectedToken(token);
-    navigate('/');
+    navigate(`/terminal/${token.address}`);
   };
 
   const { allTokens: liveTokens } = useLivePrices();
