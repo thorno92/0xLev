@@ -28,6 +28,10 @@ function PageLoader() {
     </div>
   );
 }
+function isValidTokenRoute(address: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+}
+
 function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -40,8 +44,6 @@ function Router() {
         <Route path="/404" component={NotFound} />
         <Route path="/terminal/:address" component={Terminal} />
         <Route path="/terminal" component={Terminal} />
-        <Route path="/markets" component={Markets} />
-        <Route path="/:address" component={Terminal} />
         <Route path="/" component={Markets} />
         <Route component={NotFound} />
       </Switch>
