@@ -1411,13 +1411,13 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
 
   return (
     <div className="mb-4">
-      {/* Tab bar */}
-      <div className="flex justify-center gap-1 mb-3 overflow-x-auto scrollbar-none">
+      {/* Tab bar — full width, equal columns matching stats bar */}
+      <div className="grid grid-cols-4 gap-1.5 mb-3">
         {tabs.map(t => (
           <button
             key={t.key}
             onClick={() => setFilter(t.key)}
-            className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
+            className={`text-[12px] font-medium py-2 rounded-md transition-all text-center ${
               filter === t.key
                 ? 'bg-primary/12 text-primary border border-primary/20'
                 : 'bg-white/[0.02] text-muted-foreground/50 border border-white/[0.03] hover:text-foreground'
