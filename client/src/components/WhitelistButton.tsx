@@ -67,12 +67,12 @@ export function WhitelistButton({ token, compact = false }: WhitelistButtonProps
       onClick={(e) => {
         e.stopPropagation();
         if (!walletAddress) {
-          toast.error('Connect wallet first');
+          toast.info('Connect your wallet to request whitelist');
           return;
         }
         requestMutation.mutate({ walletAddress, contractAddress: token.address });
       }}
-      disabled={requestMutation.isPending || !enabled}
+      disabled={requestMutation.isPending}
       className={`font-semibold rounded transition-all duration-100 bg-primary/8 text-primary border border-primary/20 hover:bg-primary/15 disabled:opacity-50 btn-hover ${
         compact ? 'text-[9px] px-2 py-0.5' : 'text-[10px] px-2.5 py-1'
       }`}
