@@ -100,12 +100,14 @@ const walletAddressSchema = z
   .max(44, "Wallet address too long")
   .regex(BASE58_REGEX, "Invalid wallet address format (must be base58)");
 
-/** Solana contract/token address: same format as wallet */
+/** Contract/token address: base58 (Solana) or 0x hex (EVM) */
 const contractAddressSchema = z
   .string()
-  .min(32, "Contract address too short")
-  .max(44, "Contract address too long")
-  .regex(BASE58_REGEX, "Invalid contract address format (must be base58)");
+  .min(1, "Contract address required")
+  .refine(
+    (addr) => BASE58_REGEX.test(addr) || /^0x[a-fA-F0-9]{40}$/.test(addr),
+    "Invalid contract address format"
+  );
 
 /** Trade ID: alphanumeric + hyphens/underscores, max 128 chars */
 const tradeIdSchema = z
