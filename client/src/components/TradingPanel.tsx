@@ -418,10 +418,10 @@ export function TradingPanel() {
             </div>
           )}
 
-          <div className="flex-1 px-3 pt-3 pb-3 flex flex-col gap-3.5">
+          <div className="flex-1 px-3 pt-4 pb-4 flex flex-col gap-5">
             {/* Amount Input */}
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                   Amount (SOL)
                 </label>
@@ -444,7 +444,7 @@ export function TradingPanel() {
                   step="any"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="h-8 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover placeholder:text-muted-foreground/30"
+                  className="h-10 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover placeholder:text-muted-foreground/30"
                 />
                 <button
                   onClick={() => walletBalance != null && setAmount(String(walletBalance))}
@@ -458,7 +458,7 @@ export function TradingPanel() {
             {/* Leverage Control */}
             {tradingMode === 'leverage' && (
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1.5">
                   <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                     Leverage
                   </label>
@@ -474,15 +474,15 @@ export function TradingPanel() {
                   max={50}
                   step={1}
                   aria-label="Leverage"
-                  className="mb-1.5"
+                  className="mb-2"
                 />
 
-                <div className="flex gap-0.5 mb-1">
+                <div className="flex gap-1 mb-1">
                   {leveragePresets.map((preset) => (
                     <button
                       key={preset}
                       onClick={() => setLeverage(preset)}
-                      className={`flex-1 py-1 text-[10px] font-data rounded transition-colors badge-hover ${
+                      className={`flex-1 py-1.5 text-[10px] font-data rounded transition-colors badge-hover ${
                         leverage === preset
                           ? 'bg-primary/12 text-primary border border-primary/25'
                           : 'bg-secondary text-muted-foreground hover:text-foreground border border-transparent'
@@ -497,9 +497,9 @@ export function TradingPanel() {
 
             {/* TP / SL */}
             {tradingMode === 'leverage' && (
-              <div className="grid grid-cols-2 gap-1.5 mt-1">
+              <div className="grid grid-cols-2 gap-1.5">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                       Take Profit (USD)
                     </label>
@@ -515,11 +515,11 @@ export function TradingPanel() {
                     placeholder="Optional"
                     value={takeProfit}
                     onChange={(e) => setTakeProfit(e.target.value)}
-                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${tpInvalid ? 'border-destructive/50' : ''}`}
+                    className={`h-9 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${tpInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                       Stop Loss (USD)
                     </label>
@@ -535,14 +535,14 @@ export function TradingPanel() {
                     placeholder="Optional"
                     value={stopLoss}
                     onChange={(e) => setStopLoss(e.target.value)}
-                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${slInvalid ? 'border-destructive/50' : ''}`}
+                    className={`h-9 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${slInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
               </div>
             )}
 
             {/* Slippage Settings */}
-            <div className="flex items-center justify-between py-1">
+            <div className="flex items-center justify-between py-2">
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                 Slippage
               </span>
@@ -584,7 +584,7 @@ export function TradingPanel() {
             )}
 
             {/* Order Summary — always visible */}
-            <div className="bg-secondary/40 rounded px-3 py-2.5 space-y-1.5">
+            <div className="bg-secondary/40 rounded px-3 py-3 space-y-2">
               <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
               {quoteData?.trade_cost != null && amountNum > 0 ? (
@@ -611,7 +611,7 @@ export function TradingPanel() {
               <Button
                 onClick={handleExecute}
                 disabled={isExecuting || !amountNum || entryPrice <= 0}
-                className={`w-full h-9 mt-2 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
+                className={`w-full h-10 mt-3 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
                   tradingMode === 'leverage' || isBuy
                     ? 'bg-success hover:bg-success/90 text-background'
                     : 'bg-destructive hover:bg-destructive/90 text-white'
@@ -634,7 +634,7 @@ export function TradingPanel() {
             ) : (
               <Button
                 onClick={() => setWalletModalOpen(true)}
-                className="w-full h-9 mt-2 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover gap-1.5"
+                className="w-full h-10 mt-3 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover gap-1.5"
               >
                 <WalletSolid className="w-3.5 h-3.5" />
                 Connect Wallet
