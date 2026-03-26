@@ -353,7 +353,7 @@ export function TradingPanel() {
         /* Buy/Trade View */
         <>
           {/* Mode Toggle: Leverage / Spot */}
-          <div className="flex border-b border-border shrink-0">
+          <div className="flex border-b border-border shrink-0 pb-1">
             <button
               onClick={() => setTradingMode('leverage')}
               className={`flex-1 py-2 text-[12px] font-medium text-center transition-colors relative tab-hover ${
@@ -418,7 +418,7 @@ export function TradingPanel() {
             </div>
           )}
 
-          <div className="flex-1 px-3 pt-6 pb-4 flex flex-col gap-5">
+          <div className="flex-1 px-4 pt-8 pb-5 flex flex-col gap-6">
             {/* Amount Input */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
@@ -457,7 +457,7 @@ export function TradingPanel() {
 
             {/* Leverage Control */}
             {tradingMode === 'leverage' && (
-              <div>
+              <div className="mt-1">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                     Leverage
@@ -584,7 +584,7 @@ export function TradingPanel() {
             )}
 
             {/* Order Summary — always visible */}
-            <div className="bg-secondary/40 rounded px-3 py-3 space-y-2">
+            <div className="bg-secondary/40 rounded px-3 py-3 space-y-2 mt-1">
               <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
               {quoteData?.trade_cost != null && amountNum > 0 ? (
