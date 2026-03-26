@@ -99,13 +99,6 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
           </p>
         </div>
 
-        {/* Security note */}
-        <div className="mx-5 mb-4 bg-secondary/30 rounded-md px-3 py-2">
-          <span className="text-[11px] text-muted-foreground">
-            🔒 We never have access to your private keys
-          </span>
-        </div>
-
         {/* Wallet list */}
         <div className="px-3 pb-2 max-h-[300px] overflow-y-auto">
           {/* Detected wallets */}
