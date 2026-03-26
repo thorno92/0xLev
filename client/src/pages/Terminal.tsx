@@ -666,7 +666,7 @@ export default function Terminal() {
 
                 {/* Order Summary */}
                 <div className="bg-secondary/40 rounded p-2 space-y-1">
-                  <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
+                  <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
                   <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
                   {quoteData?.trade_cost != null && amountNum > 0 ? (
                     <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />
@@ -985,7 +985,7 @@ export default function Terminal() {
 
             {/* Order Summary */}
             <div className="bg-secondary/40 rounded p-2.5 space-y-1">
-              <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
+              <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} />
               {quoteData?.trade_cost != null && amountNum > 0 ? (
                 <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />

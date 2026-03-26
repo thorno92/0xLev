@@ -436,13 +436,13 @@ export function TradingPanel() {
                 <Input
                   type="number"
                   inputMode="decimal"
-                  placeholder="0.00"
+                  placeholder="Enter amount..."
                   min={0}
                   max={10000}
                   step="any"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="h-8 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover"
+                  className="h-8 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover placeholder:text-muted-foreground/30"
                 />
                 <button
                   onClick={() => walletBalance != null && setAmount(String(walletBalance))}
@@ -510,10 +510,10 @@ export function TradingPanel() {
                   <Input
                     type="number"
                     inputMode="decimal"
-                    placeholder={formatPrice(entryPrice * (isBuy ? 1.1 : 0.9)).replace('$', '')}
+                    placeholder="Optional"
                     value={takeProfit}
                     onChange={(e) => setTakeProfit(e.target.value)}
-                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover ${tpInvalid ? 'border-destructive/50' : ''}`}
+                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${tpInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
                 <div>
@@ -530,10 +530,10 @@ export function TradingPanel() {
                   <Input
                     type="number"
                     inputMode="decimal"
-                    placeholder={formatPrice(entryPrice * (isBuy ? 0.95 : 1.05)).replace('$', '')}
+                    placeholder="Optional"
                     value={stopLoss}
                     onChange={(e) => setStopLoss(e.target.value)}
-                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover ${slInvalid ? 'border-destructive/50' : ''}`}
+                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30 ${slInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
               </div>
