@@ -364,7 +364,7 @@ export default function Positions() {
                             <TokenLogo symbol={pos.symbol} size={28} />
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-foreground">{pos.symbol}</span>
+                                <span className="font-medium text-foreground truncate max-w-[120px]">{pos.symbol}</span>
                                 <span className={`font-mono text-[10px] tracking-wider uppercase px-1.5 py-0.5 border ${
                                   pos.side === 'buy' ? 'text-success border-success/30' : 'text-destructive border-destructive/30'
                                 }`}>

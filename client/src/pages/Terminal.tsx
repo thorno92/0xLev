@@ -784,7 +784,7 @@ export default function Terminal() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={handleSwipeTab}
-            className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[64px]' : ''}`}
+            className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[140px]' : 'pb-4'}`}
             style={{ touchAction: 'pan-y' }}
           >
           {/* Chart Tab — fills all available space */}

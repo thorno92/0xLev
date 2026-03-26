@@ -86,7 +86,7 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
           </div>
           <button
             onClick={() => onOpenChange(false)}
-            className="text-muted-foreground/50 hover:text-foreground transition-colors p-1 rounded hover:bg-secondary"
+            className="text-muted-foreground/50 hover:text-foreground transition-colors p-2 rounded hover:bg-secondary"
           >
             <Xmark className="w-4 h-4" strokeWidth={2} />
           </button>
