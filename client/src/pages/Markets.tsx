@@ -1219,22 +1219,7 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
         {txns > 1000 ? `${(txns / 1000).toFixed(1)}K` : txns}
       </td>
       {/* Action */}
-      <td className="py-2.5 px-3 pr-4 text-right">
-        {whitelisted ? (
-          <button onClick={onTrade} className="text-[10px] font-medium px-3 py-1 rounded-md bg-success/[0.08] text-success/80 hover:bg-success/[0.14] transition-colors">
-            Trade
-          </button>
-        ) : whitelistPending ? (
-          <span className="text-[10px] font-medium px-3 py-1 rounded-md bg-warning/[0.08] text-warning/70">
-            Pending
-          </span>
-        ) : (
-          <button onClick={onRequestWhitelist} className="text-[10px] font-medium px-3 py-1 rounded-md bg-primary/[0.08] text-primary/80 hover:bg-primary/[0.14] transition-colors">
-            Whitelist
-          </button>
-        )}
-      </td>
-      <td className="py-2.5 px-2" onClick={(e) => e.stopPropagation()}>
+      <td className="py-2.5 px-3 pr-4 text-right" onClick={(e) => e.stopPropagation()}>
         <WhitelistButton token={token} compact />
       </td>
     </tr>
@@ -1281,22 +1266,7 @@ function TabletRow({ token, rank, onClick, whitelisted, whitelistPending, onRequ
         </div>
       </td>
       <td className="py-2.5 px-3 text-right text-[11px] text-muted-foreground/50 tabular-nums">{formatCompact(token.volume24h)}</td>
-      <td className="py-2.5 px-3 pr-4 text-right">
-        {whitelisted ? (
-          <button onClick={onTrade} className="text-[10px] font-medium px-2.5 py-1 rounded-md bg-success/[0.08] text-success/80 hover:bg-success/[0.14] transition-colors">
-            Trade
-          </button>
-        ) : whitelistPending ? (
-          <span className="text-[10px] font-medium px-2.5 py-1 rounded-md bg-warning/[0.08] text-warning/70">
-            Pending
-          </span>
-        ) : (
-          <button onClick={onRequestWhitelist} className="text-[10px] font-medium px-2.5 py-1 rounded-md bg-primary/[0.08] text-primary/80 hover:bg-primary/[0.14] transition-colors">
-            WL
-          </button>
-        )}
-      </td>
-      <td className="py-2.5 px-2" onClick={(e) => e.stopPropagation()}>
+      <td className="py-2.5 px-3 pr-4 text-right" onClick={(e) => e.stopPropagation()}>
         <WhitelistButton token={token} compact />
       </td>
     </tr>
@@ -1342,21 +1312,6 @@ function MobileRow({ token, rank, starred, onStar, onClick, whitelisted, whiteli
             {formatPercent(token.change24h)}
           </span>
         </div>
-      </div>
-      <div className="shrink-0">
-        {whitelisted ? (
-          <button onClick={onTrade} className="text-[11px] font-medium px-3.5 py-2 rounded-md bg-success/[0.08] text-success/80 min-h-[36px] min-w-[52px] flex items-center justify-center">
-            Trade
-          </button>
-        ) : whitelistPending ? (
-          <span className="text-[11px] font-medium px-3.5 py-2 rounded-md bg-warning/[0.08] text-warning/70 min-h-[36px] min-w-[52px] flex items-center justify-center">
-            Pending
-          </span>
-        ) : (
-          <button onClick={onRequestWhitelist} className="text-[11px] font-medium px-3.5 py-2 rounded-md bg-primary/[0.08] text-primary/80 min-h-[36px] min-w-[52px] flex items-center justify-center">
-            WL
-          </button>
-        )}
       </div>
       <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
         <WhitelistButton token={token} compact />
