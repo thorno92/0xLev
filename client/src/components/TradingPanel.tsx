@@ -394,7 +394,7 @@ export function TradingPanel() {
 
           {/* Buy / Sell Toggle — only in SPOT mode */}
           {tradingMode === 'spot' && (
-            <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0">
+            <div className="flex gap-1 px-3 pt-2.5 pb-2 shrink-0">
               <button
                 onClick={() => setOrderSide('buy')}
                 className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
@@ -418,7 +418,7 @@ export function TradingPanel() {
             </div>
           )}
 
-          <div className="flex-1 px-3 pb-3 flex flex-col gap-3.5">
+          <div className="flex-1 px-3 pt-3 pb-3 flex flex-col gap-3.5">
             {/* Amount Input */}
             <div>
               <div className="flex items-center justify-between mb-1">
