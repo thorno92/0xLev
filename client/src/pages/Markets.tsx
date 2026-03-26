@@ -229,10 +229,10 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
 
       <div className="flex gap-2.5 p-2.5 pb-1.5">
         {/* ---- LARGE LOGO ---- */}
-        <div className="relative shrink-0 mt-0.5">
+        <div className="relative shrink-0 mt-0.5 w-[48px] h-[48px]">
           <TokenLogo symbol={token.symbol} size={48} />
           {whitelisted && (
-            <div className="absolute bottom-0 left-[34px] w-[16px] h-[16px] rounded-full bg-success flex items-center justify-center ring-2 ring-card">
+            <div className="absolute -bottom-[3px] -right-[3px] w-[16px] h-[16px] rounded-full bg-success flex items-center justify-center ring-2 ring-card">
               <span className="text-[8px] text-white font-bold leading-none">{'\u2713'}</span>
             </div>
           )}
