@@ -232,7 +232,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
         <div className="relative shrink-0 mt-0.5">
           <TokenLogo symbol={token.symbol} size={48} />
           {whitelisted && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-success flex items-center justify-center ring-2 ring-card">
+            <div className="absolute bottom-0 right-0 translate-x-[25%] translate-y-[25%] w-4 h-4 rounded-full bg-success flex items-center justify-center ring-2 ring-card">
               <span className="text-[8px] text-white font-bold">{'\u2713'}</span>
             </div>
           )}
