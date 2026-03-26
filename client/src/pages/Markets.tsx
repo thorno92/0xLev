@@ -985,28 +985,25 @@ export default function Markets() {
         }}
         className="md:hidden flex-1 min-h-0"
       >
-        <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
+        <PageTransition className="max-w-[1600px] mx-auto py-4 pb-24">
 
-          {/* STATS BAR (mobile) — centered, compact */}
-          <div className="flex items-center justify-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
+          {/* STATS BAR — full-width grid */}
+          <div className="grid grid-cols-5 w-full px-4 mb-4 pb-3 border-b border-white/[0.04]">
             {[
               { label: 'Volume', value: formatCompact(totalVol), color: 'text-foreground' },
               { label: 'MCap', value: formatCompact(totalMcap), color: 'text-foreground' },
               { label: 'Liq', value: formatCompact(totalLiq), color: 'text-foreground' },
               { label: '24H', value: formatPercent(avgChange), color: avgChange >= 0 ? 'text-success' : 'text-destructive' },
               { label: 'Tokens', value: String(allTokens.length), color: 'text-foreground' },
-            ].map((stat, i) => (
-              <div key={stat.label} className="shrink-0 flex items-center gap-3">
-                <div>
-                  <div className="text-[9px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
-                  <div className={`text-[14px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
-                </div>
-                {i < 4 && <div className="w-px h-5 bg-white/[0.04] shrink-0" />}
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-[9px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
+                <div className={`text-[13px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
               </div>
             ))}
           </div>
 
-          {/* MOBILE: Tab-based filter view instead of 3 stacked sections */}
+          {/* FILTER TABS + TOKEN LIST — single clean view */}
           <MobileMarketTabs
             gainers={dashGainers}
             flashSale={dashFlashSale}
@@ -1014,110 +1011,6 @@ export default function Markets() {
             allTokens={tokens}
             onSelect={handleClick}
           />
-
-          {/* CONTROLS (mobile) */}
-          <div className="flex flex-col gap-3 mb-4">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-              <div className="flex items-center gap-0.5 bg-white/[0.02] rounded-lg p-0.5 border border-white/[0.03] shrink-0">
-                {chains.map(c => (
-                  <button
-                    key={c.value}
-                    onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
-                    className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
-                      chain === c.value && !showFavoritesOnly
-                        ? 'bg-primary/[0.10] text-foreground'
-                        : 'text-muted-foreground/40 hover:text-foreground'
-                    }`}
-                  >
-                    {c.network && <span className="mr-1.5 inline-flex"><ChainIcon network={c.network} size={14} /></span>}
-                    {c.label}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setShowFavoritesOnly(prev => !prev)}
-                  className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap flex items-center gap-1 ${
-                    showFavoritesOnly
-                      ? 'bg-primary/[0.10] text-foreground'
-                      : 'text-muted-foreground/40 hover:text-foreground'
-                  }`}
-                >
-                  <span className="text-warning">{'\u2605'}</span>
-                  Favorites
-                </button>
-              </div>
-
-              <button
-                onClick={() => setFiltersOpen(true)}
-                className={`flex items-center gap-1.5 h-8 px-3.5 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
-                  activeFilterCount > 0
-                    ? 'bg-primary/[0.08] text-primary border-primary/20'
-                    : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground hover:border-primary/15'
-                }`}
-              >
-                <FilterSolid className="w-3 h-3" />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="text-[9px] bg-primary text-primary-foreground px-1.5 py-px rounded-full font-data ml-0.5">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search tokens..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="h-8 w-full pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
-              />
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          {/* MOBILE CARDS */}
-          <div className="rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
-            {loading ? (
-              Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="px-4 py-3 border-b border-white/[0.02]">
-                  <div className="skeleton-shimmer rounded h-14" style={{ animationDelay: `${i * 40}ms` }} />
-                </div>
-              ))
-            ) : tokens.length === 0 ? (
-              <div className="py-20 text-center text-xs text-muted-foreground/45">No tokens found</div>
-            ) : (
-              tokens.map((token, idx) => (
-                <MobileRow
-                  key={token.address}
-                  token={token}
-                  rank={idx + 1}
-                  starred={isFavorite(token.address)}
-                  onStar={(e) => handleToggleFavorite(e, token.address)}
-                  onClick={() => handleClick(token)}
-                  whitelisted={isWhitelisted(token.address)}
-                  whitelistPending={whitelistRequested.has(token.address)}
-                  onRequestWhitelist={(e) => handleRequestWhitelist(e, token.address)}
-                  onTrade={(e) => handleTrade(e, token)}
-                />
-              ))
-            )}
-          </div>
-
-          {/* FOOTER (mobile) */}
-          <div className="flex items-center justify-between py-4 mt-2">
-            <span className="text-[10px] text-muted-foreground/40">
-              {tokens.length} of {allTokens.length} tokens
-            </span>
-            <button
-              onClick={() => toast.info('More tokens coming soon')}
-              className="text-[10px] text-primary/50 hover:text-primary/80 transition-colors"
-            >
-              Load more
-            </button>
-          </div>
 
         </PageTransition>
       </PullToRefresh>
@@ -1455,17 +1348,17 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
   ];
 
   return (
-    <div className="mb-4">
-      {/* Tab bar */}
-      <div className="flex justify-center gap-1 mb-3 overflow-x-auto scrollbar-none">
+    <div>
+      {/* Tab bar — full width, equal columns */}
+      <div className="grid grid-cols-4 gap-0 w-full mb-1 border-b border-white/[0.04]">
         {tabs.map(t => (
           <button
             key={t.key}
             onClick={() => setFilter(t.key)}
-            className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
+            className={`w-full py-2.5 text-center text-[13px] font-medium transition-all ${
               filter === t.key
-                ? 'bg-primary/12 text-primary border border-primary/20'
-                : 'bg-white/[0.02] text-muted-foreground/50 border border-white/[0.03] hover:text-foreground'
+                ? 'text-primary border-b-2 border-primary'
+                : 'text-muted-foreground/50 hover:text-foreground'
             }`}
           >
             {t.label}
@@ -1473,8 +1366,8 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
         ))}
       </div>
 
-      {/* Token list */}
-      <div className="space-y-0.5">
+      {/* Token list — clean rows, full bleed */}
+      <div>
         {displayTokens.length === 0 ? (
           <div className="py-12 text-center text-[11px] text-muted-foreground/45">No tokens found</div>
         ) : (
@@ -1482,22 +1375,24 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
             <button
               key={token.address}
               onClick={() => onSelect(token)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-lg hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-border/20 active:bg-white/[0.02] transition-colors"
             >
-              <TokenLogo symbol={token.symbol} size={28} />
+              <TokenLogo symbol={token.symbol} size={36} />
               <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-semibold text-foreground truncate">{token.symbol}</div>
-                <div className="text-[10px] font-data text-muted-foreground/50">{token.name}</div>
+                <div className="text-[13px] font-semibold text-foreground truncate">{token.symbol}</div>
+                <div className="text-[10px] text-muted-foreground/50 truncate">{token.name}</div>
               </div>
-              <div className="text-right shrink-0 mr-1">
-                <div className="text-[11px] font-data font-semibold text-foreground">{formatPrice(token.price)}</div>
+              <div className="text-right shrink-0">
+                <div className="text-[12px] font-data font-semibold text-foreground">{formatPrice(token.price)}</div>
                 <div className={`text-[10px] font-data font-medium ${
                   token.change24h >= 0 ? 'text-success' : 'text-destructive'
                 }`}>
                   {token.change24h >= 0 ? '+' : ''}{formatPercent(token.change24h)}
                 </div>
               </div>
-              <WhitelistButton token={token} compact />
+              <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                <WhitelistButton token={token} compact />
+              </div>
             </button>
           ))
         )}
