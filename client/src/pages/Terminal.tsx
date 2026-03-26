@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid, WalletSolid } from 'iconoir-react';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 import { WalletConnectModal } from '@/components/WalletConnectModal';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useTrackPositions } from '@/hooks/useTrackPositions';
 
 const leveragePresets = [2, 5, 10, 25, 50];
@@ -171,6 +172,7 @@ export default function Terminal() {
   const [slippage, setSlippage] = useState(1.0);
   const [isExecuting, setIsExecuting] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const { connecting: isWalletConnecting } = useWallet();
 
   const entryPrice = selectedToken?.price ?? 0;
   const amountNum = parseFloat(amount) || 0;
@@ -710,10 +712,11 @@ export default function Terminal() {
                 ) : (
                   <button
                     onClick={() => setWalletModalOpen(true)}
-                    className="w-full h-10 mt-3 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover flex items-center justify-center gap-1.5"
+                    disabled={isWalletConnecting}
+                    className="w-full h-10 mt-3 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover flex items-center justify-center gap-1.5 disabled:opacity-70"
                   >
                     <WalletSolid className="w-3.5 h-3.5" />
-                    Connect Wallet
+                    {isWalletConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </button>
                 )}
 
@@ -1052,10 +1055,11 @@ export default function Terminal() {
         ) : (
           <button
             onClick={() => setWalletModalOpen(true)}
-            className="w-full py-2.5 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg flex items-center justify-center gap-1.5"
+            disabled={isWalletConnecting}
+            className="w-full py-2.5 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-70"
           >
             <WalletSolid className="w-3.5 h-3.5" />
-            Connect Wallet
+            {isWalletConnecting ? 'Connecting...' : 'Connect Wallet'}
           </button>
         )}
       </div>
