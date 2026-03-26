@@ -410,8 +410,22 @@ export default function Markets() {
 
   // 3 column lists (full filtered lists, sliced by limit)
   const gainersFull = useMemo(() => {
-    let list = [...allTokens].filter(t => t.change24h > 0).sort((a, b) => b.change24h - a.change24h);
-    if (gainerChain !== 'all') list = list.filter(t => t.chain === gainerChain);
+    let base = [...allTokens];
+    if (gainerChain !== 'all') base = base.filter(t => t.chain === gainerChain);
+
+    // Primary: tokens with positive 24h change
+    let list = base.filter(t => t.change24h > 0).sort((a, b) => b.change24h - a.change24h);
+
+    // Fallback: if fewer than 6 gainers, fill with "best performers" (least negative)
+    // so the section is never empty in a down market
+    if (list.length < 6) {
+      const remaining = base
+        .filter(t => t.change24h <= 0)
+        .sort((a, b) => b.change24h - a.change24h)
+        .slice(0, 6 - list.length);
+      list = [...list, ...remaining];
+    }
+
     if (gainerFilter === '>10%') list = list.filter(t => t.change24h > 10);
     if (gainerFilter === '>5%') list = list.filter(t => t.change24h > 5);
     return list;
@@ -709,7 +723,7 @@ export default function Markets() {
           {/* ========================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
             {renderColumn(
-              'Gainers', 'Top performing tokens by 24h change',
+              'Gainers', 'Best performers by 24h change',
               'bg-success',
               gainers, gainersFull.length,
               'No gainers right now',
