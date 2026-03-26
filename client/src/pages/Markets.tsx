@@ -486,7 +486,7 @@ export default function Markets() {
 
   const handleClick = useCallback((token: TokenInfo) => {
     setSelectedToken(token);
-    navigate('/');
+    navigate(`/terminal/${token.address}`);
   }, [setSelectedToken, navigate]);
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent, address: string) => {
