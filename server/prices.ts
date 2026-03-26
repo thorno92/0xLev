@@ -18,6 +18,9 @@ import { logger } from "./middleware/audit";
 /* ------------------------------------------------------------------ */
 
 const SYMBOL_TO_COINGECKO_ID: Readonly<Record<string, string>> = {
+  // Bitcoin
+  BTC: "bitcoin",
+  WBTC: "wrapped-bitcoin",
   // Solana ecosystem
   SOL: "solana",
   BONK: "bonk",

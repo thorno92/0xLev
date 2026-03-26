@@ -62,6 +62,10 @@ export const trendingTokens: TokenInfo[] = [
 export const allTokens: TokenInfo[] = [
   ...trendingTokens,
 
+  // --- BTC ---
+  { symbol: 'BTC', name: 'Bitcoin', address: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E', price: 0, change24h: 0, volume24h: 0, marketCap: 0, liquidity: 0, chain: 'solana' as const },
+  { symbol: 'WBTC', name: 'Wrapped Bitcoin', address: '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh', price: 0, change24h: 0, volume24h: 0, marketCap: 0, liquidity: 0, chain: 'ethereum' as const },
+
   // --- Solana ecosystem ---
   { symbol: 'PEPE', name: 'Pepe', address: '0x6982508145454Ce325dDbE47a25d4ec3d2311933', price: 0.00001245, change24h: 22.5, volume24h: 4500000, marketCap: 5200000, liquidity: 320000, chain: 'ethereum' },
   { symbol: 'ORCA', name: 'Orca', address: 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE', price: 4.12, change24h: 6.3, volume24h: 450000, marketCap: 412000, liquidity: 56000, chain: 'solana' },
