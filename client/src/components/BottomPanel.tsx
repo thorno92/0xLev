@@ -84,7 +84,7 @@ export function BottomPanel() {
             disabled={wlRequestMutation.isPending || !walletConnected}
             className={`py-2 text-[11px] font-semibold transition-colors text-center bg-card flex items-center justify-center gap-1 ${
               !walletConnected
-                ? 'text-muted-foreground/30 cursor-default'
+                ? 'text-muted-foreground/45 cursor-default'
                 : whitelistRequested
                 ? 'text-success'
                 : 'text-primary'

@@ -216,7 +216,7 @@ export default function Positions() {
                     </span>
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-success font-mono text-[11px]">{longCount}L</span>
-                      <span className="text-muted-foreground/30">/</span>
+                      <span className="text-muted-foreground/45">/</span>
                       <span className="text-destructive font-mono text-[11px]">{shortCount}S</span>
                     </div>
                     <span className={`font-data text-lg font-medium ${totalPnl >= 0 ? 'text-success' : 'text-destructive'}`}>

@@ -150,7 +150,7 @@ export default function Assistant() {
                     : 'border-primary/15 bg-primary/5 text-foreground'
                 }`}>
                   {renderMessageContent(msg.content)}
-                  <div className="font-mono text-[8px] text-muted-foreground/30 mt-2">
+                  <div className="font-mono text-[8px] text-muted-foreground/45 mt-2">
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export default function Assistant() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                  className="h-9 bg-transparent border-border font-mono text-[11px] text-foreground placeholder:text-muted-foreground/30"
+                  className="h-9 bg-transparent border-border font-mono text-[11px] text-foreground placeholder:text-muted-foreground/45"
                 />
               </div>
               <button
@@ -239,8 +239,8 @@ export default function Assistant() {
               </button>
             </div>
             <div className="flex items-center justify-between mt-1.5">
-              <span className="font-mono text-[8px] text-muted-foreground/30">ENTER TO SEND</span>
-              <span className="font-mono text-[8px] text-muted-foreground/30">{messages.length - 1} MESSAGES</span>
+              <span className="font-mono text-[8px] text-muted-foreground/45">ENTER TO SEND</span>
+              <span className="font-mono text-[8px] text-muted-foreground/45">{messages.length - 1} MESSAGES</span>
             </div>
           </div>
         </div>

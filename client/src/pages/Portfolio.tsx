@@ -265,7 +265,7 @@ export default function Portfolio() {
                   {/* UPD timestamp */}
                   <div className="text-[11px] text-muted-foreground/40 mb-5 flex items-center gap-1.5">
                     UPD: 28 MIN. AGO
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground/25 cursor-pointer hover:text-muted-foreground/50 transition-colors">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground/40 cursor-pointer hover:text-muted-foreground/50 transition-colors">
                       <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
                     </svg>
                   </div>
@@ -337,7 +337,7 @@ export default function Portfolio() {
                   {/* Time axis labels */}
                   <div className="flex justify-between px-1 mt-1">
                     {['06:00', '12:00', '18:00', '00:00', '06:00', '12:00', '18:00'].map((t, i) => (
-                      <span key={i} className="text-[9px] text-muted-foreground/25 tabular-nums">{t}</span>
+                      <span key={i} className="text-[9px] text-muted-foreground/40 tabular-nums">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -389,7 +389,7 @@ export default function Portfolio() {
                   {!holdingsLoading && portfolioData.holdings.length === 0 && (
                     <div className="text-center py-16">
                       <p className="text-[13px] text-muted-foreground/40">No token holdings found</p>
-                      <p className="text-[11px] text-muted-foreground/25 mt-1">Deposit SOL or SPL tokens to see them here</p>
+                      <p className="text-[11px] text-muted-foreground/40 mt-1">Deposit SOL or SPL tokens to see them here</p>
                     </div>
                   )}
 
@@ -448,7 +448,7 @@ export default function Portfolio() {
                           <div className="text-right">
                             <button
                               onClick={(e) => { e.stopPropagation(); toast('Token details coming soon'); }}
-                              className="text-[11px] text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors flex items-center gap-0.5 ml-auto"
+                              className="text-[11px] text-muted-foreground/45 hover:text-muted-foreground/60 transition-colors flex items-center gap-0.5 ml-auto"
                             >
                               MORE
                               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -490,14 +490,14 @@ export default function Portfolio() {
                   {positions.length === 0 ? (
                     <div className="text-center py-16">
                       <div className="w-12 h-12 mx-auto rounded-xl bg-secondary/20 flex items-center justify-center mb-3">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/30">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/45">
                           <path d="M12 2L2 7l10 5 10-5-10-5z" />
                           <path d="M2 17l10 5 10-5" />
                           <path d="M2 12l10 5 10-5" />
                         </svg>
                       </div>
                       <p className="text-[13px] text-muted-foreground/40">No open orders</p>
-                      <p className="text-[11px] text-muted-foreground/25 mt-1">Open a trade from the Terminal</p>
+                      <p className="text-[11px] text-muted-foreground/40 mt-1">Open a trade from the Terminal</p>
                     </div>
                   ) : (
                     <>
@@ -528,7 +528,7 @@ export default function Portfolio() {
                                 <TokenLogo symbol={pos.symbol} size={28} />
                                 <div>
                                   <span className="text-[13px] font-semibold text-foreground">{pos.symbol}/USDT</span>
-                                  <span className="text-[11px] text-muted-foreground/30 block">{pos.leverage}x</span>
+                                  <span className="text-[11px] text-muted-foreground/45 block">{pos.leverage}x</span>
                                 </div>
                               </div>
                               <div className="text-right">
@@ -612,13 +612,13 @@ export default function Portfolio() {
                       {/* Summary */}
                       <div className="flex items-center gap-4 sm:gap-8 px-3 py-4 mt-1 flex-wrap">
                         <div>
-                          <span className="text-[10px] text-muted-foreground/30 uppercase tracking-wider">Total Margin</span>
+                          <span className="text-[10px] text-muted-foreground/45 uppercase tracking-wider">Total Margin</span>
                           <span className="text-[13px] font-medium text-foreground tabular-nums ml-2">
                             {positions.reduce((s, p) => s + p.amount, 0).toFixed(4)} SOL
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-muted-foreground/30 uppercase tracking-wider">Unrealized PnL</span>
+                          <span className="text-[10px] text-muted-foreground/45 uppercase tracking-wider">Unrealized PnL</span>
                           <span className={`text-[13px] font-medium tabular-nums ml-2 ${
                             positions.reduce((s, p) => s + (p.liveProfit ?? 0), 0) >= 0 ? 'text-success' : 'text-destructive'
                           }`}>

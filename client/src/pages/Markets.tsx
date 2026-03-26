@@ -215,14 +215,14 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <span className="text-[9px] text-muted-foreground/40 block">Buy/Sell</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-semibold text-success tabular-nums">{buyRatio}%</span>
-                <span className="text-[8px] text-muted-foreground/20">/</span>
+                <span className="text-[8px] text-muted-foreground/35">/</span>
                 <span className="text-[10px] font-semibold text-destructive tabular-nums">{100 - buyRatio}%</span>
               </div>
             </div>
           </div>
           {/* Quick actions hint */}
           <div className="mt-3 pt-2.5 border-t border-white/[0.04] flex items-center justify-center gap-1">
-            <span className="text-[9px] text-muted-foreground/30">Click to open in Terminal</span>
+            <span className="text-[9px] text-muted-foreground/45">Click to open in Terminal</span>
           </div>
         </div>
       )}
@@ -300,7 +300,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />
               {chainLabel}
             </span>
-            <span className="text-[9px] text-muted-foreground/25">{'\uD83D\uDC65'}</span>
+            <span className="text-[9px] text-muted-foreground/40">{'\uD83D\uDC65'}</span>
             <span className="text-[9px] text-muted-foreground/35 tabular-nums">{fmtNum(makers)}</span>
           </div>
 
@@ -356,7 +356,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               style={{ width: `${score}%` }}
             />
           </div>
-          <span className="text-[9px] text-muted-foreground/30 tabular-nums shrink-0">{score}%</span>
+          <span className="text-[9px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
         </div>
         <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
           <WhitelistButton token={token} compact />
@@ -666,7 +666,7 @@ export default function Markets() {
       {/* Card list — flex-1 fills remaining height so all columns align */}
       <div className="flex-1 p-1.5 space-y-1.5 max-h-[720px] overflow-y-auto scrollbar-thin">
         {items.length === 0 ? (
-          <div className="py-16 text-center text-[11px] text-muted-foreground/20">{emptyText}</div>
+          <div className="py-16 text-center text-[11px] text-muted-foreground/35">{emptyText}</div>
         ) : (
           <>
             {items.map((token) => (
@@ -714,7 +714,7 @@ export default function Markets() {
             ].map((stat, i) => (
               <div key={stat.label} className="shrink-0 flex items-center gap-4 sm:gap-8">
                 <div>
-                  <div className="text-[10px] text-muted-foreground/30 font-medium">{stat.label}</div>
+                  <div className="text-[10px] text-muted-foreground/45 font-medium">{stat.label}</div>
                   <div className={`text-[15px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
                 </div>
                 {i < 4 && <div className="w-px h-7 bg-white/[0.04] shrink-0" />}
@@ -811,9 +811,9 @@ export default function Markets() {
                 placeholder="Search tokens..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="h-8 w-full sm:w-56 pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:border-primary/25 transition-colors"
+                className="h-8 w-full sm:w-56 pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
               />
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -855,7 +855,7 @@ export default function Markets() {
                     ))
                   ) : tokens.length === 0 ? (
                     <tr>
-                      <td colSpan={13} className="py-20 text-center text-xs text-muted-foreground/30">
+                      <td colSpan={13} className="py-20 text-center text-xs text-muted-foreground/45">
                         No tokens match your filters
                       </td>
                     </tr>
@@ -909,7 +909,7 @@ export default function Markets() {
                   ))
                 ) : tokens.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-20 text-center text-xs text-muted-foreground/30">
+                    <td colSpan={7} className="py-20 text-center text-xs text-muted-foreground/45">
                       No tokens match your filters
                     </td>
                   </tr>
@@ -942,7 +942,7 @@ export default function Markets() {
                 </div>
               ))
             ) : tokens.length === 0 ? (
-              <div className="py-20 text-center text-xs text-muted-foreground/30">No tokens found</div>
+              <div className="py-20 text-center text-xs text-muted-foreground/45">No tokens found</div>
             ) : (
               tokens.map((token, idx) => (
                 <MobileRow
@@ -963,7 +963,7 @@ export default function Markets() {
 
           {/* FOOTER */}
           <div className="flex items-center justify-between py-4 mt-2">
-            <span className="text-[10px] text-muted-foreground/25">
+            <span className="text-[10px] text-muted-foreground/40">
               {tokens.length} of {allTokens.length} tokens
             </span>
             <button
@@ -998,7 +998,7 @@ export default function Markets() {
             ].map((stat, i) => (
               <div key={stat.label} className="shrink-0 flex items-center gap-3">
                 <div>
-                  <div className="text-[8px] text-muted-foreground/30 font-medium uppercase">{stat.label}</div>
+                  <div className="text-[8px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
                   <div className={`text-[11px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
                 </div>
                 {i < 4 && <div className="w-px h-5 bg-white/[0.04] shrink-0" />}
@@ -1070,9 +1070,9 @@ export default function Markets() {
                 placeholder="Search tokens..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="h-8 w-full pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:border-primary/25 transition-colors"
+                className="h-8 w-full pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
               />
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -1087,7 +1087,7 @@ export default function Markets() {
                 </div>
               ))
             ) : tokens.length === 0 ? (
-              <div className="py-20 text-center text-xs text-muted-foreground/30">No tokens found</div>
+              <div className="py-20 text-center text-xs text-muted-foreground/45">No tokens found</div>
             ) : (
               tokens.map((token, idx) => (
                 <MobileRow
@@ -1108,7 +1108,7 @@ export default function Markets() {
 
           {/* FOOTER (mobile) */}
           <div className="flex items-center justify-between py-4 mt-2">
-            <span className="text-[10px] text-muted-foreground/25">
+            <span className="text-[10px] text-muted-foreground/40">
               {tokens.length} of {allTokens.length} tokens
             </span>
             <button
@@ -1165,7 +1165,7 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
         </button>
       </td>
       {/* Rank */}
-      <td className="py-2.5 text-[10px] text-muted-foreground/25 tabular-nums">{rank}</td>
+      <td className="py-2.5 text-[10px] text-muted-foreground/40 tabular-nums">{rank}</td>
       {/* Token */}
       <td className="py-2.5">
         <div className="flex items-center gap-2.5">
@@ -1173,12 +1173,12 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{token.symbol}</span>
-              <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/30 bg-white/[0.03] px-1 py-px rounded">
+              <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-white/[0.03] px-1 py-px rounded">
                 <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />
                 {chainLabel}
               </span>
             </div>
-            <span className="text-[10px] text-muted-foreground/25 leading-tight">{token.name}</span>
+            <span className="text-[10px] text-muted-foreground/40 leading-tight">{token.name}</span>
           </div>
         </div>
       </td>
@@ -1215,7 +1215,7 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
       {/* LIQ */}
       <td className="py-2.5 px-3 text-right text-[11px] text-muted-foreground/50 tabular-nums">{formatCompact(token.liquidity)}</td>
       {/* TXNS */}
-      <td className="py-2.5 px-3 text-right text-[10px] text-muted-foreground/30 tabular-nums">
+      <td className="py-2.5 px-3 text-right text-[10px] text-muted-foreground/45 tabular-nums">
         {txns > 1000 ? `${(txns / 1000).toFixed(1)}K` : txns}
       </td>
       {/* Action */}
@@ -1259,13 +1259,13 @@ function TabletRow({ token, rank, onClick, whitelisted, whitelistPending, onRequ
 
   return (
     <tr className="border-t border-white/[0.02] hover:bg-white/[0.015] transition-colors cursor-pointer" onClick={onClick}>
-      <td className="py-2.5 pl-3 text-[10px] text-muted-foreground/25 tabular-nums">{rank}</td>
+      <td className="py-2.5 pl-3 text-[10px] text-muted-foreground/40 tabular-nums">{rank}</td>
       <td className="py-2.5">
         <div className="flex items-center gap-2">
           <TokenLogo symbol={token.symbol} size={24} />
           <div>
             <span className="text-[12px] font-semibold text-foreground">{token.symbol}</span>
-            <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/30 ml-1"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
+            <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 ml-1"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
           </div>
         </div>
       </td>
@@ -1329,12 +1329,12 @@ function MobileRow({ token, rank, starred, onStar, onClick, whitelisted, whiteli
       <button onClick={onStar} className="text-muted-foreground/15 hover:text-warning transition-colors shrink-0 p-1 -ml-1">
         <span className={`text-[14px] ${starred ? 'text-warning' : ''}`}>{starred ? '\u2605' : '\u2606'}</span>
       </button>
-      <span className="text-[10px] text-muted-foreground/20 tabular-nums w-5 shrink-0">{rank}</span>
+      <span className="text-[10px] text-muted-foreground/35 tabular-nums w-5 shrink-0">{rank}</span>
       <TokenLogo symbol={token.symbol} size={32} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-semibold text-foreground">{token.symbol}</span>
-          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/30 bg-white/[0.03] px-1 py-px rounded"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
+          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-white/[0.03] px-1 py-px rounded"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-[11px] text-foreground tabular-nums font-medium">{formatPrice(token.price)}</span>
@@ -1476,7 +1476,7 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
       {/* Token list */}
       <div className="space-y-0.5">
         {displayTokens.length === 0 ? (
-          <div className="py-12 text-center text-[11px] text-muted-foreground/30">No tokens found</div>
+          <div className="py-12 text-center text-[11px] text-muted-foreground/45">No tokens found</div>
         ) : (
           displayTokens.map(token => (
             <button
