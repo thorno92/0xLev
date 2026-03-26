@@ -24,20 +24,18 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
-const ALLOWED_ORIGINS = [
-  "https://0xl-testing.xyz",
+const ALLOWED_ORIGINS = new Set([
+  "https://0x-lev-neon.vercel.app",
   "https://www.0xl-testing.xyz",
-];
+  "http://localhost:5173",
+  "http://localhost:3000",
+]);
 
 app.use(
   cors({
     origin: process.env.NODE_ENV === "production"
       ? (origin, cb) => {
-          if (
-            !origin ||
-            ALLOWED_ORIGINS.includes(origin!) ||
-            origin!.endsWith(".vercel.app")
-          ) {
+          if (!origin || ALLOWED_ORIGINS.has(origin)) {
             cb(null, true);
           } else {
             cb(null, false);

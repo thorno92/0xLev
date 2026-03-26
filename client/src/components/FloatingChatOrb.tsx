@@ -51,7 +51,7 @@ export function FloatingChatOrb() {
   };
 
   return (
-    <div className="fixed bottom-[80px] right-3 sm:bottom-5 sm:right-4 z-40">
+    <div className="fixed bottom-[80px] right-3 sm:bottom-5 sm:right-4 z-30">
       {/* Chat Panel */}
       {isOpen && (
         <div

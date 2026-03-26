@@ -1500,7 +1500,9 @@
   transform: scale(0.97);
 }
 
-/* Card hover: border brighten + subtle lift */
+/* Card hover: border brighten + subtle lift
+   TODO: rgba(139, 92, 246, ...) below is hardcoded purple — theme-locked to default.
+   Replace with theme-aware color when relative color syntax has broader support. */
 .card-hover {
   transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
@@ -1530,7 +1532,8 @@
   background-color: var(--glow-subtle);
 }
 
-/* Input focus glow */
+/* Input focus glow
+   TODO: rgba(139, 92, 246, ...) below is hardcoded purple — theme-locked to default. */
 .input-hover {
   transition: border-color 200ms ease, box-shadow 200ms ease;
 }
@@ -1698,7 +1701,7 @@
   background-size: 128px 128px;
   opacity: 0.025;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 1;
   animation: grain-shift 8s steps(10) infinite;
   mix-blend-mode: overlay;
 }

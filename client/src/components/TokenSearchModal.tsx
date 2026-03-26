@@ -120,7 +120,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
         </div>
 
         {/* Results */}
-        <div ref={resultsRef} className="max-h-[calc(100dvh-160px)] sm:max-h-[400px] overflow-y-auto">
+        <div ref={resultsRef} className="max-h-[60vh] sm:max-h-[400px] overflow-y-auto">
           {filtered.length === 0 && !customToken ? (
             <div className="py-8 text-center text-[13px] text-muted-foreground">
               No tokens found

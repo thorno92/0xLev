@@ -284,47 +284,6 @@ export default function Trending() {
               ))}
             </div>
 
-            {/* == MOBILE CARDS == */}
-            <div className="md:hidden space-y-1">
-              {isLoading ? (
-                Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={2} />)
-              ) : filteredTokens.map((token, i) => {
-                const pos = token.change24h >= 0;
-                const ex = mockExtra.get(token.address) ?? { txns: 1000, makers: 100, c5m: 0, c1h: 0, score: 50 };
-                const spark = generateSparklineData(token.address, 20);
-                return (
-                  <div
-                    key={token.address}
-                    className="border border-border/30 px-4 py-3.5 hover:bg-secondary/10 active:bg-secondary/20 transition-colors cursor-pointer"
-                    onClick={() => handleTokenClick(token)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-[10px] text-muted-foreground/40 w-4 shrink-0">{i + 1}</span>
-                      <TokenLogo symbol={token.symbol} size={24} />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-medium text-foreground">{token.symbol}</span>
-                          {chainNetworkIcon[token.chain] ? (() => { const CI = chainNetworkIcon[token.chain]; return <CI size={12} />; })() : <span className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground/50">{token.chain.slice(0, 3)}</span>}
-                        </div>
-                        <div className="font-mono text-[9px] text-muted-foreground/40 truncate">{token.name}</div>
-                      </div>
-                      <MiniSparkline data={spark} width={48} height={20} strokeWidth={1} />
-                      <div className="text-right shrink-0">
-                        <div className="font-data text-sm font-semibold text-foreground">{formatPrice(token.price)}</div>
-                        <div className={`font-mono text-[10px] ${pos ? 'text-success' : 'text-destructive'}`}>{formatPercent(token.change24h)}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 sm:gap-4 mt-2 ml-7 flex-wrap">
-                      <span className="font-mono text-[9px] text-muted-foreground/50">VOL <span className="text-foreground/60 font-data">{formatCompact(token.volume24h)}</span></span>
-                      <span className="font-mono text-[9px] text-muted-foreground/50">MC <span className="text-foreground/60 font-data">{formatCompact(token.marketCap)}</span></span>
-                      <span className={`font-mono text-[9px] ${ex.c5m >= 0 ? 'text-success' : 'text-destructive'}`}>5M {formatPercent(ex.c5m)}</span>
-                      <span className={`font-mono text-[9px] ${ex.c1h >= 0 ? 'text-success' : 'text-destructive'}`}>1H {formatPercent(ex.c1h)}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
             {/* == DESKTOP TABLE == */}
             <div className="hidden md:block border border-border overflow-hidden">
               <div className="overflow-x-auto">

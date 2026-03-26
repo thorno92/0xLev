@@ -31,7 +31,7 @@ const NetworkIcon = lazy(() =>
 /** Renders a proper branded network icon with fallback */
 function ChainIcon({ network, size = 14 }: { network: string; size?: number }) {
   return (
-    <Suspense fallback={<span className="inline-block rounded-full bg-white/[0.06]" style={{ width: size, height: size }} />}>
+    <Suspense fallback={<span className="inline-block rounded-full bg-foreground/[0.06]" style={{ width: size, height: size }} />}>
       <NetworkIcon name={network} size={size} variant="branded" className="shrink-0" fallback={
         <NetworkIcon name={network} size={size} variant="mono" className="shrink-0" />
       } />
@@ -174,16 +174,16 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
 
   return (
     <div
-      className="group relative rounded-lg bg-card/60 border border-white/[0.04] hover:border-primary/20 hover:bg-card/90 transition-all duration-200 cursor-pointer"
+      className="group relative rounded-lg bg-card/60 border border-foreground/[0.04] hover:border-primary/20 hover:bg-card/90 transition-all duration-200 cursor-pointer"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* ---- HOVER PREVIEW POPUP ---- */}
       {hovered && (
-        <div className="absolute z-50 left-full top-0 ml-2 w-[260px] rounded-xl bg-card border border-white/[0.06] shadow-2xl shadow-black/40 p-3.5 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150 hidden sm:block">
+        <div className="absolute z-50 left-full top-0 ml-2 w-[260px] rounded-xl bg-card border border-foreground/[0.06] shadow-2xl shadow-black/40 p-3.5 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150 hidden sm:block">
           {/* Sparkline chart */}
-          <div className="mb-3 rounded-lg bg-white/[0.02] p-2">
+          <div className="mb-3 rounded-lg bg-foreground/[0.02] p-2">
             <MiniSparkline data={sparkData} width={228} height={64} color={token.change24h >= 0 ? 'var(--color-success)' : 'var(--color-destructive)'} />
           </div>
           {/* Stats grid */}
@@ -218,7 +218,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             </div>
           </div>
           {/* Quick actions hint */}
-          <div className="mt-3 pt-2.5 border-t border-white/[0.04] flex items-center justify-center gap-1">
+          <div className="mt-3 pt-2.5 border-t border-foreground/[0.04] flex items-center justify-center gap-1">
             <span className="text-[9px] text-muted-foreground/45">Click to open in Terminal</span>
           </div>
         </div>
@@ -250,7 +250,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
                 age.includes('h') ? 'bg-success/[0.08] text-success/70' :
                 age === '1d' || age === '3d' || age === '5d' ? 'bg-warning/[0.08] text-warning/70' :
                 age === '1w' || age === '2w' ? 'bg-primary/[0.08] text-primary/70' :
-                'bg-white/[0.03] text-muted-foreground/35'
+                'bg-foreground/[0.03] text-muted-foreground/35'
               }`}>{age}</span>
               <div onClick={(e) => e.stopPropagation()}>
                 <WhitelistButton token={token} compact />
@@ -264,7 +264,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <a
                 href={socials.x}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-foreground/[0.04] hover:bg-white/[0.08] transition-colors"
                 title="X (Twitter)"
               >
                 <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor">
@@ -276,7 +276,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <a
                 href={socials.tg}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-foreground/[0.04] hover:bg-white/[0.08] transition-colors"
                 title="Telegram"
               >
                 <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor">
@@ -288,7 +288,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <a
                 href={socials.web}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-foreground/[0.04] hover:bg-white/[0.08] transition-colors"
                 title="Website"
               >
                 <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -298,7 +298,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
                 </svg>
               </a>
             )}
-            <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground/50 font-medium bg-white/[0.04] px-1.5 py-[1px] rounded">
+            <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground/50 font-medium bg-foreground/[0.04] px-1.5 py-[1px] rounded">
               <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />
               {chainLabel}
             </span>
@@ -352,7 +352,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
       {/* ---- BOTTOM: Progress bar ---- */}
       <div className="px-2.5 pb-2">
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
+          <div className="flex-1 h-[3px] rounded-full bg-foreground/[0.04] overflow-hidden">
             <div
               className="h-full rounded-full bg-success/50 transition-all"
               style={{ width: `${score}%` }}
@@ -577,7 +577,7 @@ export default function Markets() {
       className={`text-[10px] font-medium px-2.5 py-1 rounded-md transition-all whitespace-nowrap ${
         active
           ? 'bg-primary/[0.10] text-primary/90 border border-primary/20'
-          : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-white/[0.04]'
+          : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-foreground/[0.04]'
       }`}
     >
       {label}
@@ -589,13 +589,13 @@ export default function Markets() {
   /* ================================================================ */
   /** Chain filter pills for columns */
   const ChainFilterRow = ({ activeChain, onChange }: { activeChain: string; onChange: (v: string) => void }) => (
-    <div className="flex items-center gap-1 px-3 py-1.5 border-b border-white/[0.02] bg-white/[0.01] shrink-0">
+    <div className="flex items-center gap-1 px-3 py-1.5 border-b border-white/[0.02] bg-foreground/[0.01] shrink-0">
       <button
         onClick={() => onChange('all')}
         className={`text-[9px] font-medium px-2 py-[3px] rounded-md transition-all ${
           activeChain === 'all'
             ? 'bg-primary/[0.10] text-primary/90 border border-primary/20'
-            : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-white/[0.04]'
+            : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-foreground/[0.04]'
         }`}
       >
         All
@@ -607,7 +607,7 @@ export default function Markets() {
           className={`flex items-center gap-1 text-[9px] font-medium px-2 py-[3px] rounded-md transition-all ${
             activeChain === c.value
               ? 'bg-primary/[0.10] text-primary/90 border border-primary/20'
-              : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-white/[0.04]'
+              : 'text-muted-foreground/35 hover:text-muted-foreground/60 border border-transparent hover:border-foreground/[0.04]'
           }`}
         >
           <ChainIcon network={c.network!} size={10} />
@@ -631,7 +631,7 @@ export default function Markets() {
     activeFilter?: string,
     onFilterChange?: (v: string) => void,
   ) => (
-    <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-white/[0.04] h-full">
+    <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-foreground/[0.04] h-full">
       {/* Column header — fixed structure for alignment across columns */}
       <div className="px-3 py-2 border-b border-white/[0.03] shrink-0">
         <div className="flex items-center justify-between min-h-[24px]">
@@ -680,7 +680,7 @@ export default function Markets() {
             {items.length < totalCount && (
               <button
                 onClick={onLoadMore}
-                className="w-full py-2.5 text-[10px] font-medium text-muted-foreground/40 hover:text-primary/70 hover:bg-white/[0.02] rounded-lg transition-all border border-transparent hover:border-white/[0.04]"
+                className="w-full py-2.5 text-[10px] font-medium text-muted-foreground/40 hover:text-primary/70 hover:bg-foreground/[0.02] rounded-lg transition-all border border-transparent hover:border-foreground/[0.04]"
               >
                 Load More ({totalCount - items.length} remaining)
               </button>
@@ -701,7 +701,7 @@ export default function Markets() {
           {/* ========================================================== */}
           {/*  STATS BAR (desktop)                                       */}
           {/* ========================================================== */}
-          <div className="flex items-center gap-4 sm:gap-8 mb-6 pb-4 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-4 sm:gap-8 mb-6 pb-4 border-b border-foreground/[0.04] overflow-x-auto scrollbar-none">
             {[
               { label: '24H Volume', value: formatCompact(totalVol), color: 'text-foreground' },
               { label: 'Market Cap', value: formatCompact(totalMcap), color: 'text-foreground' },
@@ -714,7 +714,7 @@ export default function Markets() {
                   <div className="text-[10px] text-muted-foreground/45 font-medium">{stat.label}</div>
                   <div className={`text-[15px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
                 </div>
-                {i < 4 && <div className="w-px h-7 bg-white/[0.04] shrink-0" />}
+                {i < 4 && <div className="w-px h-7 bg-foreground/[0.04] shrink-0" />}
               </div>
             ))}
           </div>
@@ -765,7 +765,7 @@ export default function Markets() {
                   className={`flex items-center gap-1.5 text-[11px] font-medium h-8 px-3 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
                     chain === c.value && !showFavoritesOnly
                       ? 'bg-primary/[0.10] text-foreground border-primary/20'
-                      : 'bg-white/[0.02] text-muted-foreground/40 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
+                      : 'bg-foreground/[0.02] text-muted-foreground/40 border-foreground/[0.04] hover:text-foreground hover:border-white/[0.08]'
                   }`}
                 >
                   {c.network && <ChainIcon network={c.network} size={14} />}
@@ -777,7 +777,7 @@ export default function Markets() {
                 className={`flex items-center gap-1.5 text-[11px] font-medium h-8 px-3 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
                   showFavoritesOnly
                     ? 'bg-primary/[0.10] text-foreground border-primary/20'
-                    : 'bg-white/[0.02] text-muted-foreground/40 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
+                    : 'bg-foreground/[0.02] text-muted-foreground/40 border-foreground/[0.04] hover:text-foreground hover:border-white/[0.08]'
                 }`}
               >
                 <span className="text-warning text-[13px]">{'\u2605'}</span>
@@ -793,7 +793,7 @@ export default function Markets() {
                   placeholder="Search tokens..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="h-8 w-full sm:w-56 pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
+                  className="h-8 w-full sm:w-56 pl-8 pr-3 text-[11px] bg-foreground/[0.02] border border-foreground/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
                 />
                 <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -804,7 +804,7 @@ export default function Markets() {
                 className={`flex items-center gap-1.5 h-8 px-3 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
                   activeFilterCount > 0
                     ? 'bg-primary/[0.08] text-primary border-primary/20'
-                    : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
+                    : 'bg-foreground/[0.02] text-muted-foreground/50 border-foreground/[0.04] hover:text-foreground hover:border-white/[0.08]'
                 }`}
               >
                 <FilterSolid className="w-3 h-3" />
@@ -821,7 +821,7 @@ export default function Markets() {
           {/* ========================================================== */}
           {/*  DESKTOP TABLE                                              */}
           {/* ========================================================== */}
-          <div className="hidden lg:block rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
+          <div className="hidden lg:block rounded-xl overflow-hidden bg-card/40 border border-foreground/[0.04]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px]">
                 <thead>
@@ -882,7 +882,7 @@ export default function Markets() {
           {/* ========================================================== */}
           {/*  TABLET TABLE                                               */}
           {/* ========================================================== */}
-          <div className="hidden md:block lg:hidden rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
+          <div className="hidden md:block lg:hidden rounded-xl overflow-hidden bg-card/40 border border-foreground/[0.04]">
             <table className="w-full">
               <thead>
                 <tr className="text-[10px] text-muted-foreground/35 uppercase tracking-[0.08em] border-b border-white/[0.03]">
@@ -933,7 +933,7 @@ export default function Markets() {
           {/* ========================================================== */}
           {/*  MOBILE CARDS                                               */}
           {/* ========================================================== */}
-          <div className="md:hidden rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
+          <div className="md:hidden rounded-xl overflow-hidden bg-card/40 border border-foreground/[0.04]">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="px-4 py-3 border-b border-white/[0.02]">
@@ -987,7 +987,7 @@ export default function Markets() {
         <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
 
           {/* STATS BAR (mobile) — full-width grid matching tabs */}
-          <div className="grid grid-cols-5 mb-4 pb-3 border-b border-white/[0.04]">
+          <div className="grid grid-cols-5 mb-4 pb-3 border-b border-foreground/[0.04]">
             {[
               { label: 'Volume', value: formatCompact(totalVol), color: 'text-foreground' },
               { label: 'MCap', value: formatCompact(totalMcap), color: 'text-foreground' },
@@ -1053,7 +1053,7 @@ export default function Markets() {
                 placeholder="Search tokens..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="h-8 w-full pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
+                className="h-8 w-full pl-8 pr-3 text-[11px] bg-foreground/[0.02] border border-foreground/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
               />
               <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1064,7 +1064,7 @@ export default function Markets() {
               className={`flex items-center gap-1.5 h-8 px-3 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
                 activeFilterCount > 0
                   ? 'bg-primary/[0.08] text-primary border-primary/20'
-                  : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground'
+                  : 'bg-foreground/[0.02] text-muted-foreground/50 border-foreground/[0.04] hover:text-foreground'
               }`}
             >
               <FilterSolid className="w-3 h-3" />
@@ -1078,7 +1078,7 @@ export default function Markets() {
           </div>
 
           {/* MOBILE CARDS */}
-          <div className="rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
+          <div className="rounded-xl overflow-hidden bg-card/40 border border-foreground/[0.04]">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="px-4 py-3 border-b border-white/[0.02]">
@@ -1172,7 +1172,7 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{token.symbol}</span>
-              <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-white/[0.03] px-1 py-px rounded">
+              <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-foreground/[0.03] px-1 py-px rounded">
                 <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />
                 {chainLabel}
               </span>
@@ -1292,7 +1292,7 @@ function MobileRow({ token, rank, starred, onStar, onClick, whitelisted, whiteli
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.02] hover:bg-white/[0.015] active:bg-white/[0.03] transition-colors cursor-pointer"
+      className="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.02] hover:bg-white/[0.015] active:bg-foreground/[0.03] transition-colors cursor-pointer"
       onClick={onClick}
     >
       <button onClick={onStar} className="text-muted-foreground/15 hover:text-warning transition-colors shrink-0 p-1 -ml-1">
@@ -1303,7 +1303,7 @@ function MobileRow({ token, rank, starred, onStar, onClick, whitelisted, whiteli
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-semibold text-foreground">{token.symbol}</span>
-          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-white/[0.03] px-1 py-px rounded"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
+          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/45 bg-foreground/[0.03] px-1 py-px rounded"><ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />{chainLabel}</span>
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-[11px] text-foreground tabular-nums font-medium">{formatPrice(token.price)}</span>
@@ -1419,7 +1419,7 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
             className={`text-[12px] font-medium py-2 rounded-md transition-all text-center ${
               filter === t.key
                 ? 'bg-primary/12 text-primary border border-primary/20'
-                : 'bg-white/[0.02] text-muted-foreground/50 border border-white/[0.03] hover:text-foreground'
+                : 'bg-foreground/[0.02] text-muted-foreground/50 border border-white/[0.03] hover:text-foreground'
             }`}
           >
             {t.label}

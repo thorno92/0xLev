@@ -250,14 +250,35 @@ export default function Terminal() {
       toast.error('Enter a valid amount');
       return;
     }
+    if (amountNum < 0.001) {
+      toast.error('Minimum amount is 0.001 SOL');
+      return;
+    }
     if (amountNum > 10_000) {
       toast.error('Maximum amount is 10,000 SOL');
       return;
     }
+
+    const tpNum = takeProfit ? parseFloat(takeProfit) : undefined;
+    const slNum = stopLoss ? parseFloat(stopLoss) : undefined;
+
+    if (tpNum !== undefined && tpNum <= 0) { toast.error('Take Profit must be positive'); return; }
+    if (slNum !== undefined && slNum <= 0) { toast.error('Stop Loss must be positive'); return; }
+
+    // For Long positions (leverage is always long)
+    if (tradingMode === 'leverage' || orderSide === 'buy') {
+      if (tpNum !== undefined && entryPrice > 0 && tpNum <= entryPrice) {
+        toast.error('Take Profit must be above entry price'); return;
+      }
+      if (slNum !== undefined && entryPrice > 0 && slNum >= entryPrice) {
+        toast.error('Stop Loss must be below entry price'); return;
+      }
+    }
+
     setIsExecuting(true);
     try {
-      const tp = takeProfit ? parseFloat(takeProfit) : undefined;
-      const sl = stopLoss ? parseFloat(stopLoss) : undefined;
+      const tp = tpNum;
+      const sl = slNum;
       const result = await openMutation.mutateAsync({
         walletAddress,
         contractAddress: selectedToken.address,
@@ -361,7 +382,7 @@ export default function Terminal() {
       <div className="sm:hidden h-9 border-b border-border bg-card flex items-center px-3 gap-2 shrink-0">
         <TokenLogo symbol={selectedToken?.symbol ?? 'SOL'} size={20} eager />
         <span className="text-[13px] font-semibold text-foreground">{selectedToken?.symbol ?? 'SOL'}</span>
-        <span className="text-[13px] font-data font-bold text-foreground">{selectedToken ? formatPrice(selectedToken.price) : '$148.23'}</span>
+        <span className="text-[13px] font-data font-bold text-foreground">{selectedToken ? formatPrice(selectedToken.price) : '\u2014'}</span>
         <span className={`text-[11px] font-data font-semibold ${(selectedToken?.change24h ?? 0) >= 0 ? 'text-success' : 'text-destructive'}`}>
           {selectedToken ? formatPercent(selectedToken.change24h) : '+5.2%'}
         </span>

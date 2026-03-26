@@ -575,7 +575,10 @@ export const leverageRouter = router({
         tradeId: tradeIdSchema,
         tp: priceLevelSchema,
         sl: priceLevelSchema,
-      }),
+      }).refine(
+        (data) => data.tp !== undefined || data.sl !== undefined,
+        "At least one of TP or SL is required"
+      ),
     )
     .mutation(async ({ input, ctx }) => {
       await requireWalletAuth(input, "updateTpSl");

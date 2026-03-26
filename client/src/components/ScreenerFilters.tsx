@@ -120,7 +120,7 @@ export function ScreenerFilterDialog({ open, onOpenChange, filters, setFilters, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-0 bg-card border-border gap-0 overflow-hidden max-h-[calc(100dvh-48px)] mx-3 sm:mx-auto">
+      <DialogContent className="sm:max-w-[480px] p-0 bg-card border-border gap-0 overflow-hidden max-h-[85vh] mx-3 sm:mx-auto">
         <DialogHeader className="px-5 pt-4 pb-3">
           <DialogTitle className="text-[14px] text-foreground flex items-center gap-2">
             <FilterSolid className="w-4 h-4 text-primary" />

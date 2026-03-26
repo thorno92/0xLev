@@ -154,10 +154,14 @@ export function Header() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    toast.info('Refreshing data...');
-    await new Promise((r) => setTimeout(r, 800));
-    setIsRefreshing(false);
-    toast.success('Data refreshed');
+    try {
+      await utils.invalidate();
+      toast.success('Data refreshed');
+    } catch {
+      toast.error('Refresh failed');
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleConnectWallet = () => {
