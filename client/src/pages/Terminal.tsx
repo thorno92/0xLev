@@ -880,29 +880,31 @@ export default function Terminal() {
               </button>
             </div>
 
-            {/* Side Toggle */}
-            <div className="flex gap-1">
-              <button
-                onClick={() => setOrderSide('buy')}
-                className={`flex-1 py-2 text-[13px] font-semibold rounded transition-all ${
-                  isBuy
-                    ? 'bg-success/12 text-success border border-success/25'
-                    : 'bg-secondary text-muted-foreground border border-transparent'
-                }`}
-              >
-                Buy
-              </button>
-              <button
-                onClick={() => setOrderSide('sell')}
-                className={`flex-1 py-2 text-[13px] font-semibold rounded transition-all ${
-                  !isBuy
-                    ? 'bg-destructive/12 text-destructive border border-destructive/25'
-                    : 'bg-secondary text-muted-foreground border border-transparent'
-                }`}
-              >
-                Sell
-              </button>
-            </div>
+            {/* Side Toggle — only in SPOT mode */}
+            {tradingMode === 'spot' && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setOrderSide('buy')}
+                  className={`flex-1 py-2 text-[13px] font-semibold rounded transition-all ${
+                    isBuy
+                      ? 'bg-success/12 text-success border border-success/25'
+                      : 'bg-secondary text-muted-foreground border border-transparent'
+                  }`}
+                >
+                  Buy
+                </button>
+                <button
+                  onClick={() => setOrderSide('sell')}
+                  className={`flex-1 py-2 text-[13px] font-semibold rounded transition-all ${
+                    !isBuy
+                      ? 'bg-destructive/12 text-destructive border border-destructive/25'
+                      : 'bg-secondary text-muted-foreground border border-transparent'
+                  }`}
+                >
+                  Sell
+                </button>
+              </div>
+            )}
 
             {/* Amount */}
             <div>
@@ -1049,7 +1051,7 @@ export default function Terminal() {
             onClick={handleExecute}
             disabled={isExecuting || !amountNum}
             className={`w-full py-2.5 text-[13px] font-semibold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${
-              isBuy
+              tradingMode === 'leverage' || isBuy
                 ? 'bg-success hover:bg-success/90 text-background'
                 : 'bg-destructive hover:bg-destructive/90 text-white'
             }`}
@@ -1059,7 +1061,9 @@ export default function Terminal() {
             ) : (
               <>
                 <TokenLogo symbol={selectedToken?.symbol ?? 'SOL'} size={16} />
-                {isBuy ? 'Buy' : 'Sell'} {selectedToken?.symbol ?? 'SOL'}
+                {tradingMode === 'leverage'
+                  ? `Long ${selectedToken?.symbol ?? 'SOL'}`
+                  : `${isBuy ? 'Buy' : 'Sell'} ${selectedToken?.symbol ?? 'SOL'}`}
                 {amountNum > 0 && (
                   <span className="opacity-75 ml-1">
                     {formatNumber(amountNum, 2)} SOL

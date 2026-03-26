@@ -71,6 +71,7 @@ function FilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, prefix = '
           )}
           <Input
             type="number"
+            inputMode="decimal"
             placeholder="Min"
             value={minVal}
             onChange={(e) => onMinChange(e.target.value)}
@@ -86,6 +87,7 @@ function FilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, prefix = '
           )}
           <Input
             type="number"
+            inputMode="decimal"
             placeholder="Max"
             value={maxVal}
             onChange={(e) => onMaxChange(e.target.value)}
