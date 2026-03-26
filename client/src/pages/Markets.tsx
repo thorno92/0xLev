@@ -705,12 +705,37 @@ export default function Markets() {
           </div>
 
           {/* ========================================================== */}
-          {/*  DASHBOARD SECTIONS (compact top cards)                     */}
+          {/*  3 SIDE-BY-SIDE COLUMNS (desktop)                           */}
           {/* ========================================================== */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            <SectionCard title="Gainers" subtitle="Sorted by 24h change" tokens={dashGainers} onSelect={handleClick} />
-            <SectionCard title="Flash Sale" subtitle="Dips with real liquidity" tokens={dashFlashSale} onSelect={handleClick} />
-            <SectionCard title="Top Volume" subtitle="Most active in 24 hours" tokens={dashTopVolume} onSelect={handleClick} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+            {renderColumn(
+              'Gainers', 'Top performing tokens by 24h change',
+              'bg-success',
+              gainers, gainersFull.length,
+              'No gainers right now',
+              () => setGainerLimit(prev => prev + LOAD_MORE_COUNT),
+              gainerChain, setGainerChain,
+              [{ value: 'all', label: 'All' }, { value: '>5%', label: '>5%' }, { value: '>10%', label: '>10%' }],
+              gainerFilter, setGainerFilter,
+            )}
+            {renderColumn(
+              'Flash Sale', 'Tokens with significant price drops',
+              'bg-warning',
+              flashSale, flashSaleFull.length,
+              'No flash sales right now',
+              () => setFlashLimit(prev => prev + LOAD_MORE_COUNT),
+              flashChain, setFlashChain,
+            )}
+            {renderColumn(
+              'Top Volume', 'Highest trading volume in 24 hours',
+              'bg-primary',
+              topVolume, topVolumeFull.length,
+              'No volume data',
+              () => setVolumeLimit(prev => prev + LOAD_MORE_COUNT),
+              volumeChain, setVolumeChain,
+              [{ value: 'all', label: 'All' }, { value: 'rising', label: 'Rising' }, { value: 'new', label: 'New' }],
+              volumeFilter, setVolumeFilter,
+            )}
           </div>
 
           {/* ========================================================== */}
