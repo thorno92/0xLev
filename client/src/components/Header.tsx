@@ -134,16 +134,24 @@ export function Header() {
   // Auto-trigger sign-message when wallet adapter connects,
   // but wait for session resume to finish first, and skip if session was restored.
   const hasTriggeredAuth = useRef(false);
+  // Track if user explicitly initiated connect (vs auto-connect on page load)
+  const userInitiated = useRef(false);
+
   useEffect(() => {
-    if (isSessionLoading) return;
+    // Only block on session loading for auto-connect, not user-initiated
+    if (isSessionLoading && !userInitiated.current) return;
     if (sessionRestored || walletConnected) return;
     if (adapterConnected && !isConnecting && !hasTriggeredAuth.current) {
       hasTriggeredAuth.current = true;
       walletAuthConnect()
-        .then(() => toast.success('Wallet connected'))
+        .then(() => {
+          toast.success('Wallet connected');
+          userInitiated.current = false;
+        })
         .catch((err) => {
           toast.error(err instanceof Error ? err.message : 'Failed to connect wallet');
           walletAuthDisconnect();
+          userInitiated.current = false;
         })
         .finally(() => { hasTriggeredAuth.current = false; });
     }
@@ -165,6 +173,7 @@ export function Header() {
   };
 
   const handleConnectWallet = () => {
+    userInitiated.current = true;
     setWalletModalOpen(true);
   };
 

@@ -50,6 +50,10 @@ export function useWalletAuth() {
 
     const signature = Buffer.from(signatureBytes).toString("base64");
 
+    // Optimistic: show connected state immediately after signing
+    // The server call may take a few seconds on cold starts
+    storeConnect(walletAddress, '');
+
     // Attempt connection with one retry on timeout
     try {
       const result = await connectMutation.mutateAsync({
@@ -57,12 +61,12 @@ export function useWalletAuth() {
         signature,
         timestamp,
       });
+      // Update with real trade wallet from server
       storeConnect(walletAddress, result.tradeWallet);
       return result;
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';
       if (msg.includes('imeout')) {
-        // Retry once — same signature, same timestamp (within 5min window)
         const result = await connectMutation.mutateAsync({
           walletAddress,
           signature,
@@ -71,9 +75,11 @@ export function useWalletAuth() {
         storeConnect(walletAddress, result.tradeWallet);
         return result;
       }
+      // Revert optimistic update on failure
+      storeDisconnect();
       throw err;
     }
-  }, [publicKey, signMessage, connectMutation, storeConnect]);
+  }, [publicKey, signMessage, connectMutation, storeConnect, storeDisconnect]);
 
   const disconnect = useCallback(() => {
     const wallet = publicKey?.toBase58();
