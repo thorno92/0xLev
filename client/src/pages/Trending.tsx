@@ -64,7 +64,7 @@ function getHeatColor(value: number, positive: boolean): string {
 export default function Trending() {
   const { setSelectedToken } = useStore();
   const [, navigate] = useLocation();
-  const { allTokens, refetch } = useLivePrices();
+  const { allTokens, refetch, isLoading: isPricesLoading } = useLivePrices();
   const [activeTime, setActiveTime] = useState<string>('Trending');
   const [activeNet, setActiveNet] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('volume');
@@ -169,12 +169,26 @@ export default function Trending() {
     </th>
   );
 
+  if (isPricesLoading) {
+    return (
+      <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-[11px] text-muted-foreground font-data tracking-wider">LOADING</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
       <Header />
       {/* Desktop: normal scroll */}
       <div className="hidden md:block flex-1 overflow-auto">
-        <PageTransition className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-6">
+        <PageTransition className="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-6">
           <StaggerContainer className="space-y-8">
 
             {/* == HEADER == */}
@@ -315,6 +329,18 @@ export default function Trending() {
                     rows={10}
                     headers={['#', 'TOKEN', 'PRICE', 'CHART', 'TXNS', 'VOLUME', 'MAKERS', '5M', '1H', '24H', 'LIQ', 'MCAP']}
                   />
+                ) : filteredTokens.length === 0 ? (
+                  activeTime === 'Favorites' ? (
+                    <div className="py-12 text-center">
+                      <div className="text-[13px] text-muted-foreground mb-1">No favorites yet</div>
+                      <div className="text-[11px] text-muted-foreground/50">Star tokens from the list to track them here</div>
+                    </div>
+                  ) : (
+                    <div className="py-12 text-center">
+                      <div className="text-[13px] text-muted-foreground mb-1">No tokens found</div>
+                      <div className="text-[11px] text-muted-foreground/50">Try adjusting your filters or search criteria</div>
+                    </div>
+                  )
                 ) : (
                   <table className="data-table">
                     <thead>
@@ -421,7 +447,7 @@ export default function Trending() {
         }}
         className="md:hidden flex-1 min-h-0"
       >
-        <PageTransition className="max-w-[1400px] mx-auto px-4 py-5 pb-24">
+        <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
           <StaggerContainer className="space-y-8">
 
             {/* == HEADER (mobile) == */}
@@ -493,6 +519,19 @@ export default function Trending() {
 
             {/* MOBILE CARDS */}
             <div className="space-y-2">
+              {filteredTokens.length === 0 ? (
+                activeTime === 'Favorites' ? (
+                  <div className="py-12 text-center">
+                    <div className="text-[13px] text-muted-foreground mb-1">No favorites yet</div>
+                    <div className="text-[11px] text-muted-foreground/50">Star tokens from the list to track them here</div>
+                  </div>
+                ) : (
+                  <div className="py-12 text-center">
+                    <div className="text-[13px] text-muted-foreground mb-1">No tokens found</div>
+                    <div className="text-[11px] text-muted-foreground/50">Try adjusting your filters or search criteria</div>
+                  </div>
+                )
+              ) : null}
               {filteredTokens.map((token, idx) => {
                 const spark = generateSparklineData(token.address, 20);
                 return (

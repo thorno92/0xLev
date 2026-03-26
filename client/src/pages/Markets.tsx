@@ -698,7 +698,7 @@ export default function Markets() {
       <Header />
       {/* Desktop: normal scroll */}
       <div className="hidden md:block flex-1 overflow-auto">
-        <PageTransition className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-6">
+        <PageTransition className="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-6">
 
           {/* ========================================================== */}
           {/*  STATS BAR (desktop)                                       */}
@@ -984,7 +984,7 @@ export default function Markets() {
         }}
         className="md:hidden flex-1 min-h-0"
       >
-        <PageTransition className="max-w-[1400px] mx-auto px-4 py-5 pb-24">
+        <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
 
           {/* STATS BAR (mobile) — smaller text, scrollable */}
           <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">

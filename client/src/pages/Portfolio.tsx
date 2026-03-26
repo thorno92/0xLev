@@ -20,7 +20,7 @@ import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 /* ------------------------------------------------------------------ */
 function ConnectState({ onConnect }: { onConnect: () => void }) {
   return (
-    <PageTransition className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6 flex items-center justify-center min-h-[60vh]">
+    <PageTransition className="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6 flex items-center justify-center min-h-[60vh]">
       <div className="text-center max-w-sm space-y-6">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
@@ -214,7 +214,7 @@ export default function Portfolio() {
         <ConnectState onConnect={handleConnect} />
       ) : (
         <div className="flex-1 overflow-auto">
-          <PageTransition className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6">
+          <PageTransition className="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6">
 
             {/* ============================================ */}
             {/* HERO: Estimated Balance + Chart side by side  */}
