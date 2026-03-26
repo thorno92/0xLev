@@ -42,16 +42,27 @@ export function formatNumber(num: number, decimals: number = 2): string {
 
 export function formatCompact(num: number): string {
   num = safeNum(num);
-  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
-  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
-  if (num >= 1_000) return `$${(num / 1_000).toFixed(1)}K`;
-  return `$${num.toFixed(2)}`;
+  if (num >= 1_000_000_000) {
+    const b = num / 1_000_000_000;
+    return `$${b >= 100 ? b.toFixed(0) : b >= 10 ? b.toFixed(1) : b.toFixed(2)}B`;
+  }
+  if (num >= 1_000_000) {
+    const m = num / 1_000_000;
+    return `$${m >= 100 ? m.toFixed(0) : m >= 10 ? m.toFixed(1) : m.toFixed(2)}M`;
+  }
+  if (num >= 1_000) {
+    const k = num / 1_000;
+    return `$${k >= 100 ? k.toFixed(0) : k.toFixed(1)}K`;
+  }
+  return `$${num.toFixed(0)}`;
 }
 
 export function formatPercent(pct: number): string {
   pct = safeNum(pct);
   const sign = pct >= 0 ? '+' : '';
-  return `${sign}${pct.toFixed(2)}%`;
+  const abs = Math.abs(pct);
+  const d = abs >= 10 ? 1 : 2;
+  return `${sign}${pct.toFixed(d)}%`;
 }
 
 export function formatSol(amount: number): string {
