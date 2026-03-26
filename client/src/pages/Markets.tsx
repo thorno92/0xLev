@@ -162,12 +162,7 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
     setHovered(false);
   };
 
-  const fmtNum = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
-  const fmtVol = (n: number) => {
-    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-    return `$${n.toFixed(0)}`;
-  };
+  const fmtNum = (n: number) => n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
   // Score for the progress bar (deterministic per token)
   const score = useMemo(() => {
@@ -201,11 +196,11 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             </div>
             <div>
               <span className="text-[9px] text-muted-foreground/40 block">Volume</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{fmtVol(token.volume24h)}</span>
+              <span className="text-[11px] font-semibold text-foreground tabular-nums">{formatCompact(token.volume24h)}</span>
             </div>
             <div>
               <span className="text-[9px] text-muted-foreground/40 block">Market Cap</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{fmtVol(token.marketCap)}</span>
+              <span className="text-[11px] font-semibold text-foreground tabular-nums">{formatCompact(token.marketCap)}</span>
             </div>
             <div>
               <span className="text-[9px] text-muted-foreground/40 block">Liquidity</span>
@@ -342,10 +337,10 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[10px] text-muted-foreground/50">
-                V <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.volume24h)}</span>
+                V <span className="text-foreground/70 font-semibold tabular-nums">{formatCompact(token.volume24h)}</span>
               </span>
               <span className="text-[10px] text-muted-foreground/50">
-                MC <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.marketCap)}</span>
+                MC <span className="text-foreground/70 font-semibold tabular-nums">{formatCompact(token.marketCap)}</span>
               </span>
             </div>
           </div>
