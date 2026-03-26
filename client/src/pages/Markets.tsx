@@ -617,7 +617,7 @@ export default function Markets() {
     activeFilter?: string,
     onFilterChange?: (v: string) => void,
   ) => (
-    <div className="flex flex-col rounded-xl overflow-hidden bg-card/40 border border-white/[0.04]">
+    <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-white/[0.04]">
       {/* Column header */}
       <div className="px-4 py-3.5 border-b border-white/[0.03]">
         <div className="flex items-center justify-between">
@@ -980,63 +980,33 @@ export default function Markets() {
       >
         <PageTransition className="max-w-[1400px] mx-auto px-4 py-5 pb-24">
 
-          {/* STATS BAR (mobile) */}
-          <div className="flex items-center gap-4 mb-6 pb-4 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
+          {/* STATS BAR (mobile) — smaller text, scrollable */}
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
             {[
-              { label: '24H Volume', value: formatCompact(totalVol), color: 'text-foreground' },
-              { label: 'Market Cap', value: formatCompact(totalMcap), color: 'text-foreground' },
-              { label: 'Liquidity', value: formatCompact(totalLiq), color: 'text-foreground' },
-              { label: 'Avg 24H', value: formatPercent(avgChange), color: avgChange >= 0 ? 'text-success' : 'text-destructive' },
+              { label: 'Volume', value: formatCompact(totalVol), color: 'text-foreground' },
+              { label: 'MCap', value: formatCompact(totalMcap), color: 'text-foreground' },
+              { label: 'Liq', value: formatCompact(totalLiq), color: 'text-foreground' },
+              { label: '24H', value: formatPercent(avgChange), color: avgChange >= 0 ? 'text-success' : 'text-destructive' },
               { label: 'Tokens', value: String(allTokens.length), color: 'text-foreground' },
             ].map((stat, i) => (
-              <div key={stat.label} className="shrink-0 flex items-center gap-4">
+              <div key={stat.label} className="shrink-0 flex items-center gap-3">
                 <div>
-                  <div className="text-[10px] text-muted-foreground/30 font-medium">{stat.label}</div>
-                  <div className={`text-[15px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
+                  <div className="text-[8px] text-muted-foreground/30 font-medium uppercase">{stat.label}</div>
+                  <div className={`text-[11px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
                 </div>
-                {i < 4 && <div className="w-px h-7 bg-white/[0.04] shrink-0" />}
+                {i < 4 && <div className="w-px h-5 bg-white/[0.04] shrink-0" />}
               </div>
             ))}
           </div>
 
-          {/* DASHBOARD SECTIONS (compact top cards, mobile) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            <SectionCard title="Gainers" subtitle="Sorted by 24h change" tokens={dashGainers} onSelect={handleClick} />
-            <SectionCard title="Flash Sale" subtitle="Dips with real liquidity" tokens={dashFlashSale} onSelect={handleClick} />
-            <SectionCard title="Top Volume" subtitle="Most active in 24 hours" tokens={dashTopVolume} onSelect={handleClick} />
-          </div>
-
-          {/* 3 COLUMNS (mobile stacked) */}
-          <div className="grid grid-cols-1 gap-3 mb-8">
-            {renderColumn(
-              'Gainers', 'Top performing tokens by 24h change',
-              'bg-success',
-              gainers, gainersFull.length,
-              'No gainers right now',
-              () => setGainerLimit(prev => prev + LOAD_MORE_COUNT),
-              gainerChain, setGainerChain,
-              [{ value: 'all', label: 'All' }, { value: '>5%', label: '>5%' }, { value: '>10%', label: '>10%' }],
-              gainerFilter, setGainerFilter,
-            )}
-            {renderColumn(
-              'Flash Sale', 'Tokens with significant price drops',
-              'bg-warning',
-              flashSale, flashSaleFull.length,
-              'No flash sales right now',
-              () => setFlashLimit(prev => prev + LOAD_MORE_COUNT),
-              flashChain, setFlashChain,
-            )}
-            {renderColumn(
-              'Top Volume', 'Highest trading volume in 24 hours',
-              'bg-primary',
-              topVolume, topVolumeFull.length,
-              'No volume data',
-              () => setVolumeLimit(prev => prev + LOAD_MORE_COUNT),
-              volumeChain, setVolumeChain,
-              [{ value: 'all', label: 'All' }, { value: 'rising', label: 'Rising' }, { value: 'new', label: 'New' }],
-              volumeFilter, setVolumeFilter,
-            )}
-          </div>
+          {/* MOBILE: Tab-based filter view instead of 3 stacked sections */}
+          <MobileMarketTabs
+            gainers={dashGainers}
+            flashSale={dashFlashSale}
+            topVolume={dashTopVolume}
+            allTokens={tokens}
+            onSelect={handleClick}
+          />
 
           {/* CONTROLS (mobile) */}
           <div className="flex flex-col gap-3 mb-4">
@@ -1437,6 +1407,88 @@ function SectionCard({ title, subtitle, tokens, onSelect }: {
                     Vol {formatCompact(token.volume24h)}
                   </div>
                 ) : null}
+              </div>
+              <WhitelistButton token={token} compact />
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  MOBILE MARKET TABS — filter-based single list                      */
+/* ------------------------------------------------------------------ */
+type MobileFilter = 'all' | 'gainers' | 'flash' | 'volume';
+
+function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }: {
+  gainers: TokenInfo[];
+  flashSale: TokenInfo[];
+  topVolume: TokenInfo[];
+  allTokens: TokenInfo[];
+  onSelect: (token: TokenInfo) => void;
+}) {
+  const [filter, setFilter] = useState<MobileFilter>('all');
+
+  const displayTokens = useMemo(() => {
+    switch (filter) {
+      case 'gainers': return gainers;
+      case 'flash': return flashSale;
+      case 'volume': return topVolume;
+      default: return allTokens.slice(0, 50);
+    }
+  }, [filter, gainers, flashSale, topVolume, allTokens]);
+
+  const tabs: { key: MobileFilter; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'gainers', label: 'Gainers' },
+    { key: 'flash', label: 'Flash Sale' },
+    { key: 'volume', label: 'Volume' },
+  ];
+
+  return (
+    <div className="mb-4">
+      {/* Tab bar */}
+      <div className="flex gap-1 mb-3 overflow-x-auto scrollbar-none">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            onClick={() => setFilter(t.key)}
+            className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
+              filter === t.key
+                ? 'bg-primary/12 text-primary border border-primary/20'
+                : 'bg-white/[0.02] text-muted-foreground/50 border border-white/[0.03] hover:text-foreground'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Token list */}
+      <div className="space-y-0.5">
+        {displayTokens.length === 0 ? (
+          <div className="py-12 text-center text-[11px] text-muted-foreground/30">No tokens found</div>
+        ) : (
+          displayTokens.map(token => (
+            <button
+              key={token.address}
+              onClick={() => onSelect(token)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-lg hover:bg-white/[0.02] transition-colors"
+            >
+              <TokenLogo symbol={token.symbol} size={28} />
+              <div className="flex-1 min-w-0">
+                <div className="text-[12px] font-semibold text-foreground truncate">{token.symbol}</div>
+                <div className="text-[10px] font-data text-muted-foreground/50">{token.name}</div>
+              </div>
+              <div className="text-right shrink-0 mr-1">
+                <div className="text-[11px] font-data font-semibold text-foreground">{formatPrice(token.price)}</div>
+                <div className={`text-[10px] font-data font-medium ${
+                  token.change24h >= 0 ? 'text-success' : 'text-destructive'
+                }`}>
+                  {token.change24h >= 0 ? '+' : ''}{formatPercent(token.change24h)}
+                </div>
               </div>
               <WhitelistButton token={token} compact />
             </button>

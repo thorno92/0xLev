@@ -20,7 +20,7 @@ import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid } fro
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 import { useTrackPositions } from '@/hooks/useTrackPositions';
 
-const leveragePresets = [2, 5, 10, 25, 50, 100];
+const leveragePresets = [2, 5, 10, 25, 50];
 const slippagePresets = [0.5, 1.0, 2.0, 5.0];
 const amountPresets = [25, 50, 75, 100];
 
@@ -55,14 +55,14 @@ export default function Terminal() {
   const [isDragging, setIsDragging] = useState(false);
 
   // Right panel tab
-  type RightTab = 'trade' | 'book';
+  type RightTab = 'trade';
   const [rightTab, setRightTab] = useState<RightTab>('trade');
 
   // Mobile view tab
-  type MobileTab = 'chart' | 'book' | 'trade' | 'data';
+  type MobileTab = 'chart' | 'trade' | 'data';
   const [mobileTab, setMobileTab] = useState<MobileTab>('chart');
   const [swipeDirection, setSwipeDirection] = useState(0); // -1 left, 1 right
-  const mobileTabs: MobileTab[] = ['chart', 'book', 'trade', 'data'];
+  const mobileTabs: MobileTab[] = ['chart', 'trade', 'data'];
 
   const handleSwipeTab = useCallback((_: unknown, info: PanInfo) => {
     const SWIPE_THRESHOLD = 50;
@@ -399,46 +399,9 @@ export default function Terminal() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Trading Panel + Order Book */}
+        {/* RIGHT COLUMN: Trading Panel */}
         <div className="w-[280px] lg:w-[320px] xl:w-[340px] shrink-0 border-l border-border flex flex-col bg-card overflow-hidden">
-          {/* Tab bar: Trade / Order Book */}
-          <div className="flex border-b border-border shrink-0">
-            <button
-              onClick={() => setRightTab('trade')}
-              className={`flex-1 py-2 text-[12px] font-medium text-center transition-colors relative tab-hover ${
-                rightTab === 'trade' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Trade
-              {rightTab === 'trade' && (
-                <motion.div
-                  layoutId="right-panel-tab"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                  style={{ boxShadow: '0 0 8px var(--glow), 0 0 16px var(--glow-subtle)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </button>
-            <button
-              onClick={() => setRightTab('book')}
-              className={`flex-1 py-2 text-[12px] font-medium text-center transition-colors relative tab-hover ${
-                rightTab === 'book' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Order Book
-              {rightTab === 'book' && (
-                <motion.div
-                  layoutId="right-panel-tab"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                  style={{ boxShadow: '0 0 8px var(--glow), 0 0 16px var(--glow-subtle)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </button>
-          </div>
 
-          {rightTab === 'trade' ? (
-            /* ---- TRADE TAB ---- */
             <div className="flex-1 overflow-y-auto scrollbar-none">
               {/* Mode Toggle: Leverage / Spot */}
               <div className="flex border-b border-border shrink-0">
@@ -561,7 +524,7 @@ export default function Terminal() {
                       value={[leverage]}
                       onValueChange={([v]) => setLeverage(v)}
                       min={1}
-                      max={100}
+                      max={50}
                       step={1}
                       className="mb-1.5"
                     />
@@ -771,17 +734,6 @@ export default function Terminal() {
                 )}
               </div>
             </div>
-          ) : (
-            /* ---- ORDER BOOK TAB ---- */
-            <div className="flex-1 overflow-hidden">
-              <MiniOrderBook
-                asks={orderBook.asks}
-                bids={orderBook.bids}
-                midPrice={entryPrice}
-                symbol={selectedToken?.symbol ?? 'SOL'}
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -791,11 +743,11 @@ export default function Terminal() {
       <div className="md:hidden flex flex-col flex-1 min-h-0 pb-[72px]">
         {/* Mobile Tab Bar */}
         <div className="flex bg-card border-b border-border shrink-0">
-          {(['chart', 'book', 'trade', 'data'] as const).map(tab => (
+          {(['chart', 'trade', 'data'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => {
-                const allTabs = ['chart', 'book', 'trade', 'data'] as const;
+                const allTabs = ['chart', 'trade', 'data'] as const;
                 const fromIdx = allTabs.indexOf(mobileTab as typeof allTabs[number]);
                 const toIdx = allTabs.indexOf(tab);
                 setSwipeDirection(toIdx > fromIdx ? 1 : -1);
@@ -807,7 +759,7 @@ export default function Terminal() {
                   : 'text-muted-foreground/50'
               }`}
             >
-              {tab === 'chart' ? 'Chart' : tab === 'book' ? 'Book' : tab === 'trade' ? 'Trade' : 'Data'}
+              {tab === 'chart' ? 'Chart' : tab === 'trade' ? 'Trade' : 'Data'}
               {mobileTab === tab && (
                 <motion.div
                   layoutId="mobile-tab-indicator"
@@ -839,18 +791,6 @@ export default function Terminal() {
           {mobileTab === 'chart' && (
             <div className="h-full">
               <ChartPanel />
-            </div>
-          )}
-
-          {/* Order Book Tab */}
-          {mobileTab === 'book' && (
-            <div className="h-full">
-              <MiniOrderBook
-                asks={orderBook.asks}
-                bids={orderBook.bids}
-                midPrice={entryPrice}
-                symbol={selectedToken?.symbol ?? 'SOL'}
-              />
             </div>
           )}
 
@@ -960,7 +900,7 @@ export default function Terminal() {
                   value={[leverage]}
                   onValueChange={([v]) => setLeverage(v)}
                   min={1}
-                  max={100}
+                  max={50}
                   step={1}
                   className="mb-1.5"
                 />

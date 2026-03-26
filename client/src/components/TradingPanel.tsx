@@ -14,7 +14,7 @@ import { WhitelistStatus } from './WhitelistStatus';
 import { TokenLogo } from './TokenLogo';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 
-const leveragePresets = [2, 5, 10, 25, 50, 100];
+const leveragePresets = [2, 5, 10, 25, 50];
 const slippagePresets = [0.5, 1.0, 2.0, 5.0];
 
 type PanelTab = 'buy' | 'positions';
@@ -416,7 +416,7 @@ export function TradingPanel() {
                   value={[leverage]}
                   onValueChange={([v]) => setLeverage(v)}
                   min={1}
-                  max={100}
+                  max={50}
                   step={1}
                   className="mb-1.5"
                 />
