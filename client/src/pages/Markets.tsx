@@ -592,7 +592,7 @@ export default function Markets() {
   /* ================================================================ */
   /** Chain filter pills for columns */
   const ChainFilterRow = ({ activeChain, onChange }: { activeChain: string; onChange: (v: string) => void }) => (
-    <div className="flex items-center gap-1 px-4 py-2 border-b border-white/[0.02] bg-white/[0.01]">
+    <div className="flex items-center gap-1 px-3 py-1.5 border-b border-white/[0.02] bg-white/[0.01] shrink-0">
       <button
         onClick={() => onChange('all')}
         className={`text-[9px] font-medium px-2 py-[3px] rounded-md transition-all ${
@@ -635,35 +635,36 @@ export default function Markets() {
     onFilterChange?: (v: string) => void,
   ) => (
     <div className="flex flex-col rounded-xl overflow-visible bg-card/40 border border-white/[0.04] h-full">
-      {/* Column header */}
-      <div className="px-4 py-3.5 border-b border-white/[0.03]">
-        <div className="flex items-center justify-between">
+      {/* Column header — fixed structure for alignment across columns */}
+      <div className="px-3 py-2 border-b border-white/[0.03] shrink-0">
+        <div className="flex items-center justify-between min-h-[24px]">
           <div className="flex items-center gap-2.5">
             <div className={`w-1.5 h-1.5 rounded-full ${accentColor}`} />
             <span className="text-[13px] font-semibold text-foreground tracking-wide">{title}</span>
             <span className="text-[10px] text-muted-foreground/45 tabular-nums">{totalCount}</span>
           </div>
-          {filterOptions && onFilterChange && (
-            <div className="flex items-center gap-0.5">
-              {filterOptions.map(opt => (
+          {/* Filter pills — always reserve space for alignment */}
+          <div className="flex items-center gap-0.5 min-h-[22px]">
+            {filterOptions && onFilterChange ? (
+              filterOptions.map(opt => (
                 <FilterPill
                   key={opt.value}
                   label={opt.label}
                   active={activeFilter === opt.value}
                   onClick={() => onFilterChange(opt.value)}
                 />
-              ))}
-            </div>
-          )}
+              ))
+            ) : null}
+          </div>
         </div>
         <p className="text-[10px] text-muted-foreground/50 mt-0.5 ml-4">{subtitle}</p>
       </div>
 
-      {/* Chain filter row */}
+      {/* Chain filter row — consistent px-3 py-1.5 */}
       <ChainFilterRow activeChain={columnChain} onChange={onChainChange} />
 
-      {/* Card list */}
-      <div className="flex-1 p-1.5 space-y-1.5 max-h-[400px] sm:max-h-[720px] overflow-y-auto scrollbar-thin">
+      {/* Card list — flex-1 fills remaining height so all columns align */}
+      <div className="flex-1 p-1.5 space-y-1.5 max-h-[720px] overflow-y-auto scrollbar-thin">
         {items.length === 0 ? (
           <div className="py-16 text-center text-[11px] text-muted-foreground/20">{emptyText}</div>
         ) : (
