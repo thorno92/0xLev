@@ -177,181 +177,116 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
 
   return (
     <div
-      className="group relative rounded-lg bg-card/60 border border-white/[0.04] hover:border-primary/20 hover:bg-card/90 transition-all duration-200 cursor-pointer"
+      className="group relative border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors cursor-pointer"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* ---- HOVER PREVIEW POPUP ---- */}
       {hovered && (
-        <div className="absolute z-50 left-full top-0 ml-2 w-[260px] rounded-xl bg-card border border-white/[0.06] shadow-2xl shadow-black/40 p-3.5 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150 hidden sm:block">
-          {/* Sparkline chart */}
-          <div className="mb-3 rounded-lg bg-white/[0.02] p-2">
-            <MiniSparkline data={sparkData} width={228} height={64} color={token.change24h >= 0 ? 'var(--color-success)' : 'var(--color-destructive)'} />
+        <div className="absolute z-50 left-full top-0 ml-2 w-[240px] rounded-xl bg-card border border-white/[0.06] shadow-2xl shadow-black/40 p-3 pointer-events-none animate-in fade-in-0 zoom-in-95 duration-150 hidden sm:block">
+          <div className="mb-2 rounded-lg bg-white/[0.02] p-2">
+            <MiniSparkline data={sparkData} width={208} height={56} color={token.change24h >= 0 ? 'var(--color-success)' : 'var(--color-destructive)'} />
           </div>
-          {/* Stats grid */}
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">Price</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{formatPrice(token.price)}</span>
-            </div>
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">24H Change</span>
-              <span className={`text-[11px] font-semibold tabular-nums ${token.change24h >= 0 ? 'text-success' : 'text-destructive'}`}>{formatPercent(token.change24h)}</span>
-            </div>
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">Volume</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{fmtVol(token.volume24h)}</span>
-            </div>
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">Market Cap</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{fmtVol(token.marketCap)}</span>
-            </div>
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">Liquidity</span>
-              <span className="text-[11px] font-semibold text-foreground tabular-nums">{formatCompact(token.liquidity)}</span>
-            </div>
-            <div>
-              <span className="text-[9px] text-muted-foreground/40 block">Buy/Sell</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-semibold text-success tabular-nums">{buyRatio}%</span>
-                <span className="text-[8px] text-muted-foreground/35">/</span>
-                <span className="text-[10px] font-semibold text-destructive tabular-nums">{100 - buyRatio}%</span>
-              </div>
-            </div>
-          </div>
-          {/* Quick actions hint */}
-          <div className="mt-3 pt-2.5 border-t border-white/[0.04] flex items-center justify-center gap-1">
-            <span className="text-[9px] text-muted-foreground/45">Click to open in Terminal</span>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px]">
+            <div><span className="text-muted-foreground/40 block text-[9px]">Price</span><span className="font-semibold tabular-nums">{formatPrice(token.price)}</span></div>
+            <div><span className="text-muted-foreground/40 block text-[9px]">Volume</span><span className="font-semibold tabular-nums">{fmtVol(token.volume24h)}</span></div>
+            <div><span className="text-muted-foreground/40 block text-[9px]">Liquidity</span><span className="font-semibold tabular-nums">{formatCompact(token.liquidity)}</span></div>
+            <div><span className="text-muted-foreground/40 block text-[9px]">Buy/Sell</span><span className="font-semibold text-success tabular-nums">{buyRatio}%</span><span className="text-muted-foreground/35 mx-0.5">/</span><span className="font-semibold text-destructive tabular-nums">{100 - buyRatio}%</span></div>
           </div>
         </div>
       )}
 
-      <div className="flex gap-2.5 p-2.5 pb-1.5">
-        {/* ---- LARGE LOGO ---- */}
-        <div className="relative shrink-0 mt-0.5">
-          <TokenLogo symbol={token.symbol} size={48} />
-          {whitelisted && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-success flex items-center justify-center ring-2 ring-card">
-              <span className="text-[8px] text-white font-bold">{'\u2713'}</span>
-            </div>
-          )}
+      {/* ---- COMPACT ROW LAYOUT ---- */}
+      <div className="grid grid-cols-[44px_1fr_auto_auto] gap-x-3 gap-y-0 items-center px-3 py-2">
+        {/* Col 1: Logo */}
+        <div className="row-span-2 self-center">
+          <TokenLogo symbol={token.symbol} size={44} />
         </div>
 
-        {/* ---- ALL INFO TO THE RIGHT ---- */}
-        <div className="flex-1 min-w-0">
-          {/* Row 1: Name + ticker + chain + age */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{token.symbol}</span>
-              <span className="text-[10px] text-muted-foreground/40">{'\u00B7'}</span>
-              <span className="text-[10px] text-muted-foreground/40 truncate">{token.name}</span>
-              {whitelisted && <span className="text-[9px] text-success/60">{'\uD83D\uDD12'}</span>}
-            </div>
+        {/* Col 2: Name + socials + TX bar */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors truncate">{token.symbol}</span>
+            <span className="text-[10px] text-muted-foreground/40">&middot;</span>
+            <span className="text-[10px] text-muted-foreground/40 truncate">{token.name}</span>
+          </div>
+          <div className="flex items-center gap-1 mt-0.5">
+            {socials.x && (
+              <a href={socials.x} onClick={(e) => e.stopPropagation()} className="flex items-center justify-center w-[16px] h-[16px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors" title="X">
+                <svg className="w-[9px] h-[9px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+              </a>
+            )}
+            {socials.tg && (
+              <a href={socials.tg} onClick={(e) => e.stopPropagation()} className="flex items-center justify-center w-[16px] h-[16px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors" title="Telegram">
+                <svg className="w-[9px] h-[9px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
+              </a>
+            )}
+            {socials.web && (
+              <a href={socials.web} onClick={(e) => e.stopPropagation()} className="flex items-center justify-center w-[16px] h-[16px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors" title="Website">
+                <svg className="w-[9px] h-[9px] text-muted-foreground/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+              </a>
+            )}
+            <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground/50 font-medium bg-white/[0.04] px-1 py-[1px] rounded">
+              <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={9} />
+              {chainLabel}
+            </span>
+            <span className="text-[9px] text-muted-foreground/40">{'\uD83D\uDC65'}</span>
+            <span className="text-[9px] text-muted-foreground/45 tabular-nums">{fmtNum(makers)}</span>
+          </div>
+        </div>
+
+        {/* Col 3: Change pills (stacked) */}
+        <div className="flex flex-col gap-0.5 items-end">
+          {[
+            { label: '1H', value: tf.change1h },
+            { label: '6H', value: tf.change6h },
+            { label: '24H', value: token.change24h },
+          ].map(item => (
+            <span
+              key={item.label}
+              className={`text-[9px] tabular-nums font-semibold px-1.5 py-[1px] rounded ${
+                item.value >= 0 ? 'bg-success/[0.08] text-success/80' : 'bg-destructive/[0.08] text-destructive/80'
+              }`}
+            >
+              {item.label} {formatPercent(item.value)}
+            </span>
+          ))}
+        </div>
+
+        {/* Col 4: V + MC + Age + Whitelist (stacked) */}
+        <div className="flex flex-col items-end gap-0.5">
+          <div className="flex items-center gap-2">
             <span className={`text-[9px] tabular-nums shrink-0 font-medium px-1.5 py-[1px] rounded ${
               age.includes('h') ? 'bg-success/[0.08] text-success/70' :
               age === '1d' || age === '3d' || age === '5d' ? 'bg-warning/[0.08] text-warning/70' :
               age === '1w' || age === '2w' ? 'bg-primary/[0.08] text-primary/70' :
-              'bg-white/[0.03] text-muted-foreground/35'
+              'bg-white/[0.03] text-muted-foreground/45'
             }`}>{age}</span>
-          </div>
-
-          {/* Row 2: Social icons + chain badge + makers */}
-          <div className="flex items-center gap-1.5 mt-1">
-            {socials.x && (
-              <a
-                href={socials.x}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
-                title="X (Twitter)"
-              >
-                <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-            )}
-            {socials.tg && (
-              <a
-                href={socials.tg}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
-                title="Telegram"
-              >
-                <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                </svg>
-              </a>
-            )}
-            {socials.web && (
-              <a
-                href={socials.web}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center w-[18px] h-[18px] rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
-                title="Website"
-              >
-                <svg className="w-[10px] h-[10px] text-muted-foreground/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-              </a>
-            )}
-            <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground/50 font-medium bg-white/[0.04] px-1.5 py-[1px] rounded">
-              <ChainIcon network={token.chain === 'bnb' ? 'binance-smart-chain' : token.chain} size={10} />
-              {chainLabel}
-            </span>
-            <span className="text-[9px] text-muted-foreground/40">{'\uD83D\uDC65'}</span>
-            <span className="text-[9px] text-muted-foreground/35 tabular-nums">{fmtNum(makers)}</span>
-          </div>
-
-          {/* Row 3: Colored change badges inline */}
-          <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-            {[
-              { label: '1H', value: tf.change1h },
-              { label: '6H', value: tf.change6h },
-              { label: '24H', value: token.change24h },
-            ].map(item => (
-              <span
-                key={item.label}
-                className={`text-[9px] tabular-nums font-semibold px-1.5 py-[1px] rounded ${
-                  item.value >= 0
-                    ? 'bg-success/[0.08] text-success/80'
-                    : 'bg-destructive/[0.08] text-destructive/80'
-                }`}
-              >
-                {item.label} {formatPercent(item.value)}
-              </span>
-            ))}
-          </div>
-
-          {/* Row 4: TX count + progress bar */}
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className="text-[10px] text-muted-foreground/50">TX</span>
-            <span className="text-[10px] font-semibold text-foreground/70 tabular-nums">{fmtNum(txns)}</span>
-            <div className="flex h-[4px] w-12 rounded-full overflow-hidden">
-              <div className="bg-success/50 rounded-l-full" style={{ width: `${buyRatio}%` }} />
-              <div className="bg-destructive/50 rounded-r-full flex-1" />
+            <div onClick={(e) => e.stopPropagation()}>
+              <WhitelistButton token={token} compact />
             </div>
-            <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
-              <div className="h-full rounded-full bg-success/50 transition-all" style={{ width: `${score}%` }} />
-            </div>
-            <span className="text-[9px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
           </div>
+          <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+            V <span className="text-foreground/70 font-semibold">{fmtVol(token.volume24h)}</span>
+          </span>
+          <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+            MC <span className="text-foreground/70 font-semibold">{fmtVol(token.marketCap)}</span>
+          </span>
+        </div>
 
-          {/* Row 5: Whitelist button */}
-          <div className="flex justify-end mt-1 mb-1" onClick={(e) => e.stopPropagation()}>
-            <WhitelistButton token={token} compact />
+        {/* Row 2 spanning cols 2-4: TX + progress bar */}
+        <div className="col-start-2 col-span-3 flex items-center gap-2 -mt-0.5 pb-0.5">
+          <span className="text-[9px] text-muted-foreground/50">TX</span>
+          <span className="text-[9px] font-semibold text-foreground/70 tabular-nums">{fmtNum(txns)}</span>
+          <div className="flex h-[3px] w-10 rounded-full overflow-hidden shrink-0">
+            <div className="bg-success/50 rounded-l-full" style={{ width: `${buyRatio}%` }} />
+            <div className="bg-destructive/50 rounded-r-full flex-1" />
           </div>
-
-          {/* Row 6: V + MC stats */}
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] text-muted-foreground/50">
-              V <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.volume24h)}</span>
-            </span>
-            <span className="text-[10px] text-muted-foreground/50">
-              MC <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.marketCap)}</span>
-            </span>
+          <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
+            <div className="h-full rounded-full bg-success/50 transition-all" style={{ width: `${score}%` }} />
           </div>
+          <span className="text-[8px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
         </div>
       </div>
     </div>
@@ -656,7 +591,7 @@ export default function Markets() {
       <ChainFilterRow activeChain={columnChain} onChange={onChainChange} />
 
       {/* Card list — flex-1 fills remaining height so all columns align */}
-      <div className="flex-1 p-1.5 space-y-1.5 max-h-[720px] overflow-y-auto scrollbar-thin">
+      <div className="flex-1 max-h-[720px] overflow-y-auto scrollbar-thin">
         {items.length === 0 ? (
           <div className="py-16 text-center text-[11px] text-muted-foreground/35">{emptyText}</div>
         ) : (
