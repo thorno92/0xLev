@@ -513,10 +513,10 @@ export default function Terminal() {
                     <Input
                       type="number"
                       inputMode="decimal"
-                      placeholder="0.00"
+                      placeholder="Enter amount..."
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="h-8 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover"
+                      className="h-10 bg-secondary border-border text-foreground font-data text-[13px] pr-14 input-hover placeholder:text-muted-foreground/30"
                     />
                     <button
                       onClick={() => walletBalance != null && setAmount(String(walletBalance))}
@@ -593,10 +593,10 @@ export default function Terminal() {
                       <Input
                         type="number"
                         inputMode="decimal"
-                        placeholder={formatPrice(entryPrice * (isBuy ? 1.1 : 0.9)).replace('$', '')}
+                        placeholder="Optional"
                         value={takeProfit}
                         onChange={(e) => setTakeProfit(e.target.value)}
-                        className="h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover"
+                        className="h-9 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30"
                       />
                     </div>
                     <div>
@@ -613,10 +613,10 @@ export default function Terminal() {
                       <Input
                         type="number"
                         inputMode="decimal"
-                        placeholder={formatPrice(entryPrice * (isBuy ? 0.95 : 1.05)).replace('$', '')}
+                        placeholder="Optional"
                         value={stopLoss}
                         onChange={(e) => setStopLoss(e.target.value)}
-                        className="h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover"
+                        className="h-9 bg-secondary border-border text-foreground font-data text-[12px] input-hover placeholder:text-muted-foreground/30"
                       />
                     </div>
                   </div>
@@ -896,10 +896,10 @@ export default function Terminal() {
                 <Input
                   type="number"
                   inputMode="decimal"
-                  placeholder="0.00"
+                  placeholder="Enter amount..."
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="h-9 bg-secondary border-border text-foreground font-data text-[13px] pr-14"
+                  className="h-10 bg-secondary border-border text-foreground font-data text-[13px] pr-14 placeholder:text-muted-foreground/30"
                 />
                 <button
                   onClick={() => walletBalance != null && setAmount(String(walletBalance))}
@@ -963,10 +963,10 @@ export default function Terminal() {
                   <Input
                     type="number"
                     inputMode="decimal"
-                    placeholder={formatPrice(entryPrice * (isBuy ? 1.1 : 0.9)).replace('$', '')}
+                    placeholder="Optional"
                     value={takeProfit}
                     onChange={(e) => setTakeProfit(e.target.value)}
-                    className="h-8 bg-secondary border-border text-foreground font-data text-[12px]"
+                    className="h-9 bg-secondary border-border text-foreground font-data text-[12px] placeholder:text-muted-foreground/30"
                   />
                 </div>
                 <div>
@@ -974,10 +974,10 @@ export default function Terminal() {
                   <Input
                     type="number"
                     inputMode="decimal"
-                    placeholder={formatPrice(entryPrice * (isBuy ? 0.95 : 1.05)).replace('$', '')}
+                    placeholder="Optional"
                     value={stopLoss}
                     onChange={(e) => setStopLoss(e.target.value)}
-                    className="h-8 bg-secondary border-border text-foreground font-data text-[12px]"
+                    className="h-9 bg-secondary border-border text-foreground font-data text-[12px] placeholder:text-muted-foreground/30"
                   />
                 </div>
               </div>
