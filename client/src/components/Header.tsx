@@ -263,6 +263,7 @@ export function Header() {
           {/* Mobile search icon */}
           <button
             onClick={() => setSearchOpen(true)}
+            aria-label="Search tokens"
             className="md:hidden text-muted-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-primary/8 border border-border/40"
           >
             <Search className="w-5 h-5" />
@@ -271,6 +272,7 @@ export function Header() {
           {/* Mobile theme toggle -- tap opens picker sheet */}
           <button
             onClick={() => setThemePickerOpen(true)}
+            aria-label="Change theme"
             className="sm:hidden flex items-center justify-center p-1.5 rounded hover:bg-primary/8 transition-colors select-none"
             title={`Theme: ${currentThemeOption.label}`}
           >
@@ -285,6 +287,7 @@ export function Header() {
             href="#" data-todo="0xLeverage-social-url"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Follow on X"
             className="hidden sm:flex text-muted-foreground/70 hover:text-primary transition-all p-1.5 rounded hover:bg-primary/10 icon-btn-hover"
             title="Follow on X"
           >
@@ -296,6 +299,7 @@ export function Header() {
             href="#" data-todo="0xLeverage-social-url"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Join Telegram"
             className="hidden sm:flex text-muted-foreground/70 hover:text-primary transition-all p-1.5 rounded hover:bg-primary/10 icon-btn-hover"
             title="Join Telegram"
           >
@@ -308,6 +312,7 @@ export function Header() {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
+            aria-label="Refresh data"
             className="hidden sm:flex text-muted-foreground hover:text-primary transition-colors p-1.5 rounded hover:bg-primary/8 disabled:opacity-50 icon-btn-hover"
           >
             <RefreshCircleSolid className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
