@@ -1790,8 +1790,15 @@
 }
 
 /* Keyboard focus indicators — only show on keyboard nav, not mouse clicks */
+/* Keyboard focus indicators — only on interactive elements, not modals/dialogs */
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 2px;
+}
+[data-slot="dialog-content"]:focus-visible,
+[data-slot="dialog-content"] input:focus-visible,
+[data-slot="dialog-content"] textarea:focus-visible,
+[data-slot="drawer-content"]:focus-visible {
+  outline: none;
 }

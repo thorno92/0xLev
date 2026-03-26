@@ -96,7 +96,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[480px] p-0 bg-card border-border gap-0 overflow-hidden mx-3 sm:mx-auto">
+      <DialogContent showCloseButton={false} className="sm:max-w-[480px] p-0 bg-card border-border gap-0 overflow-hidden mx-3 sm:mx-auto focus:outline-none focus-visible:outline-none focus-visible:ring-0">
         {/* Search Input */}
         <div className="flex items-center gap-2 px-4 border-b border-border">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -109,7 +109,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            className="border-0 bg-transparent h-11 text-[14px] focus-visible:ring-0 px-0"
+            className="border-0 bg-transparent h-14 text-[14px] focus-visible:ring-0 focus:outline-none focus-visible:outline-none px-0"
           />
           <button
             onClick={() => onOpenChange(false)}
