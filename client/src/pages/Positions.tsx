@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Xmark, EditPencil } from 'iconoir-react';
 import { TokenLogo } from '@/components/TokenLogo';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { WalletConnectModal } from '@/components/WalletConnectModal';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
@@ -64,7 +64,7 @@ function getHealthTextClass(dist: number) {
 /* ------------------------------------------------------------------ */
 export default function Positions() {
   const { openPositions, removeOpenPosition, addClosedPosition, updatePositionTpSl, walletConnected, walletAddress } = useStore();
-  const { setVisible } = useWalletModal();
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const closeMutation = trpc.leverage.closePosition.useMutation();
   const updateTpSlMutation = trpc.leverage.updateTpSl.useMutation();
   const [isClosing, setIsClosing] = useState<string | null>(null);
@@ -155,7 +155,7 @@ export default function Positions() {
   }, [positions]);
 
   const handleConnect = () => {
-    setVisible(true);
+    setWalletModalOpen(true);
   };
 
   return (
@@ -553,6 +553,7 @@ export default function Positions() {
           </PageTransition>
         )}
       </div>
+      <WalletConnectModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
     </div>
   );
 }

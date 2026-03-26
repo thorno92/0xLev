@@ -25,8 +25,8 @@ import {
 import { useStore } from '@/lib/store';
 import { truncateAddress, formatNumber, formatPrice } from '@/lib/format';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { WalletConnectModal } from './WalletConnectModal';
 import { useWalletAuth } from '@/hooks/useWalletAuth';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 import { useWalletHoldings } from '@/hooks/useWalletHoldings';
@@ -84,7 +84,7 @@ export function Header() {
   useTradeWalletBalance();
   const utils = trpc.useUtils();
   const { connection } = useConnection();
-  const { setVisible } = useWalletModal();
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const { publicKey, connected: adapterConnected, sendTransaction } = useWallet();
   const {
     connect: walletAuthConnect,
@@ -161,7 +161,7 @@ export function Header() {
   };
 
   const handleConnectWallet = () => {
-    setVisible(true);
+    setWalletModalOpen(true);
   };
 
   const handleDeposit = useCallback(async () => {
@@ -448,7 +448,7 @@ export function Header() {
               onClick={handleConnectWallet}
               disabled={isConnecting}
               size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-7 text-[11px] sm:text-[12px] font-medium gap-1 sm:gap-1.5 px-2 sm:px-3 neon-cta btn-hover"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 text-[12px] font-medium gap-1.5 px-4 neon-cta btn-hover"
             >
               <WalletSolid className="w-3.5 h-3.5" />
               {isConnecting ? (
@@ -466,6 +466,9 @@ export function Header() {
 
       {/* Token Search Modal */}
       <TokenSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+
+      {/* Custom Wallet Connect Modal */}
+      <WalletConnectModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
 
       {/* Deposit SOL Dialog */}
       <Dialog open={depositOpen} onOpenChange={setDepositOpen}>

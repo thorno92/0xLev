@@ -11,7 +11,7 @@ import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline
 import { useStore } from '@/lib/store';
 import { formatPrice, formatPercent, formatNumber, formatCompact } from '@/lib/format';
 import { Header } from '@/components/Header';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { WalletConnectModal } from '@/components/WalletConnectModal';
 import { toast } from 'sonner';
 import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 
@@ -146,7 +146,7 @@ function StatCell({ label, value, valueColor }: { label: string; value: string; 
 /* ------------------------------------------------------------------ */
 export default function Portfolio() {
   const { walletConnected, walletAddress, openPositions } = useStore();
-  const { setVisible } = useWalletModal();
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('assets');
   const [timePeriod, setTimePeriod] = useState<'1D' | '7D' | '1M' | '1Y' | 'ALL'>('7D');
 
@@ -172,8 +172,8 @@ export default function Portfolio() {
   }, [realHoldings, holdingsTotalValue]);
 
   const handleConnect = useCallback(() => {
-    setVisible(true);
-  }, [setVisible]);
+    setWalletModalOpen(true);
+  }, []);
 
   const handleExportCSV = useCallback(() => {
     const headers = ['Name', 'Allocation', '24h Change', 'Price', 'Balance', 'Estimated Value'];
@@ -636,6 +636,7 @@ export default function Portfolio() {
           </PageTransition>
         </div>
       )}
+      <WalletConnectModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
     </div>
   );
 }
