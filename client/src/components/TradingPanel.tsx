@@ -75,10 +75,10 @@ export function TradingPanel() {
     return entryPrice * (1 + 1 / leverage);
   }, [entryPrice, leverage, orderSide]);
 
-  const tpPercent = takeProfit
+  const tpPercent = takeProfit && entryPrice > 0
     ? ((parseFloat(takeProfit) - entryPrice) / entryPrice * 100 * (orderSide === 'buy' ? 1 : -1)).toFixed(1)
     : null;
-  const slPercent = stopLoss
+  const slPercent = stopLoss && entryPrice > 0
     ? ((parseFloat(stopLoss) - entryPrice) / entryPrice * 100 * (orderSide === 'buy' ? 1 : -1)).toFixed(1)
     : null;
 
