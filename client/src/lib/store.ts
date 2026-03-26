@@ -91,7 +91,7 @@ export const useStore = create<AppState>()(
         symbol: 'SOL',
         name: 'Solana',
         address: 'So11111111111111111111111111111111111111112',
-        price: 145.67,
+        price: 0,
         change24h: 9.57,
         volume24h: 2200000,
         marketCap: 660000,

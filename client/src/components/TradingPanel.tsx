@@ -93,6 +93,10 @@ export function TradingPanel() {
       toast.error('Enter a valid amount');
       return;
     }
+    if (amountNum < 0.001) {
+      toast.error('Minimum amount is 0.001 SOL');
+      return;
+    }
     if (amountNum > 10_000) {
       toast.error('Maximum amount is 10,000 SOL');
       return;
@@ -101,6 +105,44 @@ export function TradingPanel() {
     try {
       const tp = takeProfit ? parseFloat(takeProfit) : undefined;
       const sl = stopLoss ? parseFloat(stopLoss) : undefined;
+
+      if (tp !== undefined && tp <= 0) {
+        toast.error('Take Profit must be a positive price');
+        setIsExecuting(false);
+        return;
+      }
+      if (sl !== undefined && sl <= 0) {
+        toast.error('Stop Loss must be a positive price');
+        setIsExecuting(false);
+        return;
+      }
+
+      if (orderSide === 'buy' || tradingMode === 'leverage') {
+        if (tp !== undefined && entryPrice > 0 && tp <= entryPrice) {
+          toast.error('Take Profit must be above entry price for Long positions');
+          setIsExecuting(false);
+          return;
+        }
+        if (sl !== undefined && entryPrice > 0 && sl >= entryPrice) {
+          toast.error('Stop Loss must be below entry price for Long positions');
+          setIsExecuting(false);
+          return;
+        }
+      }
+
+      if (tradingMode === 'spot' && orderSide === 'sell') {
+        if (tp !== undefined && entryPrice > 0 && tp >= entryPrice) {
+          toast.error('Take Profit must be below entry price for Sell orders');
+          setIsExecuting(false);
+          return;
+        }
+        if (sl !== undefined && entryPrice > 0 && sl <= entryPrice) {
+          toast.error('Stop Loss must be above entry price for Sell orders');
+          setIsExecuting(false);
+          return;
+        }
+      }
+
       const result = await openMutation.mutateAsync({
         walletAddress,
         contractAddress: selectedToken.address,
@@ -173,6 +215,17 @@ export function TradingPanel() {
       setOrderSide('buy');
     }
   }, [tradingMode, setOrderSide]);
+
+  const tpNum = takeProfit ? parseFloat(takeProfit) : 0;
+  const slNum = stopLoss ? parseFloat(stopLoss) : 0;
+  const tpInvalid = tpNum > 0 && entryPrice > 0 && (
+    ((orderSide === 'buy' || tradingMode === 'leverage') && tpNum <= entryPrice) ||
+    (tradingMode === 'spot' && orderSide === 'sell' && tpNum >= entryPrice)
+  );
+  const slInvalid = slNum > 0 && entryPrice > 0 && (
+    ((orderSide === 'buy' || tradingMode === 'leverage') && slNum >= entryPrice) ||
+    (tradingMode === 'spot' && orderSide === 'sell' && slNum <= entryPrice)
+  );
 
   const isBuy = orderSide === 'buy';
   const tokenPositions = openPositions.filter(
@@ -418,6 +471,7 @@ export function TradingPanel() {
                   min={1}
                   max={50}
                   step={1}
+                  aria-label="Leverage"
                   className="mb-1.5"
                 />
 
@@ -459,7 +513,7 @@ export function TradingPanel() {
                     placeholder={formatPrice(entryPrice * (isBuy ? 1.1 : 0.9)).replace('$', '')}
                     value={takeProfit}
                     onChange={(e) => setTakeProfit(e.target.value)}
-                    className="h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover"
+                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover ${tpInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
                 <div>
@@ -479,7 +533,7 @@ export function TradingPanel() {
                     placeholder={formatPrice(entryPrice * (isBuy ? 0.95 : 1.05)).replace('$', '')}
                     value={stopLoss}
                     onChange={(e) => setStopLoss(e.target.value)}
-                    className="h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover"
+                    className={`h-7 bg-secondary border-border text-foreground font-data text-[12px] input-hover ${slInvalid ? 'border-destructive/50' : ''}`}
                   />
                 </div>
               </div>
@@ -492,7 +546,7 @@ export function TradingPanel() {
               </span>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="flex items-center gap-1 text-[11px] font-data text-foreground hover:text-primary transition-colors">
+                  <button aria-label="Slippage settings" className="flex items-center gap-1 text-[11px] font-data text-foreground hover:text-primary transition-colors">
                     {slippage}%
                     <Settings className="w-3 h-3 text-muted-foreground" />
                   </button>
@@ -529,7 +583,7 @@ export function TradingPanel() {
 
             {/* Order Summary — always visible */}
             <div className="bg-secondary/40 rounded p-2 space-y-1">
-              <SummaryRow label="Entry Price" value={formatPrice(quoteData?.current_price ?? entryPrice)} />
+              <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
               {quoteData?.trade_cost != null && amountNum > 0 ? (
                 <SummaryRow label="Trade Cost" value={`${formatNumber(quoteData.trade_cost, 4)} SOL`} />
@@ -554,7 +608,7 @@ export function TradingPanel() {
             {walletConnected ? (
               <Button
                 onClick={handleExecute}
-                disabled={isExecuting || !amountNum}
+                disabled={isExecuting || !amountNum || entryPrice <= 0}
                 className={`w-full h-9 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
                   tradingMode === 'leverage' || isBuy
                     ? 'bg-success hover:bg-success/90 text-background'
