@@ -16,8 +16,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid } from 'iconoir-react';
+import { Settings, WarningTriangleSolid, InfoCircleSolid, XmarkCircleSolid, WalletSolid } from 'iconoir-react';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
+import { WalletConnectModal } from '@/components/WalletConnectModal';
 import { useTrackPositions } from '@/hooks/useTrackPositions';
 
 const leveragePresets = [2, 5, 10, 25, 50];
@@ -169,6 +170,7 @@ export default function Terminal() {
   const [stopLoss, setStopLoss] = useState('');
   const [slippage, setSlippage] = useState(1.0);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
 
   const entryPrice = selectedToken?.price ?? 0;
   const amountNum = parseFloat(amount) || 0;
@@ -707,9 +709,10 @@ export default function Terminal() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => toast.info('Wallet connection required')}
-                    className="w-full h-9 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover"
+                    onClick={() => setWalletModalOpen(true)}
+                    className="w-full h-10 mt-3 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover flex items-center justify-center gap-1.5"
                   >
+                    <WalletSolid className="w-3.5 h-3.5" />
                     Connect Wallet
                   </button>
                 )}
@@ -1048,13 +1051,15 @@ export default function Terminal() {
           </button>
         ) : (
           <button
-            onClick={() => toast.info('Wallet connection required')}
-            className="w-full py-2.5 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
+            onClick={() => setWalletModalOpen(true)}
+            className="w-full py-2.5 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg flex items-center justify-center gap-1.5"
           >
-            Connect Wallet to Trade
+            <WalletSolid className="w-3.5 h-3.5" />
+            Connect Wallet
           </button>
         )}
       </div>
+      <WalletConnectModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
     </div>
   );
 }
