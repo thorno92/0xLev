@@ -756,41 +756,39 @@ export default function Markets() {
           {/*  CONTROLS                                                   */}
           {/* ========================================================== */}
           <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-none w-full sm:w-auto">
-              <div className="flex items-center gap-0.5 bg-white/[0.02] rounded-lg p-0.5 border border-white/[0.03] shrink-0">
-                {chains.map(c => (
-                  <button
-                    key={c.value}
-                    onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
-                    className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
-                      chain === c.value && !showFavoritesOnly
-                        ? 'bg-primary/[0.10] text-foreground'
-                        : 'text-muted-foreground/40 hover:text-foreground'
-                    }`}
-                  >
-                    {c.network && <span className="mr-1.5 inline-flex"><ChainIcon network={c.network} size={14} /></span>}
-                    {c.label}
-                  </button>
-                ))}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none w-full sm:w-auto">
+              {chains.map(c => (
                 <button
-                  onClick={() => setShowFavoritesOnly(prev => !prev)}
-                  className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap flex items-center gap-1 ${
-                    showFavoritesOnly
-                      ? 'bg-primary/[0.10] text-foreground'
-                      : 'text-muted-foreground/40 hover:text-foreground'
+                  key={c.value}
+                  onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
+                  className={`flex items-center gap-1.5 text-[11px] font-medium h-8 px-3 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
+                    chain === c.value && !showFavoritesOnly
+                      ? 'bg-primary/[0.10] text-foreground border-primary/20'
+                      : 'bg-white/[0.02] text-muted-foreground/40 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
                   }`}
                 >
-                  <span className="text-warning">{'\u2605'}</span>
-                  Favorites
+                  {c.network && <ChainIcon network={c.network} size={14} />}
+                  {c.label}
                 </button>
-              </div>
+              ))}
+              <button
+                onClick={() => setShowFavoritesOnly(prev => !prev)}
+                className={`flex items-center gap-1.5 text-[11px] font-medium h-8 px-3 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
+                  showFavoritesOnly
+                    ? 'bg-primary/[0.10] text-foreground border-primary/20'
+                    : 'bg-white/[0.02] text-muted-foreground/40 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
+                }`}
+              >
+                <span className="text-warning text-[13px]">{'\u2605'}</span>
+                Favorites
+              </button>
 
               <button
                 onClick={() => setFiltersOpen(true)}
-                className={`flex items-center gap-1.5 h-8 px-3.5 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 h-8 px-3 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
                   activeFilterCount > 0
                     ? 'bg-primary/[0.08] text-primary border-primary/20'
-                    : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground hover:border-primary/15'
+                    : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground hover:border-white/[0.08]'
                 }`}
               >
                 <FilterSolid className="w-3 h-3" />
