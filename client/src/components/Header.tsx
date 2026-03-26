@@ -49,8 +49,8 @@ import {
 } from '@solana/web3.js';
 
 const navLinks = [
-  { name: 'Terminal', path: '/' },
-  { name: 'Markets', path: '/markets' },
+  { name: 'Markets', path: '/' },
+  { name: 'Terminal', path: '/terminal' },
   { name: 'Trending', path: '/trending' },
   { name: 'Portfolio', path: '/portfolio' },
   { name: 'Positions', path: '/positions' },
@@ -216,8 +216,8 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-0.5 mr-3 shrink-0">
           {navLinks.map((link) => {
             const isActive = link.path === '/'
-              ? location === '/' || location === '/terminal'
-              : location === link.path;
+              ? location === '/' || location === '/markets'
+              : location === link.path || (link.path === '/terminal' && location.startsWith('/terminal'));
             return (
               <Link key={link.path} href={link.path}>
                 <span
@@ -240,9 +240,9 @@ export function Header() {
         {/* Dedicated Search Bar -- always visible on desktop */}
         <button
           onClick={() => setSearchOpen(true)}
-          className="hidden md:flex items-center gap-2 h-7 px-3 bg-secondary/30 border border-border/40 rounded text-[11px] text-muted-foreground/60 hover:text-muted-foreground hover:border-primary/30 hover:bg-secondary/50 transition-all mr-2 min-w-[180px] lg:min-w-[220px]"
+          className="hidden md:flex items-center gap-2 h-8 px-4 bg-secondary/50 border border-border/60 rounded-md text-[12px] text-muted-foreground/50 hover:text-muted-foreground hover:border-primary/30 hover:bg-secondary/60 transition-all mr-2 flex-1 max-w-[400px]"
         >
-          <Search className="w-3.5 h-3.5 shrink-0" />
+          <Search className="w-4 h-4 shrink-0" />
           <span className="flex-1 text-left">Search tokens...</span>
           <kbd className="text-[9px] bg-secondary/80 px-1.5 py-0.5 rounded font-data shrink-0">&#8984;K</kbd>
         </button>
@@ -263,9 +263,9 @@ export function Header() {
           {/* Mobile search icon */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="md:hidden text-muted-foreground hover:text-primary transition-colors p-1.5 rounded hover:bg-primary/8"
+            className="md:hidden text-muted-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-primary/8 border border-border/40"
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-5 h-5" />
           </button>
 
           {/* Mobile theme toggle -- tap opens picker sheet */}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, WarningTriangleSolid, InfoCircleSolid } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
@@ -125,7 +125,7 @@ export function TradingPanel() {
         tp,
         sl,
       });
-      toast.success(`${orderSide === 'buy' ? 'Buy' : 'Sell'} position opened`);
+      toast.success(`${tradingMode === 'leverage' ? 'Long' : orderSide === 'buy' ? 'Buy' : 'Sell'} position opened`);
       setAmount('');
       setTakeProfit('');
       setStopLoss('');
@@ -166,6 +166,13 @@ export function TradingPanel() {
       setIsClosing(null);
     }
   };
+
+  // Force buy side when switching to leverage mode
+  useEffect(() => {
+    if (tradingMode === 'leverage') {
+      setOrderSide('buy');
+    }
+  }, [tradingMode, setOrderSide]);
 
   const isBuy = orderSide === 'buy';
   const tokenPositions = openPositions.filter(
@@ -330,29 +337,31 @@ export function TradingPanel() {
             </button>
           </div>
 
-          {/* Buy / Sell Toggle */}
-          <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0">
-            <button
-              onClick={() => setOrderSide('buy')}
-              className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
-                isBuy
-                  ? 'bg-success/12 text-success border border-success/25'
-                  : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
-              }`}
-            >
-              Buy
-            </button>
-            <button
-              onClick={() => setOrderSide('sell')}
-              className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
-                !isBuy
-                  ? 'bg-destructive/12 text-destructive border border-destructive/25'
-                  : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
-              }`}
-            >
-              Sell
-            </button>
-          </div>
+          {/* Buy / Sell Toggle — only in SPOT mode */}
+          {tradingMode === 'spot' && (
+            <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0">
+              <button
+                onClick={() => setOrderSide('buy')}
+                className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
+                  isBuy
+                    ? 'bg-success/12 text-success border border-success/25'
+                    : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Buy
+              </button>
+              <button
+                onClick={() => setOrderSide('sell')}
+                className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
+                  !isBuy
+                    ? 'bg-destructive/12 text-destructive border border-destructive/25'
+                    : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Sell
+              </button>
+            </div>
+          )}
 
           <div className="flex-1 px-3 pb-3 flex flex-col gap-2.5">
             {/* Amount Input */}
@@ -547,7 +556,7 @@ export function TradingPanel() {
                 onClick={handleExecute}
                 disabled={isExecuting || !amountNum}
                 className={`w-full h-9 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
-                  isBuy
+                  tradingMode === 'leverage' || isBuy
                     ? 'bg-success hover:bg-success/90 text-background'
                     : 'bg-destructive hover:bg-destructive/90 text-white'
                 }`}
@@ -557,7 +566,12 @@ export function TradingPanel() {
                 ) : (
                   <span className="flex items-center gap-1.5 justify-center">
                     <TokenLogo symbol={selectedToken?.symbol ?? 'SOL'} size={16} />
-                    {isBuy ? 'Buy' : 'Sell'} {selectedToken?.symbol ?? 'Token'}
+                    {tradingMode === 'leverage'
+                      ? `Long ${selectedToken?.symbol ?? 'Token'}`
+                      : isBuy
+                        ? `Buy ${selectedToken?.symbol ?? 'Token'}`
+                        : `Sell ${selectedToken?.symbol ?? 'Token'}`
+                    }
                   </span>
                 )}
               </Button>

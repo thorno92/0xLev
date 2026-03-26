@@ -8,11 +8,11 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { WalletContextProvider } from "./contexts/WalletContext";
 import { MobileBottomNav } from './components/MobileBottomNav';
 
-// Critical path -- eagerly loaded (Terminal IS the landing page now)
-import Terminal from "./pages/Terminal";
+// Critical path -- eagerly loaded (Markets is the landing page)
+import Markets from "./pages/Markets";
 
 // Lazy-loaded secondary pages -- only fetched when navigated to
-const Markets = lazy(() => import("./pages/Markets"));
+const Terminal = lazy(() => import("./pages/Terminal"));
 const Trending = lazy(() => import("./pages/Trending"));
 const Assistant = lazy(() => import("./pages/Assistant"));
 const Portfolio = lazy(() => import("./pages/Portfolio"));
@@ -40,8 +40,9 @@ function Router() {
         <Route path="/404" component={NotFound} />
         <Route path="/terminal/:address" component={Terminal} />
         <Route path="/terminal" component={Terminal} />
+        <Route path="/markets" component={Markets} />
         <Route path="/:address" component={Terminal} />
-        <Route path="/" component={Terminal} />
+        <Route path="/" component={Markets} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

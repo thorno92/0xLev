@@ -13,17 +13,12 @@ import { formatPrice, formatPercent, formatCompact } from '@/lib/format';
 import { useStore, type Chain, type TokenInfo } from '@/lib/store';
 import { useLocation } from 'wouter';
 import { TokenLogo } from '@/components/TokenLogo';
+import { WhitelistButton } from '@/components/WhitelistButton';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
 import { toast } from 'sonner';
 import { useFavorites } from '@/hooks/useFavorites';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Settings, FilterSolid, NavArrowDownSolid } from 'iconoir-react';
+import { ScreenerFilters, emptyFilters, ScreenerFilterDialog } from '@/components/ScreenerFilters';
 
 
 // Dynamic web3icons for proper branded network logos
@@ -57,37 +52,8 @@ type SortKey = 'price' | 'change1h' | 'change6h' | 'change24h' | 'volume' | 'mca
 type SortDir = 'asc' | 'desc';
 
 /* ------------------------------------------------------------------ */
-/*  FILTER STATE                                                       */
+/*  FILTER STATE -- imported from @/components/ScreenerFilters          */
 /* ------------------------------------------------------------------ */
-interface ScreenerFilters {
-  liquidityMin: string; liquidityMax: string;
-  mcapMin: string; mcapMax: string;
-  fdvMin: string; fdvMax: string;
-  pairAgeMin: string; pairAgeMax: string;
-  txns24hMin: string; txns24hMax: string;
-  buys24hMin: string; buys24hMax: string;
-  sells24hMin: string; sells24hMax: string;
-  volume24hMin: string; volume24hMax: string;
-  change24hMin: string; change24hMax: string;
-  txns6hMin: string; txns6hMax: string;
-  buys6hMin: string; buys6hMax: string;
-  sells6hMin: string; sells6hMax: string;
-}
-
-const emptyFilters: ScreenerFilters = {
-  liquidityMin: '', liquidityMax: '',
-  mcapMin: '', mcapMax: '',
-  fdvMin: '', fdvMax: '',
-  pairAgeMin: '', pairAgeMax: '',
-  txns24hMin: '', txns24hMax: '',
-  buys24hMin: '', buys24hMax: '',
-  sells24hMin: '', sells24hMax: '',
-  volume24hMin: '', volume24hMax: '',
-  change24hMin: '', change24hMax: '',
-  txns6hMin: '', txns6hMax: '',
-  buys6hMin: '', buys6hMax: '',
-  sells6hMin: '', sells6hMax: '',
-};
 
 /* ------------------------------------------------------------------ */
 /*  HELPERS                                                            */
@@ -160,162 +126,8 @@ function getSocialLinks(address: string): { x?: string; tg?: string; web?: strin
 }
 
 /* ------------------------------------------------------------------ */
-/*  SCREENER FILTER DIALOG                                             */
+/*  SCREENER FILTER DIALOG -- imported from @/components/ScreenerFilters */
 /* ------------------------------------------------------------------ */
-function FilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, prefix = '$', suffix }: {
-  label: string;
-  minVal: string;
-  maxVal: string;
-  onMinChange: (v: string) => void;
-  onMaxChange: (v: string) => void;
-  prefix?: string;
-  suffix?: string;
-}) {
-  const showPrefix = prefix === '$';
-  const showSuffix = !!suffix;
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-[12px] text-muted-foreground w-24 shrink-0 text-right">{label}:</span>
-      <div className="flex-1 flex items-center gap-2">
-        <div className="flex-1 flex items-center">
-          {showPrefix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
-          )}
-          <Input
-            type="number"
-            placeholder="Min"
-            value={minVal}
-            onChange={(e) => onMinChange(e.target.value)}
-            className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`}
-          />
-          {showSuffix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>
-          )}
-        </div>
-        <div className="flex-1 flex items-center">
-          {showPrefix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
-          )}
-          <Input
-            type="number"
-            placeholder="Max"
-            value={maxVal}
-            onChange={(e) => onMaxChange(e.target.value)}
-            className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`}
-          />
-          {showSuffix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScreenerFilterDialog({ open, onOpenChange, filters, setFilters, onApply }: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  filters: ScreenerFilters;
-  setFilters: (f: ScreenerFilters) => void;
-  onApply: () => void;
-}) {
-  const [filterTab, setFilterTab] = useState<'all' | 'dexes'>('all');
-  const [profileToggles, setProfileToggles] = useState<string[]>(['Profile', 'Boosted', 'Ads', 'Launchpad']);
-
-  const update = (key: keyof ScreenerFilters, val: string) => {
-    setFilters({ ...filters, [key]: val });
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px] p-0 bg-card border-border gap-0 overflow-hidden max-h-[85vh] mx-3 sm:mx-auto">
-        <DialogHeader className="px-4 pt-4 pb-2">
-          <DialogTitle className="text-[14px] text-foreground flex items-center gap-2">
-            <FilterSolid className="w-4 h-4 text-primary" />
-            Customize Filters
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex gap-2 px-4 sm:px-5 pb-3">
-          <button
-            onClick={() => setFilterTab('all')}
-            className={`flex-1 text-[13px] font-semibold py-2.5 rounded-lg border transition-all ${
-              filterTab === 'all'
-                ? 'border-foreground/30 bg-secondary/60 text-foreground'
-                : 'border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60'
-            }`}
-          >
-            All Platforms
-          </button>
-          <button
-            onClick={() => setFilterTab('dexes')}
-            className={`flex-1 text-[13px] font-semibold py-2.5 rounded-lg border transition-all ${
-              filterTab === 'dexes'
-                ? 'border-foreground/30 bg-secondary/60 text-foreground'
-                : 'border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60'
-            }`}
-          >
-            All DEXes
-          </button>
-        </div>
-
-        <div className="px-4 sm:px-5 pt-2 pb-2">
-          <div className="text-[11px] text-muted-foreground/60 uppercase tracking-wider font-medium mb-3 text-center">FILTERS (OPTIONAL)</div>
-          <div className="flex items-center gap-2 justify-center flex-wrap">
-            <span className="text-[12px] text-muted-foreground mr-1">Profile:</span>
-            {(['Profile', 'Boosted', 'Ads', 'Launchpad'] as const).map((tag) => {
-              const icons: Record<string, string> = { Profile: '\u{1F464}', Boosted: '\u26A1', Ads: '\u{1F50A}', Launchpad: '\u{1F680}' };
-              const isActive = profileToggles.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  onClick={() => {
-                    setProfileToggles((prev: string[]) =>
-                      prev.includes(tag) ? prev.filter((t: string) => t !== tag) : [...prev, tag]
-                    );
-                  }}
-                  className={`text-[12px] px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 ${
-                    isActive
-                      ? 'border-primary/50 bg-primary/10 text-primary'
-                      : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border/80'
-                  }`}
-                >
-                  <span className="text-[11px]">{icons[tag]}</span>
-                  {tag}
-                  {isActive && <span className="text-primary ml-0.5">{'\u2713'}</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="px-4 sm:px-5 py-3 space-y-3 overflow-y-auto max-h-[45vh] sm:max-h-[50vh] scrollbar-thin">
-          <FilterRow label="Liquidity" minVal={filters.liquidityMin} maxVal={filters.liquidityMax} onMinChange={v => update('liquidityMin', v)} onMaxChange={v => update('liquidityMax', v)} />
-          <FilterRow label="Market cap" minVal={filters.mcapMin} maxVal={filters.mcapMax} onMinChange={v => update('mcapMin', v)} onMaxChange={v => update('mcapMax', v)} />
-          <FilterRow label="FDV" minVal={filters.fdvMin} maxVal={filters.fdvMax} onMinChange={v => update('fdvMin', v)} onMaxChange={v => update('fdvMax', v)} />
-          <FilterRow label="Pair age" minVal={filters.pairAgeMin} maxVal={filters.pairAgeMax} onMinChange={v => update('pairAgeMin', v)} onMaxChange={v => update('pairAgeMax', v)} prefix="" suffix="hours" />
-          <FilterRow label="24H txns" minVal={filters.txns24hMin} maxVal={filters.txns24hMax} onMinChange={v => update('txns24hMin', v)} onMaxChange={v => update('txns24hMax', v)} prefix="" />
-          <FilterRow label="24H buys" minVal={filters.buys24hMin} maxVal={filters.buys24hMax} onMinChange={v => update('buys24hMin', v)} onMaxChange={v => update('buys24hMax', v)} prefix="" />
-          <FilterRow label="24H sells" minVal={filters.sells24hMin} maxVal={filters.sells24hMax} onMinChange={v => update('sells24hMin', v)} onMaxChange={v => update('sells24hMax', v)} prefix="" />
-          <FilterRow label="24H volume" minVal={filters.volume24hMin} maxVal={filters.volume24hMax} onMinChange={v => update('volume24hMin', v)} onMaxChange={v => update('volume24hMax', v)} />
-          <FilterRow label="24H change" minVal={filters.change24hMin} maxVal={filters.change24hMax} onMinChange={v => update('change24hMin', v)} onMaxChange={v => update('change24hMax', v)} prefix="" suffix="%" />
-          <FilterRow label="6H txns" minVal={filters.txns6hMin} maxVal={filters.txns6hMax} onMinChange={v => update('txns6hMin', v)} onMaxChange={v => update('txns6hMax', v)} prefix="" />
-          <FilterRow label="6H buys" minVal={filters.buys6hMin} maxVal={filters.buys6hMax} onMinChange={v => update('buys6hMin', v)} onMaxChange={v => update('buys6hMax', v)} prefix="" />
-          <FilterRow label="6H sells" minVal={filters.sells6hMin} maxVal={filters.sells6hMax} onMinChange={v => update('sells6hMin', v)} onMaxChange={v => update('sells6hMax', v)} prefix="" />
-        </div>
-
-        <div className="px-4 sm:px-5 py-4 border-t border-border/15 flex justify-center">
-          <button
-            onClick={() => { onApply(); onOpenChange(false); }}
-            className="flex items-center gap-2 px-8 py-2.5 bg-primary text-primary-foreground text-[13px] font-semibold rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <span>{'\u2713'}</span> Apply
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 
 /* ------------------------------------------------------------------ */
@@ -701,6 +513,27 @@ export default function Markets() {
     navigate('/');
   }, [setSelectedToken, navigate]);
 
+  // Computed dashboard sections (compact top cards)
+  const dashGainers = useMemo(() => {
+    return allTokens
+      .filter((t) => t.change24h > 0)
+      .sort((a, b) => b.change24h - a.change24h)
+      .slice(0, 6);
+  }, [allTokens]);
+
+  const dashFlashSale = useMemo(() => {
+    return allTokens
+      .filter((t) => t.change24h < 0 && (t.liquidity ?? 0) > 50000)
+      .sort((a, b) => a.change24h - b.change24h)
+      .slice(0, 6);
+  }, [allTokens]);
+
+  const dashTopVolume = useMemo(() => {
+    return [...allTokens]
+      .sort((a, b) => (b.volume24h ?? 0) - (a.volume24h ?? 0))
+      .slice(0, 6);
+  }, [allTokens]);
+
   // Aggregate stats
   const totalVol = allTokens.reduce((s, t) => s + t.volume24h, 0);
   const totalMcap = allTokens.reduce((s, t) => s + t.marketCap, 0);
@@ -869,6 +702,15 @@ export default function Markets() {
                 {i < 4 && <div className="w-px h-7 bg-white/[0.04] shrink-0" />}
               </div>
             ))}
+          </div>
+
+          {/* ========================================================== */}
+          {/*  DASHBOARD SECTIONS (compact top cards)                     */}
+          {/* ========================================================== */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <SectionCard title="Gainers" subtitle="Sorted by 24h change" tokens={dashGainers} onSelect={handleClick} />
+            <SectionCard title="Flash Sale" subtitle="Dips with real liquidity" tokens={dashFlashSale} onSelect={handleClick} />
+            <SectionCard title="Top Volume" subtitle="Most active in 24 hours" tokens={dashTopVolume} onSelect={handleClick} />
           </div>
 
           {/* ========================================================== */}
@@ -1157,6 +999,13 @@ export default function Markets() {
             ))}
           </div>
 
+          {/* DASHBOARD SECTIONS (compact top cards, mobile) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <SectionCard title="Gainers" subtitle="Sorted by 24h change" tokens={dashGainers} onSelect={handleClick} />
+            <SectionCard title="Flash Sale" subtitle="Dips with real liquidity" tokens={dashFlashSale} onSelect={handleClick} />
+            <SectionCard title="Top Volume" subtitle="Most active in 24 hours" tokens={dashTopVolume} onSelect={handleClick} />
+          </div>
+
           {/* 3 COLUMNS (mobile stacked) */}
           <div className="grid grid-cols-1 gap-3 mb-8">
             {renderColumn(
@@ -1408,6 +1257,9 @@ function DesktopRow({ token, rank, starred, onStar, onClick, whitelisted, whitel
           </button>
         )}
       </td>
+      <td className="py-2.5 px-2" onClick={(e) => e.stopPropagation()}>
+        <WhitelistButton token={token} compact />
+      </td>
     </tr>
   );
 }
@@ -1467,6 +1319,9 @@ function TabletRow({ token, rank, onClick, whitelisted, whitelistPending, onRequ
           </button>
         )}
       </td>
+      <td className="py-2.5 px-2" onClick={(e) => e.stopPropagation()}>
+        <WhitelistButton token={token} compact />
+      </td>
     </tr>
   );
 }
@@ -1524,6 +1379,68 @@ function MobileRow({ token, rank, starred, onStar, onClick, whitelisted, whiteli
           <button onClick={onRequestWhitelist} className="text-[11px] font-medium px-3.5 py-2 rounded-md bg-primary/[0.08] text-primary/80 min-h-[36px] min-w-[52px] flex items-center justify-center">
             WL
           </button>
+        )}
+      </div>
+      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+        <WhitelistButton token={token} compact />
+      </div>
+    </div>
+  );
+}
+
+
+/* ================================================================== */
+/*  SECTION CARD (compact dashboard card)                              */
+/* ================================================================== */
+function SectionCard({ title, subtitle, tokens, onSelect }: {
+  title: string;
+  subtitle: string;
+  tokens: TokenInfo[];
+  onSelect: (token: TokenInfo) => void;
+}) {
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="px-3 py-2 border-b border-border">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[12px] font-semibold text-foreground flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              {title}
+            </span>
+            <span className="text-[9px] text-muted-foreground/50">{subtitle}</span>
+          </div>
+        </div>
+      </div>
+      <div className="divide-y divide-border/30">
+        {tokens.length === 0 ? (
+          <div className="py-4 text-center text-[11px] text-muted-foreground/50">No tokens</div>
+        ) : (
+          tokens.map(token => (
+            <button
+              key={token.address}
+              onClick={() => onSelect(token)}
+              className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-secondary/50 transition-colors"
+            >
+              <TokenLogo symbol={token.symbol} size={24} />
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-medium text-foreground truncate">{token.symbol}</div>
+                <div className="text-[10px] font-data text-muted-foreground">{formatPrice(token.price)}</div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className={`text-[10px] font-data font-medium ${
+                  token.change24h >= 0 ? 'text-success' : 'text-destructive'
+                }`}>
+                  {token.change24h >= 0 ? '+' : ''}{formatPercent(token.change24h)}
+                </div>
+                {token.volume24h ? (
+                  <div className="text-[9px] font-data text-muted-foreground/50">
+                    Vol {formatCompact(token.volume24h)}
+                  </div>
+                ) : null}
+              </div>
+              <WhitelistButton token={token} compact />
+            </button>
+          ))
         )}
       </div>
     </div>

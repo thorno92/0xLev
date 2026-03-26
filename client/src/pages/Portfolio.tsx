@@ -20,7 +20,7 @@ import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 /* ------------------------------------------------------------------ */
 function ConnectState({ onConnect }: { onConnect: () => void }) {
   return (
-    <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6 min-h-[60vh]">
+    <PageTransition className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-24 md:pb-6 flex items-center justify-center min-h-[60vh]">
       <div className="text-center max-w-sm space-y-6">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
@@ -30,7 +30,7 @@ function ConnectState({ onConnect }: { onConnect: () => void }) {
         <div className="space-y-2">
           <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Connect your wallet</h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Track your holdings, monitor performance, and manage positions.
+            Track your holdings, monitor performance, and manage positions across all chains.
           </p>
         </div>
         <button
@@ -43,7 +43,7 @@ function ConnectState({ onConnect }: { onConnect: () => void }) {
           Connect Wallet
         </button>
       </div>
-    </div>
+    </PageTransition>
   );
 }
 

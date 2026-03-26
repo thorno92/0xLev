@@ -49,11 +49,20 @@ export function WhitelistStatus() {
     );
   }
 
-  if (requestMutation.isSuccess && !requestMutation.data?.alreadyWhitelisted) {
+  if (requestMutation.isSuccess && requestMutation.data?.alreadyWhitelisted) {
     return (
-      <div className="flex items-center gap-1.5 text-[11px] text-warning">
-        <span className="w-3 h-3 border-2 border-warning border-t-transparent rounded-full animate-spin inline-block" />
-        <span>Whitelist pending</span>
+      <div className="flex items-center gap-1.5 text-[11px] text-success">
+        <ShieldCheck className="w-3 h-3" />
+        <span>Whitelisted</span>
+      </div>
+    );
+  }
+
+  if (requestMutation.isSuccess) {
+    return (
+      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
+        <ShieldAlert className="w-3 h-3" />
+        <span>Whitelist Pending</span>
       </div>
     );
   }

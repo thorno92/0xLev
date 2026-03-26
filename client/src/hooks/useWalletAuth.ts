@@ -50,15 +50,29 @@ export function useWalletAuth() {
 
     const signature = Buffer.from(signatureBytes).toString("base64");
 
-    const result = await connectMutation.mutateAsync({
-      walletAddress,
-      signature,
-      timestamp,
-    });
-
-    storeConnect(walletAddress, result.tradeWallet);
-
-    return result;
+    // Attempt connection with one retry on timeout
+    try {
+      const result = await connectMutation.mutateAsync({
+        walletAddress,
+        signature,
+        timestamp,
+      });
+      storeConnect(walletAddress, result.tradeWallet);
+      return result;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('imeout')) {
+        // Retry once — same signature, same timestamp (within 5min window)
+        const result = await connectMutation.mutateAsync({
+          walletAddress,
+          signature,
+          timestamp,
+        });
+        storeConnect(walletAddress, result.tradeWallet);
+        return result;
+      }
+      throw err;
+    }
   }, [publicKey, signMessage, connectMutation, storeConnect]);
 
   const disconnect = useCallback(() => {

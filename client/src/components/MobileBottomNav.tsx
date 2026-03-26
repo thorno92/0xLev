@@ -9,21 +9,21 @@ import { useLocation, Link } from 'wouter';
 
 const tabs = [
   {
-    name: 'Terminal',
+    name: 'Markets',
     path: '/',
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="4 17 10 11 4 5" />
-        <line x1="12" y1="19" x2="20" y2="19" />
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
       </svg>
     ),
   },
   {
-    name: 'Markets',
-    path: '/markets',
+    name: 'Terminal',
+    path: '/terminal',
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        <polyline points="4 17 10 11 4 5" />
+        <line x1="12" y1="19" x2="20" y2="19" />
       </svg>
     ),
   },
@@ -63,8 +63,8 @@ export function MobileBottomNav() {
         <div className="flex items-center justify-around px-1 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {tabs.map((tab) => {
             const isActive = tab.path === '/'
-              ? location === '/' || location === '/terminal'
-              : location.startsWith(tab.path);
+              ? location === '/' || location === '/markets'
+              : location === tab.path || (tab.path === '/terminal' && location.startsWith('/terminal'));
 
             return (
               <Link key={tab.path} href={tab.path}>

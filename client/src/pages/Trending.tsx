@@ -16,14 +16,9 @@ import { SkeletonTable, SkeletonCard } from '@/components/Skeleton';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
 import { toast } from 'sonner';
 import { useFavorites } from '@/hooks/useFavorites';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { WhitelistButton } from '@/components/WhitelistButton';
 import { FilterSolid } from 'iconoir-react';
+import { type ScreenerFilters, emptyFilters, ScreenerFilterDialog } from '@/components/ScreenerFilters';
 import { networkIcons } from '@web3icons/react';
 const { NetworkSolana, NetworkEthereum, NetworkBase, NetworkBinanceSmartChain } = networkIcons;
 
@@ -47,72 +42,7 @@ const networkToChain: Record<string, Chain | 'all'> = {
   'All': 'all', 'Solana': 'solana', 'Ethereum': 'ethereum', 'BNB': 'bnb', 'Base': 'base',
 };
 
-/* ---- Screener Filters ---- */
-interface TrendingFilters {
-  liquidityMin: string; liquidityMax: string;
-  mcapMin: string; mcapMax: string;
-  fdvMin: string; fdvMax: string;
-  pairAgeMin: string; pairAgeMax: string;
-  txns24hMin: string; txns24hMax: string;
-  buys24hMin: string; buys24hMax: string;
-  sells24hMin: string; sells24hMax: string;
-  volumeMin: string; volumeMax: string;
-  changeMin: string; changeMax: string;
-  txns6hMin: string; txns6hMax: string;
-  buys6hMin: string; buys6hMax: string;
-  sells6hMin: string; sells6hMax: string;
-}
-
-const emptyTrendingFilters: TrendingFilters = {
-  liquidityMin: '', liquidityMax: '',
-  mcapMin: '', mcapMax: '',
-  fdvMin: '', fdvMax: '',
-  pairAgeMin: '', pairAgeMax: '',
-  txns24hMin: '', txns24hMax: '',
-  buys24hMin: '', buys24hMax: '',
-  sells24hMin: '', sells24hMax: '',
-  volumeMin: '', volumeMax: '',
-  changeMin: '', changeMax: '',
-  txns6hMin: '', txns6hMax: '',
-  buys6hMin: '', buys6hMax: '',
-  sells6hMin: '', sells6hMax: '',
-};
-
-function TrendingFilterRow({ label, minVal, maxVal, onMinChange, onMaxChange, prefix = '$', suffix }: {
-  label: string; minVal: string; maxVal: string;
-  onMinChange: (v: string) => void; onMaxChange: (v: string) => void;
-  prefix?: string; suffix?: string;
-}) {
-  const showPrefix = prefix === '$';
-  const showSuffix = !!suffix;
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-[12px] text-muted-foreground w-24 shrink-0 text-right">{label}:</span>
-      <div className="flex-1 flex items-center gap-2">
-        <div className="flex-1 flex items-center">
-          {showPrefix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
-          )}
-          <Input type="number" inputMode="decimal" placeholder="Min" value={minVal} onChange={(e) => onMinChange(e.target.value)}
-            className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`} />
-          {showSuffix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>
-          )}
-        </div>
-        <div className="flex-1 flex items-center">
-          {showPrefix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-r-0 rounded-l-md px-2 h-8 flex items-center">$</span>
-          )}
-          <Input type="number" inputMode="decimal" placeholder="Max" value={maxVal} onChange={(e) => onMaxChange(e.target.value)}
-            className={`h-8 text-[12px] bg-secondary/30 border-border/30 font-data ${showPrefix ? 'rounded-l-none' : ''} ${showSuffix ? 'rounded-r-none' : ''}`} />
-          {showSuffix && (
-            <span className="text-[11px] text-muted-foreground/60 bg-secondary/50 border border-border/30 border-l-0 rounded-r-md px-2 h-8 flex items-center">{suffix}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ---- Screener Filters -- imported from @/components/ScreenerFilters ---- */
 
 function seededRandom(seed: string) {
   let hash = 0;
@@ -141,14 +71,11 @@ export default function Trending() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<TrendingFilters>(emptyTrendingFilters);
+  const [filters, setFilters] = useState<ScreenerFilters>(emptyFilters);
 
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const activeFilterCount = useMemo(() => Object.values(filters).filter(v => v !== '').length, [filters]);
-  const updateFilter = useCallback((key: keyof TrendingFilters, val: string) => {
-    setFilters(prev => ({ ...prev, [key]: val }));
-  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -167,10 +94,10 @@ export default function Trending() {
     if (filters.liquidityMax) tokens = tokens.filter(t => t.liquidity <= Number(filters.liquidityMax));
     if (filters.mcapMin) tokens = tokens.filter(t => t.marketCap >= Number(filters.mcapMin));
     if (filters.mcapMax) tokens = tokens.filter(t => t.marketCap <= Number(filters.mcapMax));
-    if (filters.volumeMin) tokens = tokens.filter(t => t.volume24h >= Number(filters.volumeMin));
-    if (filters.volumeMax) tokens = tokens.filter(t => t.volume24h <= Number(filters.volumeMax));
-    if (filters.changeMin) tokens = tokens.filter(t => t.change24h >= Number(filters.changeMin));
-    if (filters.changeMax) tokens = tokens.filter(t => t.change24h <= Number(filters.changeMax));
+    if (filters.volume24hMin) tokens = tokens.filter(t => t.volume24h >= Number(filters.volume24hMin));
+    if (filters.volume24hMax) tokens = tokens.filter(t => t.volume24h <= Number(filters.volume24hMax));
+    if (filters.change24hMin) tokens = tokens.filter(t => t.change24h >= Number(filters.change24hMin));
+    if (filters.change24hMax) tokens = tokens.filter(t => t.change24h <= Number(filters.change24hMax));
     tokens.sort((a, b) => {
       let aV = 0, bV = 0;
       switch (sortBy) {
@@ -405,6 +332,7 @@ export default function Trending() {
                         <SortTh label="24H" col="change" />
                         <SortTh label="LIQ" col="liquidity" />
                         <SortTh label="MCAP" col="mcap" />
+                        <th style={{ textAlign: 'center' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -461,6 +389,9 @@ export default function Trending() {
                             </td>
                             <td className="numeric">{formatCompact(token.liquidity)}</td>
                             <td className="numeric">{formatCompact(token.marketCap)}</td>
+                            <td style={{ textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                              <WhitelistButton token={token} compact />
+                            </td>
                           </tr>
                         );
                       })}
@@ -621,71 +552,14 @@ export default function Trending() {
       </PullToRefresh>
 
       {/* Screener Filter Dialog */}
-      <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
-        <DialogContent className="sm:max-w-[520px] p-0 bg-card border-border gap-0 overflow-hidden max-h-[85vh] mx-3 sm:mx-auto">
-          <DialogHeader className="px-5 pt-4 pb-2">
-            <DialogTitle className="text-[16px] text-foreground font-semibold">Customize Filters</DialogTitle>
-          </DialogHeader>
-
-          {/* Tabs -- full-width bordered buttons */}
-          <div className="flex gap-2 px-4 sm:px-5 pb-3">
-            <button className="flex-1 text-[13px] font-semibold py-2.5 rounded-lg border border-foreground/30 bg-secondary/60 text-foreground">
-              All Platforms
-            </button>
-            <button className="flex-1 text-[13px] font-semibold py-2.5 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60 transition-all">
-              All DEXes
-            </button>
-          </div>
-
-          {/* Profile Toggles */}
-          <div className="px-4 sm:px-5 pt-2 pb-2">
-            <div className="text-[11px] text-muted-foreground/60 uppercase tracking-wider font-medium mb-3 text-center">FILTERS (OPTIONAL)</div>
-            <div className="flex items-center gap-2 justify-center flex-wrap">
-              <span className="text-[12px] text-muted-foreground mr-1">Profile:</span>
-              {(['Profile', 'Boosted', 'Ads', 'Launchpad'] as const).map((tag) => {
-                const icons: Record<string, string> = { Profile: '\u{1F464}', Boosted: '\u26A1', Ads: '\u{1F50A}', Launchpad: '\u{1F680}' };
-                return (
-                  <span key={tag} className="text-[12px] px-3 py-1.5 rounded-lg border border-primary/50 bg-primary/10 text-primary flex items-center gap-1.5">
-                    <span className="text-[11px]">{icons[tag]}</span>{tag} <span className="text-primary ml-0.5">\u2713</span>
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="px-4 sm:px-5 py-3 space-y-3 overflow-y-auto max-h-[45vh] sm:max-h-[50vh] scrollbar-thin">
-            <TrendingFilterRow label="Liquidity" minVal={filters.liquidityMin} maxVal={filters.liquidityMax} onMinChange={v => updateFilter('liquidityMin', v)} onMaxChange={v => updateFilter('liquidityMax', v)} />
-            <TrendingFilterRow label="Market cap" minVal={filters.mcapMin} maxVal={filters.mcapMax} onMinChange={v => updateFilter('mcapMin', v)} onMaxChange={v => updateFilter('mcapMax', v)} />
-            <TrendingFilterRow label="FDV" minVal={filters.fdvMin} maxVal={filters.fdvMax} onMinChange={v => updateFilter('fdvMin', v)} onMaxChange={v => updateFilter('fdvMax', v)} />
-            <TrendingFilterRow label="Pair age" minVal={filters.pairAgeMin} maxVal={filters.pairAgeMax} onMinChange={v => updateFilter('pairAgeMin', v)} onMaxChange={v => updateFilter('pairAgeMax', v)} prefix="" suffix="hours" />
-
-            <div className="h-px bg-border/20 my-2" />
-
-            <TrendingFilterRow label="24H txns" minVal={filters.txns24hMin} maxVal={filters.txns24hMax} onMinChange={v => updateFilter('txns24hMin', v)} onMaxChange={v => updateFilter('txns24hMax', v)} prefix="" />
-            <TrendingFilterRow label="24H buys" minVal={filters.buys24hMin} maxVal={filters.buys24hMax} onMinChange={v => updateFilter('buys24hMin', v)} onMaxChange={v => updateFilter('buys24hMax', v)} prefix="" />
-            <TrendingFilterRow label="24H sells" minVal={filters.sells24hMin} maxVal={filters.sells24hMax} onMinChange={v => updateFilter('sells24hMin', v)} onMaxChange={v => updateFilter('sells24hMax', v)} prefix="" />
-            <TrendingFilterRow label="24H volume" minVal={filters.volumeMin} maxVal={filters.volumeMax} onMinChange={v => updateFilter('volumeMin', v)} onMaxChange={v => updateFilter('volumeMax', v)} />
-            <TrendingFilterRow label="24H change" minVal={filters.changeMin} maxVal={filters.changeMax} onMinChange={v => updateFilter('changeMin', v)} onMaxChange={v => updateFilter('changeMax', v)} prefix="" suffix="%" />
-
-            <div className="h-px bg-border/20 my-2" />
-
-            <TrendingFilterRow label="6H txns" minVal={filters.txns6hMin} maxVal={filters.txns6hMax} onMinChange={v => updateFilter('txns6hMin', v)} onMaxChange={v => updateFilter('txns6hMax', v)} prefix="" />
-            <TrendingFilterRow label="6H buys" minVal={filters.buys6hMin} maxVal={filters.buys6hMax} onMinChange={v => updateFilter('buys6hMin', v)} onMaxChange={v => updateFilter('buys6hMax', v)} prefix="" />
-            <TrendingFilterRow label="6H sells" minVal={filters.sells6hMin} maxVal={filters.sells6hMax} onMinChange={v => updateFilter('sells6hMin', v)} onMaxChange={v => updateFilter('sells6hMax', v)} prefix="" />
-          </div>
-
-          {/* Footer -- centered Apply button */}
-          <div className="flex flex-col items-center gap-2 px-4 sm:px-5 py-4 border-t border-border/30">
-            <button
-              onClick={() => { setFiltersOpen(false); toast.success('Filters applied'); }}
-              className="px-8 py-2.5 text-[13px] font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all flex items-center gap-2"
-            >
-              <span>\u2713</span> Apply
-            </button>
-            <button onClick={() => setFilters(emptyTrendingFilters)} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Reset All</button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ScreenerFilterDialog
+        open={filtersOpen}
+        onOpenChange={setFiltersOpen}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={() => toast.success('Filters applied')}
+        onReset={() => setFilters(emptyFilters)}
+      />
     </div>
   );
 }
