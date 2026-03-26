@@ -1012,67 +1012,52 @@ export default function Markets() {
             onSelect={handleClick}
           />
 
-          {/* CONTROLS (mobile) */}
-          <div className="flex flex-col gap-3 mb-4">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-              <div className="flex items-center gap-0.5 bg-white/[0.02] rounded-lg p-0.5 border border-white/[0.03] shrink-0">
-                {chains.map(c => (
-                  <button
-                    key={c.value}
-                    onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
-                    className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap ${
-                      chain === c.value && !showFavoritesOnly
-                        ? 'bg-primary/[0.10] text-foreground'
-                        : 'text-muted-foreground/40 hover:text-foreground'
-                    }`}
-                  >
-                    {c.network && <span className="mr-1.5 inline-flex"><ChainIcon network={c.network} size={14} /></span>}
-                    {c.label}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setShowFavoritesOnly(prev => !prev)}
-                  className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all whitespace-nowrap flex items-center gap-1 ${
-                    showFavoritesOnly
-                      ? 'bg-primary/[0.10] text-foreground'
-                      : 'text-muted-foreground/40 hover:text-foreground'
-                  }`}
-                >
-                  <span className="text-warning">{'\u2605'}</span>
-                  Favorites
-                </button>
-              </div>
-
+          {/* CONTROLS (mobile) — compact single row, no scroll */}
+          <div className="flex items-center gap-1 mb-4 px-1">
+            {[
+              { label: 'All', value: 'all' },
+              { label: 'SOL', value: 'solana' },
+              { label: 'ETH', value: 'ethereum' },
+              { label: 'BNB', value: 'bnb' },
+              { label: 'BASE', value: 'base' },
+            ].map(c => (
               <button
-                onClick={() => setFiltersOpen(true)}
-                className={`flex items-center gap-1.5 h-8 px-3.5 text-[11px] font-medium rounded-lg border transition-all shrink-0 ${
-                  activeFilterCount > 0
-                    ? 'bg-primary/[0.08] text-primary border-primary/20'
-                    : 'bg-white/[0.02] text-muted-foreground/50 border-white/[0.04] hover:text-foreground hover:border-primary/15'
+                key={c.value}
+                onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
+                className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all text-center ${
+                  chain === c.value && !showFavoritesOnly
+                    ? 'bg-primary/[0.10] text-foreground border border-primary/20'
+                    : 'text-muted-foreground/40 border border-transparent hover:text-foreground'
                 }`}
               >
-                <FilterSolid className="w-3 h-3" />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="text-[9px] bg-primary text-primary-foreground px-1.5 py-px rounded-full font-data ml-0.5">
-                    {activeFilterCount}
-                  </span>
-                )}
+                {c.label}
               </button>
-            </div>
-
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search tokens..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="h-8 w-full pl-8 pr-3 text-[11px] bg-white/[0.02] border border-white/[0.04] rounded-lg text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/25 transition-colors"
-              />
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+            ))}
+            <button
+              onClick={() => setShowFavoritesOnly(prev => !prev)}
+              className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all text-center ${
+                showFavoritesOnly
+                  ? 'bg-primary/[0.10] text-foreground border border-primary/20'
+                  : 'text-muted-foreground/40 border border-transparent hover:text-foreground'
+              }`}
+            >
+              {'\u2605'}
+            </button>
+            <button
+              onClick={() => setFiltersOpen(true)}
+              className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all text-center flex items-center justify-center gap-1 ${
+                activeFilterCount > 0
+                  ? 'bg-primary/[0.08] text-primary border border-primary/20'
+                  : 'text-muted-foreground/40 border border-transparent hover:text-foreground'
+              }`}
+            >
+              <FilterSolid className="w-3 h-3" />
+              {activeFilterCount > 0 && (
+                <span className="text-[8px] bg-primary text-primary-foreground px-1 py-px rounded-full font-data">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* MOBILE CARDS */}
