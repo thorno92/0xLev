@@ -416,7 +416,7 @@ export function TradingPanel() {
             </div>
           )}
 
-          <div className="flex-1 px-3 pb-3 flex flex-col gap-2.5">
+          <div className="flex-1 px-3 pb-3 flex flex-col gap-3.5">
             {/* Amount Input */}
             <div>
               <div className="flex items-center justify-between mb-1">
@@ -475,7 +475,7 @@ export function TradingPanel() {
                   className="mb-1.5"
                 />
 
-                <div className="flex gap-0.5">
+                <div className="flex gap-0.5 mb-1">
                   {leveragePresets.map((preset) => (
                     <button
                       key={preset}
@@ -495,7 +495,7 @@ export function TradingPanel() {
 
             {/* TP / SL */}
             {tradingMode === 'leverage' && (
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5 mt-1">
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
@@ -540,7 +540,7 @@ export function TradingPanel() {
             )}
 
             {/* Slippage Settings */}
-            <div className="flex items-center justify-between py-0.5">
+            <div className="flex items-center justify-between py-1">
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                 Slippage
               </span>
@@ -582,7 +582,7 @@ export function TradingPanel() {
             )}
 
             {/* Order Summary — always visible */}
-            <div className="bg-secondary/40 rounded p-2 space-y-1">
+            <div className="bg-secondary/40 rounded px-3 py-2.5 space-y-1.5">
               <SummaryRow label="Entry Price" value={entryPrice > 0 ? formatPrice(quoteData?.current_price ?? entryPrice) : 'Awaiting price...'} />
               <SummaryRow label="Position Size" value={amountNum > 0 ? `${formatNumber(positionSize, 4)} SOL` : '---'} muted={amountNum <= 0} />
               {quoteData?.trade_cost != null && amountNum > 0 ? (
@@ -609,7 +609,7 @@ export function TradingPanel() {
               <Button
                 onClick={handleExecute}
                 disabled={isExecuting || !amountNum || entryPrice <= 0}
-                className={`w-full h-9 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
+                className={`w-full h-9 mt-2 text-[13px] font-semibold transition-all duration-100 rounded btn-hover ${
                   tradingMode === 'leverage' || isBuy
                     ? 'bg-success hover:bg-success/90 text-background'
                     : 'bg-destructive hover:bg-destructive/90 text-white'
@@ -632,7 +632,7 @@ export function TradingPanel() {
             ) : (
               <Button
                 onClick={() => toast.info('Wallet connection required')}
-                className="w-full h-9 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover"
+                className="w-full h-9 mt-2 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover"
               >
                 Connect Wallet to Trade
               </Button>
