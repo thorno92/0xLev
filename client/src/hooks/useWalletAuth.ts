@@ -83,6 +83,8 @@ export function useWalletAuth() {
     adapterDisconnect();
     storeDisconnect();
     resumedRef.current = false;
+    // Prevent autoConnect from immediately reconnecting
+    try { localStorage.removeItem('walletName'); } catch { /* noop */ }
   }, [publicKey, adapterDisconnect, storeDisconnect, disconnectMutation]);
 
   const isSessionLoading = resumeQuery.isLoading;

@@ -136,6 +136,13 @@ export default function Terminal() {
     syncedFromUrl.current = true;
   }, [urlAddress]);
 
+  // Force buy side when switching to leverage mode (no shorting on 0xL)
+  useEffect(() => {
+    if (tradingMode === 'leverage') {
+      setOrderSide('buy');
+    }
+  }, [tradingMode, setOrderSide]);
+
   // When selected token changes (e.g. via search modal), update the URL
   useEffect(() => {
     if (!selectedToken) return;
@@ -460,29 +467,31 @@ export default function Terminal() {
                 </button>
               </div>
 
-              {/* Buy / Sell Toggle */}
-              <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0">
-                <button
-                  onClick={() => setOrderSide('buy')}
-                  className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
-                    isBuy
-                      ? 'bg-success/12 text-success border border-success/25'
-                      : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
-                  }`}
-                >
-                  Buy
-                </button>
-                <button
-                  onClick={() => setOrderSide('sell')}
-                  className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
-                    !isBuy
-                      ? 'bg-destructive/12 text-destructive border border-destructive/25'
-                      : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
-                  }`}
-                >
-                  Sell
-                </button>
-              </div>
+              {/* Buy / Sell Toggle — only in SPOT mode */}
+              {tradingMode === 'spot' && (
+                <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0">
+                  <button
+                    onClick={() => setOrderSide('buy')}
+                    className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
+                      isBuy
+                        ? 'bg-success/12 text-success border border-success/25'
+                        : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    Buy
+                  </button>
+                  <button
+                    onClick={() => setOrderSide('sell')}
+                    className={`flex-1 py-1.5 text-[12px] font-semibold rounded transition-all duration-100 btn-ghost-hover ${
+                      !isBuy
+                        ? 'bg-destructive/12 text-destructive border border-destructive/25'
+                        : 'bg-secondary text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    Sell
+                  </button>
+                </div>
+              )}
 
               <div className="px-3 pb-3 flex flex-col gap-2.5">
                 {/* Amount Input */}
@@ -680,7 +689,7 @@ export default function Terminal() {
                     onClick={handleExecute}
                     disabled={isExecuting || !amountNum}
                     className={`w-full h-9 text-[13px] font-semibold transition-all duration-100 rounded flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed btn-hover ${
-                      isBuy
+                      tradingMode === 'leverage' || isBuy
                         ? 'bg-success hover:bg-success/90 text-background'
                         : 'bg-destructive hover:bg-destructive/90 text-white'
                     }`}
@@ -690,7 +699,9 @@ export default function Terminal() {
                     ) : (
                       <>
                         <TokenLogo symbol={selectedToken?.symbol ?? 'SOL'} size={16} />
-                        {isBuy ? 'Buy' : 'Sell'} {selectedToken?.symbol ?? 'SOL'}
+                        {tradingMode === 'leverage'
+                          ? `Long ${selectedToken?.symbol ?? 'SOL'}`
+                          : `${isBuy ? 'Buy' : 'Sell'} ${selectedToken?.symbol ?? 'SOL'}`}
                       </>
                     )}
                   </button>
