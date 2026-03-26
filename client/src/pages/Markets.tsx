@@ -32,7 +32,9 @@ const NetworkIcon = lazy(() =>
 function ChainIcon({ network, size = 14 }: { network: string; size?: number }) {
   return (
     <Suspense fallback={<span className="inline-block rounded-full bg-white/[0.06]" style={{ width: size, height: size }} />}>
-      <NetworkIcon name={network} size={size} variant="branded" className="shrink-0" />
+      <NetworkIcon name={network} size={size} variant="branded" className="shrink-0" fallback={
+        <NetworkIcon name={network} size={size} variant="mono" className="shrink-0" />
+      } />
     </Suspense>
   );
 }
