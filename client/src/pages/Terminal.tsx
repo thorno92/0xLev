@@ -493,10 +493,10 @@ export default function Terminal() {
                 </div>
               )}
 
-              <div className="px-3 pb-3 flex flex-col gap-2.5">
+              <div className="px-4 pt-6 pb-5 flex flex-col gap-6">
                 {/* Amount Input */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                       Amount (SOL)
                     </label>
@@ -526,12 +526,12 @@ export default function Terminal() {
                     </button>
                   </div>
                   {/* Quick Amount Buttons */}
-                  <div className="flex gap-0.5 mt-1.5">
+                  <div className="flex gap-1 mt-2">
                     {amountPresets.map((pct) => (
                       <button
                         key={pct}
                         onClick={() => handleQuickAmount(pct)}
-                        className="flex-1 py-1 text-[10px] font-data rounded transition-colors bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 border border-transparent badge-hover"
+                        className="flex-1 py-1.5 text-[10px] font-data rounded transition-colors bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 border border-transparent badge-hover"
                       >
                         {pct}%
                       </button>
@@ -542,7 +542,7 @@ export default function Terminal() {
                 {/* Leverage Control */}
                 {tradingMode === 'leverage' && (
                   <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1.5">
                       <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                         Leverage
                       </label>
@@ -556,14 +556,14 @@ export default function Terminal() {
                       min={1}
                       max={50}
                       step={1}
-                      className="mb-1.5"
+                      className="mb-2"
                     />
-                    <div className="flex gap-0.5">
+                    <div className="flex gap-1">
                       {leveragePresets.map((preset) => (
                         <button
                           key={preset}
                           onClick={() => setLeverage(preset)}
-                          className={`flex-1 py-1 text-[10px] font-data rounded transition-colors badge-hover ${
+                          className={`flex-1 py-1.5 text-[10px] font-data rounded transition-colors badge-hover ${
                             leverage === preset
                               ? 'bg-primary/12 text-primary border border-primary/25'
                               : 'bg-secondary text-muted-foreground hover:text-foreground border border-transparent'
