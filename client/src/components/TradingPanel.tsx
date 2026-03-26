@@ -418,7 +418,7 @@ export function TradingPanel() {
             </div>
           )}
 
-          <div className="flex-1 px-3 pt-4 pb-4 flex flex-col gap-5">
+          <div className="flex-1 px-3 pt-6 pb-4 flex flex-col gap-5">
             {/* Amount Input */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
