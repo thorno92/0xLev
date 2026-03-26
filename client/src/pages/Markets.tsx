@@ -987,21 +987,18 @@ export default function Markets() {
       >
         <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
 
-          {/* STATS BAR (mobile) — centered, compact */}
-          <div className="flex items-center justify-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
+          {/* STATS BAR (mobile) — full-width grid matching tabs */}
+          <div className="grid grid-cols-5 mb-4 pb-3 border-b border-white/[0.04]">
             {[
               { label: 'Volume', value: formatCompact(totalVol), color: 'text-foreground' },
               { label: 'MCap', value: formatCompact(totalMcap), color: 'text-foreground' },
               { label: 'Liq', value: formatCompact(totalLiq), color: 'text-foreground' },
               { label: '24H', value: formatPercent(avgChange), color: avgChange >= 0 ? 'text-success' : 'text-destructive' },
               { label: 'Tokens', value: String(allTokens.length), color: 'text-foreground' },
-            ].map((stat, i) => (
-              <div key={stat.label} className="shrink-0 flex items-center gap-3">
-                <div>
-                  <div className="text-[9px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
-                  <div className={`text-[14px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
-                </div>
-                {i < 4 && <div className="w-px h-5 bg-white/[0.04] shrink-0" />}
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-[9px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
+                <div className={`text-[14px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
               </div>
             ))}
           </div>
