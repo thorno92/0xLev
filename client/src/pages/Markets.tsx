@@ -989,8 +989,8 @@ export default function Markets() {
       >
         <PageTransition className="max-w-[1600px] mx-auto px-4 py-5 pb-24">
 
-          {/* STATS BAR (mobile) — smaller text, scrollable */}
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
+          {/* STATS BAR (mobile) — centered, compact */}
+          <div className="flex items-center justify-center gap-3 mb-4 pb-3 border-b border-white/[0.04] overflow-x-auto scrollbar-none">
             {[
               { label: 'Volume', value: formatCompact(totalVol), color: 'text-foreground' },
               { label: 'MCap', value: formatCompact(totalMcap), color: 'text-foreground' },
@@ -1000,8 +1000,8 @@ export default function Markets() {
             ].map((stat, i) => (
               <div key={stat.label} className="shrink-0 flex items-center gap-3">
                 <div>
-                  <div className="text-[8px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
-                  <div className={`text-[11px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
+                  <div className="text-[9px] text-muted-foreground/45 font-medium uppercase">{stat.label}</div>
+                  <div className={`text-[14px] font-semibold tabular-nums mt-0.5 ${stat.color}`}>{stat.value}</div>
                 </div>
                 {i < 4 && <div className="w-px h-5 bg-white/[0.04] shrink-0" />}
               </div>
@@ -1459,7 +1459,7 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
   return (
     <div className="mb-4">
       {/* Tab bar */}
-      <div className="flex gap-1 mb-3 overflow-x-auto scrollbar-none">
+      <div className="flex justify-center gap-1 mb-3 overflow-x-auto scrollbar-none">
         {tabs.map(t => (
           <button
             key={t.key}
