@@ -324,42 +324,34 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             ))}
           </div>
 
-          {/* Row 4: TX count with buy/sell dots + V + MC */}
-          <div className="flex items-center justify-between mt-1.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground/50">TX</span>
-              <span className="text-[10px] font-semibold text-foreground/70 tabular-nums">{fmtNum(txns)}</span>
-              {/* Mini buy/sell ratio bar inline */}
-              <div className="flex h-[4px] w-12 rounded-full overflow-hidden">
-                <div className="bg-success/50 rounded-l-full" style={{ width: `${buyRatio}%` }} />
-                <div className="bg-destructive/50 rounded-r-full flex-1" />
-              </div>
+          {/* Row 4: TX count + progress bar */}
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="text-[10px] text-muted-foreground/50">TX</span>
+            <span className="text-[10px] font-semibold text-foreground/70 tabular-nums">{fmtNum(txns)}</span>
+            <div className="flex h-[4px] w-12 rounded-full overflow-hidden">
+              <div className="bg-success/50 rounded-l-full" style={{ width: `${buyRatio}%` }} />
+              <div className="bg-destructive/50 rounded-r-full flex-1" />
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] text-muted-foreground/50">
-                V <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.volume24h)}</span>
-              </span>
-              <span className="text-[10px] text-muted-foreground/50">
-                MC <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.marketCap)}</span>
-              </span>
+            <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
+              <div className="h-full rounded-full bg-success/50 transition-all" style={{ width: `${score}%` }} />
             </div>
+            <span className="text-[9px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
           </div>
-        </div>
-      </div>
 
-      {/* ---- BOTTOM: Progress bar + whitelist button ---- */}
-      <div className="px-2.5 pb-2">
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
-            <div
-              className="h-full rounded-full bg-success/50 transition-all"
-              style={{ width: `${score}%` }}
-            />
+          {/* Row 5: Whitelist button */}
+          <div className="flex justify-end mt-1 mb-1" onClick={(e) => e.stopPropagation()}>
+            <WhitelistButton token={token} compact />
           </div>
-          <span className="text-[9px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
-        </div>
-        <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-          <WhitelistButton token={token} compact />
+
+          {/* Row 6: V + MC stats */}
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-muted-foreground/50">
+              V <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.volume24h)}</span>
+            </span>
+            <span className="text-[10px] text-muted-foreground/50">
+              MC <span className="text-foreground/70 font-semibold tabular-nums">{fmtVol(token.marketCap)}</span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
