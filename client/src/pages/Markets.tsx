@@ -1009,24 +1009,25 @@ export default function Markets() {
             onSelect={handleClick}
           />
 
-          {/* CONTROLS (mobile) — compact single row, no scroll */}
-          <div className="flex items-center gap-1 mb-4 px-1">
+          {/* CONTROLS (mobile) — chain tabs with icons */}
+          <div className="flex items-center gap-1 mb-3 px-1">
             {[
-              { label: 'All', value: 'all' },
-              { label: 'SOL', value: 'solana' },
-              { label: 'ETH', value: 'ethereum' },
-              { label: 'BNB', value: 'bnb' },
-              { label: 'BASE', value: 'base' },
+              { label: 'All', value: 'all', network: null },
+              { label: 'SOL', value: 'solana', network: 'solana' },
+              { label: 'ETH', value: 'ethereum', network: 'ethereum' },
+              { label: 'BNB', value: 'bnb', network: 'binance-smart-chain' },
+              { label: 'BASE', value: 'base', network: 'base' },
             ].map(c => (
               <button
                 key={c.value}
                 onClick={() => { setChain(c.value); setShowFavoritesOnly(false); }}
-                className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all text-center ${
+                className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${
                   chain === c.value && !showFavoritesOnly
                     ? 'bg-primary/[0.10] text-foreground border border-primary/20'
                     : 'text-muted-foreground/40 border border-transparent hover:text-foreground'
                 }`}
               >
+                {c.network && <ChainIcon network={c.network} size={12} />}
                 {c.label}
               </button>
             ))}
@@ -1039,21 +1040,6 @@ export default function Markets() {
               }`}
             >
               {'\u2605'}
-            </button>
-            <button
-              onClick={() => setFiltersOpen(true)}
-              className={`flex-1 text-[10px] font-medium py-1.5 rounded-md transition-all text-center flex items-center justify-center gap-1 ${
-                activeFilterCount > 0
-                  ? 'bg-primary/[0.08] text-primary border border-primary/20'
-                  : 'text-muted-foreground/40 border border-transparent hover:text-foreground'
-              }`}
-            >
-              <FilterSolid className="w-3 h-3" />
-              {activeFilterCount > 0 && (
-                <span className="text-[8px] bg-primary text-primary-foreground px-1 py-px rounded-full font-data">
-                  {activeFilterCount}
-                </span>
-              )}
             </button>
           </div>
 
