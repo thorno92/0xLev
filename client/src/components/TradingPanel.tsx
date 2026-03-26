@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, WarningTriangleSolid, InfoCircleSolid } from 'iconoir-react';
+import { Settings, WarningTriangleSolid, InfoCircleSolid, WalletSolid } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -12,6 +12,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { WhitelistStatus } from './WhitelistStatus';
 import { TokenLogo } from './TokenLogo';
+import { WalletConnectModal } from './WalletConnectModal';
 import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 
 const leveragePresets = [2, 5, 10, 25, 50];
@@ -40,6 +41,7 @@ export function TradingPanel() {
   const [leverage, setLeverage] = useState(5);
   const [takeProfit, setTakeProfit] = useState('');
   const [stopLoss, setStopLoss] = useState('');
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [slippage, setSlippage] = useState(1.0);
   const [isExecuting, setIsExecuting] = useState(false);
   const [isClosing, setIsClosing] = useState<string | null>(null);
@@ -631,15 +633,17 @@ export function TradingPanel() {
               </Button>
             ) : (
               <Button
-                onClick={() => toast.info('Wallet connection required')}
-                className="w-full h-9 mt-2 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover"
+                onClick={() => setWalletModalOpen(true)}
+                className="w-full h-9 mt-2 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded btn-hover gap-1.5"
               >
-                Connect Wallet to Trade
+                <WalletSolid className="w-3.5 h-3.5" />
+                Connect Wallet
               </Button>
             )}
           </div>
         </>
       )}
+      <WalletConnectModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
     </div>
   );
 }
