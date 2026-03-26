@@ -50,12 +50,20 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
     }
   };
 
+  // Deduplicate wallets by adapter name
+  const seen = new Set<string>();
+  const uniqueWallets = wallets.filter(w => {
+    if (seen.has(w.adapter.name)) return false;
+    seen.add(w.adapter.name);
+    return true;
+  });
+
   // Split into detected, installable, and EVM
   const detected: Wallet[] = [];
   const installable: Wallet[] = [];
   const evm: Wallet[] = [];
 
-  for (const w of wallets) {
+  for (const w of uniqueWallets) {
     if (EVM_ONLY.has(w.adapter.name)) {
       evm.push(w);
     } else if (
