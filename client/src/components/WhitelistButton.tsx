@@ -9,13 +9,17 @@ interface WhitelistButtonProps {
   compact?: boolean;
 }
 
+/** Base58 check — only Solana addresses pass */
+const BASE58_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
 export function WhitelistButton({ token, compact = false }: WhitelistButtonProps) {
   const walletAddress = useStore((s) => s.walletAddress);
   const walletConnected = useStore((s) => s.walletConnected);
   const setSelectedToken = useStore((s) => s.setSelectedToken);
   const [, navigate] = useLocation();
 
-  const enabled = !!walletAddress && walletConnected;
+  const isSolanaToken = BASE58_RE.test(token.address);
+  const enabled = !!walletAddress && walletConnected && isSolanaToken;
 
   const { data: wlStatus } = trpc.leverage.checkWhitelist.useQuery(
     { walletAddress: walletAddress!, contractAddress: token.address },
@@ -28,6 +32,17 @@ export function WhitelistButton({ token, compact = false }: WhitelistButtonProps
     },
     onError: (err) => toast.error(err.message || 'Failed'),
   });
+
+  // Non-Solana tokens can't be whitelisted via 0xLeverage
+  if (!isSolanaToken) {
+    return (
+      <span className={`font-semibold rounded bg-secondary/50 text-muted-foreground/40 border border-border/50 cursor-default ${
+        compact ? 'text-[9px] px-2 py-0.5' : 'text-[10px] px-2.5 py-1'
+      }`}>
+        Solana only
+      </span>
+    );
+  }
 
   // Explicit disconnected guard — hooks are all above so React rules are satisfied
   if (!walletConnected || !walletAddress) {
