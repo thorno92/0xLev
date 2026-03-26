@@ -132,12 +132,14 @@ export function BottomPanel() {
         <div className="flex items-center gap-0.5 mr-2 shrink-0">
           <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
+            aria-label="Visit website"
             title="Website"
           >
             <Globe className="w-3 h-3" />
           </a>
           <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
+            aria-label="Follow on X"
             title="Twitter"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
@@ -146,6 +148,7 @@ export function BottomPanel() {
           </a>
           <a href="#" data-todo="0xLeverage-social-url" target="_blank" rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary icon-btn-hover"
+            aria-label="Join Telegram"
             title="Telegram"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
@@ -223,6 +226,13 @@ function truncateMaker(address: string): string {
 function TransactionsTable() {
   const { selectedToken } = useStore();
   const tokenAddress = selectedToken?.address ?? '';
+
+  const utils = trpc.useUtils();
+  useEffect(() => {
+    if (tokenAddress) {
+      utils.leverage.getTokenTrades.invalidate({ tokenAddress });
+    }
+  }, [tokenAddress, utils.leverage.getTokenTrades]);
 
   const { data: birdeyeTrades } = trpc.leverage.getTokenTrades.useQuery(
     { tokenAddress, limit: 20 },
