@@ -1425,32 +1425,21 @@ function MobileMarketTabs({ gainers, flashSale, topVolume, allTokens, onSelect }
         ))}
       </div>
 
-      {/* Token list */}
-      <div className="space-y-0.5">
+      {/* Token list — same detailed cards as desktop */}
+      <div className="space-y-1.5 px-1">
         {displayTokens.length === 0 ? (
           <div className="py-12 text-center text-[11px] text-muted-foreground/45">No tokens found</div>
         ) : (
           displayTokens.map(token => (
-            <button
+            <ColumnCard
               key={token.address}
+              token={token}
               onClick={() => onSelect(token)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-lg hover:bg-white/[0.02] transition-colors"
-            >
-              <TokenLogo symbol={token.symbol} size={28} />
-              <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-semibold text-foreground truncate">{token.symbol}</div>
-                <div className="text-[10px] font-data text-muted-foreground/50">{token.name}</div>
-              </div>
-              <div className="text-right shrink-0 mr-1">
-                <div className="text-[11px] font-data font-semibold text-foreground">{formatPrice(token.price)}</div>
-                <div className={`text-[10px] font-data font-medium ${
-                  token.change24h >= 0 ? 'text-success' : 'text-destructive'
-                }`}>
-                  {token.change24h >= 0 ? '+' : ''}{formatPercent(token.change24h)}
-                </div>
-              </div>
-              <WhitelistButton token={token} compact />
-            </button>
+              whitelisted={isWhitelisted(token.address)}
+              whitelistPending={false}
+              onRequestWhitelist={(e) => e.stopPropagation()}
+              onTrade={(e) => e.stopPropagation()}
+            />
           ))
         )}
       </div>
