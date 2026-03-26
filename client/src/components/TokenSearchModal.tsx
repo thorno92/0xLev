@@ -56,7 +56,7 @@ export function TokenSearchModal({ open, onOpenChange }: TokenSearchModalProps) 
 
   const handleSelect = (token: TokenInfo) => {
     setSelectedToken(token);
-    setLocation(`/${token.address}`);
+    setLocation(`/terminal/${token.address}`);
     onOpenChange(false);
   };
 

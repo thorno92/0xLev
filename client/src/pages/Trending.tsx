@@ -291,7 +291,7 @@ export default function Trending() {
                   <div
                     key={token.address}
                     className="border border-border/30 px-4 py-3.5 hover:bg-secondary/10 active:bg-secondary/20 transition-colors cursor-pointer"
-                    onClick={() => { setSelectedToken(token); navigate('/terminal'); }}
+                    onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-[10px] text-muted-foreground/40 w-4 shrink-0">{i + 1}</span>
@@ -371,7 +371,7 @@ export default function Trending() {
                           <tr
                             key={token.address}
                             className="cursor-pointer group hover:bg-secondary/15 transition-colors"
-                            onClick={() => { setSelectedToken(token); navigate('/terminal'); }}
+                            onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
                           >
                             <td className="py-2">
                               <button
@@ -538,7 +538,7 @@ export default function Trending() {
                   <div
                     key={token.address}
                     className="bg-card/40 border border-white/[0.04] rounded-lg p-3 active:bg-secondary/20 transition-colors cursor-pointer"
-                    onClick={() => { setSelectedToken(token); navigate('/terminal'); }}
+                    onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
                   >
                     <div className="flex items-center gap-3">
                       <button
