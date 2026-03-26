@@ -29,6 +29,23 @@ export function WhitelistButton({ token, compact = false }: WhitelistButtonProps
     onError: (err) => toast.error(err.message || 'Failed'),
   });
 
+  // Explicit disconnected guard — hooks are all above so React rules are satisfied
+  if (!walletConnected || !walletAddress) {
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          toast.info('Connect your wallet to request whitelist');
+        }}
+        className={`font-semibold rounded transition-all duration-100 bg-primary/8 text-primary border border-primary/20 hover:bg-primary/15 btn-hover ${
+          compact ? 'text-[9px] px-2 py-0.5' : 'text-[10px] px-2.5 py-1'
+        }`}
+      >
+        Whitelist
+      </button>
+    );
+  }
+
   // If whitelisted → show "Trade" button that navigates to terminal
   if (wlStatus?.whitelisted) {
     return (

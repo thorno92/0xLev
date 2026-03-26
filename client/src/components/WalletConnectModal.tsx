@@ -2,6 +2,7 @@
 /*  Custom Wallet Connect Modal — terminal-styled                      */
 /* ------------------------------------------------------------------ */
 
+import { useMemo } from 'react';
 import { useWallet, type Wallet } from '@solana/wallet-adapter-react';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import {
@@ -51,12 +52,14 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
   };
 
   // Deduplicate wallets by adapter name
-  const seen = new Set<string>();
-  const uniqueWallets = wallets.filter(w => {
-    if (seen.has(w.adapter.name)) return false;
-    seen.add(w.adapter.name);
-    return true;
-  });
+  const uniqueWallets = useMemo(() => {
+    const seen = new Set<string>();
+    return wallets.filter(w => {
+      if (seen.has(w.adapter.name)) return false;
+      seen.add(w.adapter.name);
+      return true;
+    });
+  }, [wallets]);
 
   // Split into detected, installable, and EVM
   const detected: Wallet[] = [];

@@ -9,7 +9,7 @@ import { PageTransition, StaggerContainer } from '@/components/PageTransition';
 import { Header } from '@/components/Header';
 import { useLivePrices } from '@/hooks/useLivePrices';
 import { formatPrice, formatPercent, formatCompact } from '@/lib/format';
-import { useStore, type Chain } from '@/lib/store';
+import { useStore, type Chain, type TokenInfo } from '@/lib/store';
 import { useLocation } from 'wouter';
 import { TokenLogo } from '@/components/TokenLogo';
 import { SkeletonTable, SkeletonCard } from '@/components/Skeleton';
@@ -75,6 +75,11 @@ export default function Trending() {
 
   const { isFavorite, toggleFavorite } = useFavorites();
 
+  const handleTokenClick = useCallback((token: TokenInfo) => {
+    setSelectedToken(token);
+    navigate(`/terminal/${token.address}`);
+  }, [setSelectedToken, navigate]);
+
   const activeFilterCount = useMemo(() => Object.values(filters).filter(v => v !== '').length, [filters]);
 
   useEffect(() => {
@@ -126,7 +131,7 @@ export default function Trending() {
       });
     });
     return m;
-  }, []);
+  }, [allTokens]);
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent, address: string) => {
     e.stopPropagation();
@@ -291,7 +296,7 @@ export default function Trending() {
                   <div
                     key={token.address}
                     className="border border-border/30 px-4 py-3.5 hover:bg-secondary/10 active:bg-secondary/20 transition-colors cursor-pointer"
-                    onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
+                    onClick={() => handleTokenClick(token)}
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-[10px] text-muted-foreground/40 w-4 shrink-0">{i + 1}</span>
@@ -371,7 +376,7 @@ export default function Trending() {
                           <tr
                             key={token.address}
                             className="cursor-pointer group hover:bg-secondary/15 transition-colors"
-                            onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
+                            onClick={() => handleTokenClick(token)}
                           >
                             <td className="py-2">
                               <button
@@ -538,7 +543,7 @@ export default function Trending() {
                   <div
                     key={token.address}
                     className="bg-card/40 border border-white/[0.04] rounded-lg p-3 active:bg-secondary/20 transition-colors cursor-pointer"
-                    onClick={() => { setSelectedToken(token); navigate(`/terminal/${token.address}`); }}
+                    onClick={() => handleTokenClick(token)}
                   >
                     <div className="flex items-center gap-3">
                       <button

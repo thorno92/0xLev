@@ -787,6 +787,7 @@ export default function Terminal() {
             className={`flex-1 min-h-0 overflow-y-auto ${mobileTab === 'trade' ? 'pb-[140px]' : 'pb-4'}`}
             style={{ touchAction: 'pan-y' }}
           >
+          {/* 140px = execute bar (~52px) + bottom nav (~72px) + safe area */}
           {/* Chart Tab — fills all available space */}
           {mobileTab === 'chart' && (
             <div className="h-full">

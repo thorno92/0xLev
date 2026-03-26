@@ -477,12 +477,10 @@ export default function Markets() {
 
     list.sort((a, b) => {
       let va = 0, vb = 0;
-      const tfA = getTimeframeChanges(a.address);
-      const tfB = getTimeframeChanges(b.address);
       switch (sortKey) {
         case 'price': va = a.price; vb = b.price; break;
-        case 'change1h': va = tfA.change1h; vb = tfB.change1h; break;
-        case 'change6h': va = tfA.change6h; vb = tfB.change6h; break;
+        case 'change1h': { const tfA = getTimeframeChanges(a.address); const tfB = getTimeframeChanges(b.address); va = tfA.change1h; vb = tfB.change1h; break; }
+        case 'change6h': { const tfA = getTimeframeChanges(a.address); const tfB = getTimeframeChanges(b.address); va = tfA.change6h; vb = tfB.change6h; break; }
         case 'change24h': va = a.change24h; vb = b.change24h; break;
         case 'volume': va = a.volume24h; vb = b.volume24h; break;
         case 'mcap': va = a.marketCap; vb = b.marketCap; break;
