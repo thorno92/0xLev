@@ -18,6 +18,7 @@ const COINGECKO_IDS: Record<string, string> = {
   SOL: 'solana',
   ETH: 'ethereum',
   BTC: 'bitcoin',
+  WBTC: 'wrapped-bitcoin',
   BNB: 'binancecoin',
   AVAX: 'avalanche-2',
   MATIC: 'matic-network',
@@ -220,9 +221,13 @@ const TRADINGVIEW_SYMBOLS: Record<string, string> = {
   ADA: 'BINANCE:ADAUSDT',
   XRP: 'BINANCE:XRPUSDT',
   TON: 'BINANCE:TONUSDT',
+  JITO: 'BYBIT:JITOUSDT',
+  VIRTUAL: 'BYBIT:VIRTUALUSDT',
+  CAKE: 'BINANCE:CAKEUSDT',
+  WBTC: 'BINANCE:WBTCUSDT',
 };
 
 export function getTradingViewSymbol(symbol: string): string {
   const upper = symbol.toUpperCase();
-  return TRADINGVIEW_SYMBOLS[upper] || `BINANCE:${upper}USDT`;
+  return TRADINGVIEW_SYMBOLS[upper] || `BYBIT:${upper}USDT`;
 }

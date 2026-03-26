@@ -33,6 +33,7 @@ const THEME_BG: Record<string, string> = {
 function TradingViewChartInner({ symbol, interval = '15' }: TradingViewChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [chartError, setChartError] = useState(false);
   const { theme, isDark } = useTheme();
 
   const loadWidget = useCallback(() => {
@@ -89,11 +90,13 @@ function TradingViewChartInner({ symbol, interval = '15' }: TradingViewChartProp
     });
 
     script.onload = () => setIsLoaded(true);
+    script.onerror = () => { setIsLoaded(true); setChartError(true); };
     widgetContainer.appendChild(script);
   }, [symbol, interval, theme, isDark]);
 
   useEffect(() => {
     setIsLoaded(false);
+    setChartError(false);
     if ('requestIdleCallback' in window) {
       const id = requestIdleCallback(() => loadWidget(), { timeout: 300 });
       return () => cancelIdleCallback(id);
@@ -113,6 +116,16 @@ function TradingViewChartInner({ symbol, interval = '15' }: TradingViewChartProp
       }
     };
   }, []);
+
+  if (chartError) {
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-card">
+        <div className="text-center">
+          <span className="text-[12px] text-muted-foreground">Chart unavailable for this token</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full relative" style={{ minHeight: 200 }}>
