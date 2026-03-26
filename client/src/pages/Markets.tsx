@@ -347,9 +347,9 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
         </div>
       </div>
 
-      {/* ---- BOTTOM: Progress bar + percentage ---- */}
-      <div className="px-2.5 pb-1.5">
-        <div className="flex items-center gap-2">
+      {/* ---- BOTTOM: Progress bar + whitelist button ---- */}
+      <div className="px-2.5 pb-2">
+        <div className="flex items-center gap-2 mb-1.5">
           <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
             <div
               className="h-full rounded-full bg-success/50 transition-all"
@@ -357,6 +357,9 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             />
           </div>
           <span className="text-[9px] text-muted-foreground/30 tabular-nums shrink-0">{score}%</span>
+        </div>
+        <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+          <WhitelistButton token={token} compact />
         </div>
       </div>
     </div>
