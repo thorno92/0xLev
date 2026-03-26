@@ -248,12 +248,17 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
               <span className="text-[10px] text-muted-foreground/40 truncate">{token.name}</span>
               {whitelisted && <span className="text-[9px] text-success/60">{'\uD83D\uDD12'}</span>}
             </div>
-            <span className={`text-[9px] tabular-nums shrink-0 font-medium px-1.5 py-[1px] rounded ${
-              age.includes('h') ? 'bg-success/[0.08] text-success/70' :
-              age === '1d' || age === '3d' || age === '5d' ? 'bg-warning/[0.08] text-warning/70' :
-              age === '1w' || age === '2w' ? 'bg-primary/[0.08] text-primary/70' :
-              'bg-white/[0.03] text-muted-foreground/35'
-            }`}>{age}</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-[9px] tabular-nums font-medium px-1.5 py-[1px] rounded ${
+                age.includes('h') ? 'bg-success/[0.08] text-success/70' :
+                age === '1d' || age === '3d' || age === '5d' ? 'bg-warning/[0.08] text-warning/70' :
+                age === '1w' || age === '2w' ? 'bg-primary/[0.08] text-primary/70' :
+                'bg-white/[0.03] text-muted-foreground/35'
+              }`}>{age}</span>
+              <div onClick={(e) => e.stopPropagation()}>
+                <WhitelistButton token={token} compact />
+              </div>
+            </div>
           </div>
 
           {/* Row 2: Social icons + chain badge + makers */}
@@ -347,9 +352,9 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
         </div>
       </div>
 
-      {/* ---- BOTTOM: Progress bar + whitelist button ---- */}
+      {/* ---- BOTTOM: Progress bar ---- */}
       <div className="px-2.5 pb-2">
-        <div className="flex items-center gap-2 mb-1.5">
+        <div className="flex items-center gap-2">
           <div className="flex-1 h-[3px] rounded-full bg-white/[0.04] overflow-hidden">
             <div
               className="h-full rounded-full bg-success/50 transition-all"
@@ -357,9 +362,6 @@ function ColumnCard({ token, onClick, whitelisted, whitelistPending, onRequestWh
             />
           </div>
           <span className="text-[9px] text-muted-foreground/45 tabular-nums shrink-0">{score}%</span>
-        </div>
-        <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-          <WhitelistButton token={token} compact />
         </div>
       </div>
     </div>
