@@ -442,8 +442,42 @@ export function Header() {
                   <WalletRow label="Open Positions" value={String(openPositions.length)} />
                 </div>
 
+                {/* Rakeback */}
+                <div className="py-1 border-t border-border/20">
+                  <div className="px-3 py-2">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] text-muted-foreground/50 uppercase tracking-wider">Rakeback</span>
+                      <span className="text-[11px] font-data font-semibold text-success">0.00 SOL</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const text = encodeURIComponent(`Trading on @xLev_io — the Solana leveraged trading terminal 🚀\n\nClaim your rakeback at xLev.io`);
+                          window.open(`https://x.com/intent/tweet?text=${text}`, '_blank', 'noopener,width=550,height=420');
+                          toast.success('Share to unlock rakeback claim');
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-semibold py-1.5 rounded bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.10] transition-colors"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        Share on X
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toast.info('Rakeback claiming coming soon');
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1 text-[10px] font-semibold py-1.5 rounded bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors disabled:opacity-40"
+                        disabled
+                      >
+                        Claim
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Actions */}
-                <div className="py-1">
+                <div className="py-1 border-t border-border/20">
                   <DropdownMenuItem
                     onClick={() => navigate('/positions')}
                     className="text-[12px] text-foreground cursor-pointer gap-2 px-3"
