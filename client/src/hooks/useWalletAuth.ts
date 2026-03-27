@@ -90,7 +90,12 @@ export function useWalletAuth() {
     storeDisconnect();
     resumedRef.current = false;
     // Prevent autoConnect from immediately reconnecting
-    try { localStorage.removeItem('walletName'); } catch { /* noop */ }
+    // Prevent autoConnect from immediately reconnecting
+    try {
+      localStorage.removeItem('walletName');
+      localStorage.removeItem('walletAdapter');
+      localStorage.removeItem('wallet-adapter-wallet');
+    } catch { /* noop */ }
   }, [publicKey, adapterDisconnect, storeDisconnect, disconnectMutation]);
 
   const isSessionLoading = resumeQuery.isLoading;

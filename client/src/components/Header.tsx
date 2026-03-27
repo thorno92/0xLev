@@ -136,8 +136,11 @@ export function Header() {
   const hasTriggeredAuth = useRef(false);
   // Track if user explicitly initiated connect (vs auto-connect on page load)
   const userInitiated = useRef(false);
+  // Track intentional disconnect to prevent auto-reconnect loop
+  const justDisconnected = useRef(false);
 
   useEffect(() => {
+    if (justDisconnected.current) return;
     // Only block on session loading for auto-connect, not user-initiated
     if (isSessionLoading && !userInitiated.current) return;
     if (sessionRestored || walletConnected) return;
@@ -442,8 +445,10 @@ export function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
+                      justDisconnected.current = true;
                       walletAuthDisconnect();
                       toast.info('Wallet disconnected');
+                      setTimeout(() => { justDisconnected.current = false; }, 2000);
                     }}
                     className="text-[12px] text-destructive cursor-pointer gap-2 px-3"
                   >
