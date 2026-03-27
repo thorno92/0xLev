@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { trpc } from "@/lib/trpc";
+import { useStore } from "@/lib/store";
 
 const RPC_URL =
   import.meta.env.VITE_SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
@@ -50,12 +51,17 @@ interface DASResult {
 
 export function useWalletHoldings() {
   const { publicKey, connected } = useWallet();
+  const storeAddress = useStore((s) => s.walletAddress);
+  const storeConnected = useStore((s) => s.walletConnected);
+  // Use the AUTHENTICATED address from store, not the adapter's live publicKey
+  // This prevents showing data from wallets the user cycles to in Phantom
+  const effectiveAddress = storeConnected ? storeAddress : null;
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useUtils();
 
   useEffect(() => {
-    if (!publicKey || !connected) {
+    if (!effectiveAddress || !storeConnected) {
       setHoldings([]);
       return;
     }
@@ -73,7 +79,7 @@ export function useWalletHoldings() {
             id: "wallet-holdings",
             method: "getAssetsByOwner",
             params: {
-              ownerAddress: publicKey!.toBase58(),
+              ownerAddress: effectiveAddress!,
               displayOptions: {
                 showFungible: true,
                 showNativeBalance: true,
@@ -175,7 +181,7 @@ export function useWalletHoldings() {
       cancelled = true;
       clearInterval(id);
     };
-  }, [publicKey?.toBase58(), connected]);
+  }, [effectiveAddress, storeConnected]);
 
   const totalValue = useMemo(
     () => holdings.reduce((s, h) => s + h.value, 0),
