@@ -203,6 +203,8 @@ export function Header() {
       setDepositAmount('');
       setDepositOpen(false);
       utils.leverage.getSolBalance.invalidate();
+      // Also refetch after 3s to catch upstream propagation delay
+      setTimeout(() => { utils.leverage.getSolBalance.invalidate(); }, 3000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Deposit failed';
       toast.error(msg);
