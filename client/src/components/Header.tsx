@@ -32,7 +32,7 @@ import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 import { useWalletHoldings } from '@/hooks/useWalletHoldings';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { TrendingBar } from './TrendingBar';
+
 import { TokenSearchModal } from './TokenSearchModal';
 import { useTheme, type ThemeName } from '@/contexts/ThemeContext';
 import {
@@ -263,10 +263,6 @@ export function Header() {
         {/* Divider -- desktop only */}
         <div className="hidden md:block w-px h-4 bg-border mr-2 shrink-0" />
 
-        {/* Trending carousel -- tablet+ */}
-        <div className="hidden md:block flex-1 overflow-hidden">
-          <TrendingBar />
-        </div>
 
         {/* Spacer for mobile */}
         <div className="flex-1 md:hidden" />
