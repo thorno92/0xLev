@@ -70,7 +70,7 @@ const themeOptions: { name: ThemeName; label: string; color: string; desc: strin
 ];
 
 export function Header() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { theme, setTheme } = useTheme();
   const {
     walletConnected,
@@ -439,7 +439,10 @@ export function Header() {
 
                 {/* Actions */}
                 <div className="py-1">
-                  <DropdownMenuItem className="text-[12px] text-foreground cursor-pointer gap-2 px-3">
+                  <DropdownMenuItem
+                    onClick={() => navigate('/positions')}
+                    className="text-[12px] text-foreground cursor-pointer gap-2 px-3"
+                  >
                     <ClockSolid className="w-3.5 h-3.5 text-muted-foreground" />
                     Order History
                   </DropdownMenuItem>
