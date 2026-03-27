@@ -253,16 +253,12 @@ export function Header() {
         {/* Dedicated Search Bar -- always visible on desktop */}
         <button
           onClick={() => setSearchOpen(true)}
-          className="hidden md:flex items-center gap-2 h-8 px-4 bg-secondary/50 border border-border/60 rounded-md text-[12px] text-muted-foreground/50 hover:text-muted-foreground hover:border-primary/30 hover:bg-secondary/60 transition-all mr-2 flex-1 max-w-[400px]"
+          className="hidden md:flex items-center gap-2 h-8 px-4 bg-secondary/50 border border-border/60 rounded-md text-[12px] text-muted-foreground/50 hover:text-muted-foreground hover:border-primary/30 hover:bg-secondary/60 transition-all mr-2 flex-1"
         >
           <Search className="w-4 h-4 shrink-0" />
           <span className="flex-1 text-left">Search tokens...</span>
           <kbd className="text-[9px] bg-secondary/80 px-1.5 py-0.5 rounded font-data shrink-0">&#8984;K</kbd>
         </button>
-
-        {/* Divider -- desktop only */}
-        <div className="hidden md:block w-px h-4 bg-border mr-2 shrink-0" />
-
 
         {/* Spacer for mobile */}
         <div className="flex-1 md:hidden" />
