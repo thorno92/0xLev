@@ -256,8 +256,8 @@ export default function Positions() {
 
                 {/* Desktop table */}
                 <div className="hidden md:block border border-border overflow-hidden">
-                  <div className="grid grid-cols-[2fr_80px_1fr_80px_1fr_1fr_1fr_1fr_80px_50px] gap-2 px-4 py-3 border-b border-border">
-                    {['ASSET', 'SIDE', 'SIZE', 'LEV', 'ENTRY', 'MARK', 'LIQ', 'P&L', 'CHART', ''].map(h => (
+                  <div className="grid grid-cols-[2fr_80px_1fr_80px_1fr_1fr_1fr_1fr_80px_80px] gap-2 px-4 py-3 border-b border-border">
+                    {['ASSET', 'SIDE', 'SIZE', 'LEV', 'ENTRY', 'MARK', 'LIQ', 'P&L', 'CHART', 'ACTION'].map(h => (
                       <div key={h} className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-foreground">{h}</div>
                     ))}
                   </div>
@@ -271,7 +271,7 @@ export default function Positions() {
                     return (
                       <div
                         key={pos.trade_id}
-                        className="grid grid-cols-[2fr_80px_1fr_80px_1fr_1fr_1fr_1fr_80px_50px] gap-2 px-4 py-3 border-b border-border/30 hover:bg-secondary/20 transition-colors items-center"
+                        className="grid grid-cols-[2fr_80px_1fr_80px_1fr_1fr_1fr_1fr_80px_80px] gap-2 px-4 py-3 border-b border-border/30 hover:bg-secondary/20 transition-colors items-center"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="relative">
@@ -324,18 +324,13 @@ export default function Positions() {
                             color={isProfit ? 'var(--success)' : 'var(--destructive)'}
                           />
                         </div>
-                        <div className="flex justify-center">
+                        <div className="flex justify-end">
                           <button
                             onClick={() => handleClosePosition(pos.trade_id, pos.symbol)}
                             disabled={isClosing === pos.trade_id}
-                            className="text-muted-foreground hover:text-destructive transition-colors p-1.5 disabled:opacity-50"
-                            title="Close Position"
+                            className="font-mono text-[10px] tracking-[0.05em] uppercase px-3 py-1.5 border border-destructive/30 text-destructive hover:bg-destructive hover:text-white transition-all disabled:opacity-50 whitespace-nowrap"
                           >
-                            {isClosing === pos.trade_id ? (
-                              <span className="w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin inline-block" />
-                            ) : (
-                              <Xmark className="w-3.5 h-3.5" />
-                            )}
+                            {isClosing === pos.trade_id ? 'CLOSING...' : 'CLOSE'}
                           </button>
                         </div>
                       </div>
