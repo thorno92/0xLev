@@ -14,6 +14,7 @@ import { Header } from '@/components/Header';
 import { WalletConnectModal } from '@/components/WalletConnectModal';
 import { toast } from 'sonner';
 import { useWalletHoldings } from '@/hooks/useWalletHoldings';
+import { useTradeWalletBalance } from '@/hooks/useTradeWalletBalance';
 
 /* ------------------------------------------------------------------ */
 /*  CONNECT WALLET STATE                                               */
@@ -145,11 +146,13 @@ function StatCell({ label, value, valueColor }: { label: string; value: string; 
 /*  MAIN PORTFOLIO                                                     */
 /* ------------------------------------------------------------------ */
 export default function Portfolio() {
-  const { walletConnected, walletAddress, openPositions } = useStore();
+  const { walletConnected, walletAddress, openPositions, walletBalance } = useStore();
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('assets');
   const [timePeriod, setTimePeriod] = useState<'1D' | '7D' | '1M' | '1Y' | 'ALL'>('7D');
+  const [valueDisplay, setValueDisplay] = useState<'usd' | 'sol'>('usd');
 
+  useTradeWalletBalance();
   const positions = openPositions;
 
   // Real on-chain holdings via Solana RPC
@@ -159,16 +162,13 @@ export default function Portfolio() {
     const totalValue = holdingsTotalValue;
     const totalPnl = realHoldings.reduce((s, h) => s + h.value * (h.change / 100), 0);
     const totalPnlPct = totalValue > 0 ? (totalPnl / (totalValue - totalPnl)) * 100 : 0;
-    const minPrice = totalValue * 0.94;
-    const maxPrice = totalValue * 1.03;
-
     const withAllocation = realHoldings.map(h => ({
       ...h,
       ticker: h.ticker,
       allocation: totalValue > 0 ? (h.value / totalValue) * 100 : 0,
     }));
 
-    return { totalValue, totalPnl, totalPnlPct, minPrice, maxPrice, holdings: withAllocation };
+    return { totalValue, totalPnl, totalPnlPct, holdings: withAllocation };
   }, [realHoldings, holdingsTotalValue]);
 
   const handleConnect = useCallback(() => {
@@ -200,11 +200,19 @@ export default function Portfolio() {
   const pnlPositive = portfolioData.totalPnl >= 0;
   const equityData = useMemo(() => generateSparklineData(`equity-${timePeriod}`, 80), [timePeriod]);
 
-  // Format the balance with decimal separation like the reference (large integer, smaller decimals)
-  const balanceStr = formatNumber(portfolioData.totalValue, 3);
+  const solPrice = useMemo(() => {
+    const sol = realHoldings.find(h => h.symbol === 'SOL');
+    return sol?.price ?? 0;
+  }, [realHoldings]);
+
+  const displayValue = valueDisplay === 'usd'
+    ? portfolioData.totalValue
+    : solPrice > 0 ? portfolioData.totalValue / solPrice : 0;
+
+  const balanceStr = formatNumber(displayValue, valueDisplay === 'usd' ? 3 : 4);
   const dotIdx = balanceStr.indexOf('.');
   const balanceInt = dotIdx >= 0 ? balanceStr.slice(0, dotIdx) : balanceStr;
-  const balanceDec = dotIdx >= 0 ? balanceStr.slice(dotIdx) : '.000';
+  const balanceDec = dotIdx >= 0 ? balanceStr.slice(dotIdx) : valueDisplay === 'usd' ? '.000' : '.0000';
 
   return (
     <div className="h-screen-safe w-full flex flex-col overflow-hidden bg-background">
@@ -246,19 +254,32 @@ export default function Portfolio() {
                 <div className="shrink-0 pr-0 sm:pr-10 w-full sm:w-auto">
                   <div className="flex items-baseline mb-3">
                     <span className="text-[36px] sm:text-[52px] font-bold text-foreground tracking-tight leading-none tabular-nums">
-                      ${balanceInt}
+                      {valueDisplay === 'usd' ? '$' : ''}{balanceInt}
                     </span>
                     <span className="text-[36px] sm:text-[52px] font-bold text-foreground/30 tracking-tight leading-none tabular-nums">
                       {balanceDec}
                     </span>
-                    <div className="ml-3 flex items-center gap-2 self-center">
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/50 border border-border/40">
-                        <TokenLogo symbol="SOL" size={16} />
-                        <span className="text-[12px] font-medium text-foreground/80">USDC</span>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted-foreground/40">
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </div>
+                    <div className="ml-3 flex items-center gap-1 self-center">
+                      <button
+                        onClick={() => setValueDisplay('usd')}
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded transition-all ${
+                          valueDisplay === 'usd'
+                            ? 'bg-primary/15 text-primary border border-primary/25'
+                            : 'text-muted-foreground/50 hover:text-muted-foreground'
+                        }`}
+                      >
+                        USD
+                      </button>
+                      <button
+                        onClick={() => setValueDisplay('sol')}
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded transition-all ${
+                          valueDisplay === 'sol'
+                            ? 'bg-primary/15 text-primary border border-primary/25'
+                            : 'text-muted-foreground/50 hover:text-muted-foreground'
+                        }`}
+                      >
+                        SOL
+                      </button>
                     </div>
                   </div>
 
@@ -279,15 +300,15 @@ export default function Portfolio() {
                       </div>
                     </div>
                     <div className="px-4 sm:px-6 border-r border-border/20">
-                      <div className="text-[11px] text-muted-foreground/40 mb-1">Min. Price:</div>
+                      <div className="text-[11px] text-muted-foreground/40 mb-1">Funded Wallet:</div>
                       <div className="text-[13px] font-medium tabular-nums text-foreground">
-                        {formatPrice(portfolioData.minPrice)} USDC
+                        {formatNumber(walletBalance ?? 0, 4)} SOL
                       </div>
                     </div>
                     <div className="pl-4 sm:pl-6">
-                      <div className="text-[11px] text-muted-foreground/40 mb-1">Max. Price:</div>
+                      <div className="text-[11px] text-muted-foreground/40 mb-1">Open Positions:</div>
                       <div className="text-[13px] font-medium tabular-nums text-foreground">
-                        {formatPrice(portfolioData.maxPrice)} USDC
+                        {openPositions.length}
                       </div>
                     </div>
                   </div>
