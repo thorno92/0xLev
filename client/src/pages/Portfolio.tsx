@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import { PageTransition, FadeIn } from '@/components/PageTransition';
 import { TokenLogo } from '@/components/TokenLogo';
 import { MiniSparkline, generateSparklineData } from '@/components/MiniSparkline';
@@ -146,6 +147,7 @@ function StatCell({ label, value, valueColor }: { label: string; value: string; 
 /*  MAIN PORTFOLIO                                                     */
 /* ------------------------------------------------------------------ */
 export default function Portfolio() {
+  const [, navigate] = useLocation();
   const { walletConnected, walletAddress, openPositions, walletBalance } = useStore();
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('assets');
@@ -198,7 +200,27 @@ export default function Portfolio() {
 
   const periods = ['1D', '7D', '1M', '1Y', 'ALL'] as const;
   const pnlPositive = portfolioData.totalPnl >= 0;
-  const equityData = useMemo(() => generateSparklineData(`equity-${timePeriod}`, 80), [timePeriod]);
+  // Derive sparkline from actual holdings — simulate equity curve from 24h changes
+  const equityData = useMemo(() => {
+    if (portfolioData.holdings.length === 0 || portfolioData.totalValue === 0) {
+      return generateSparklineData(`equity-${timePeriod}`, 80);
+    }
+    // Weighted average 24h change across all holdings
+    const weightedChange = portfolioData.holdings.reduce(
+      (sum, h) => sum + (h.change / 100) * (h.allocation / 100), 0
+    );
+    const points = 80;
+    const data: number[] = [];
+    const startValue = portfolioData.totalValue / (1 + weightedChange);
+    for (let i = 0; i < points; i++) {
+      const progress = i / (points - 1);
+      // Simulate gradual change with slight noise from holdings count
+      const noise = Math.sin(i * 0.3 + portfolioData.holdings.length) * startValue * 0.003;
+      const value = startValue + (portfolioData.totalValue - startValue) * progress + noise;
+      data.push(Math.max(0, value));
+    }
+    return data;
+  }, [portfolioData, timePeriod]);
 
   const solPrice = useMemo(() => {
     const sol = realHoldings.find(h => h.symbol === 'SOL');
@@ -440,6 +462,7 @@ export default function Portfolio() {
                       <React.Fragment key={h.symbol}>
                         {/* Desktop row */}
                         <div
+                          onClick={() => navigate(`/terminal/${h.mint}`)}
                           className="hidden sm:grid grid-cols-[minmax(140px,1.5fr)_90px_90px_100px_120px_130px_40px] items-center gap-3 px-3 py-3.5 border-b border-border/6 hover:bg-secondary/15 transition-colors cursor-pointer group"
                         >
                           <div className="flex items-center gap-3 min-w-0">
@@ -481,6 +504,7 @@ export default function Portfolio() {
 
                         {/* Mobile card */}
                         <div
+                          onClick={() => navigate(`/terminal/${h.mint}`)}
                           className="sm:hidden flex items-center gap-3 px-3 py-3.5 border-b border-border/6 active:bg-secondary/15 transition-colors cursor-pointer"
                         >
                           <TokenLogo symbol={h.symbol} size={36} logoUrl={h.logoUrl} />
